@@ -393,3 +393,52 @@ footer>*{position:relative;z-index:1}
 @keyframes motorloz-aurora-sweep{0%{transform:translate3d(7%,3%,0) rotate(3deg) scale(1.02)}48%{transform:translate3d(-3%,-2%,0) rotate(-2deg) scale(1.07)}100%{transform:translate3d(-8%,1%,0) rotate(-4deg) scale(1.03)}}
 @media(max-width:760px){main>.section.workshop:before,main>.section.people:before,main>.section.films-section:before,main>.section.appointment:before{inset:-18% -55%;opacity:.92}main>.section.workshop:after,main>.section.people:after,main>.section.films-section:after,main>.section.appointment:after{inset:-24% -60%;opacity:.84}}
 @media(prefers-reduced-motion:reduce){main>.section.workshop:before,main>.section.people:before,main>.section.films-section:before,main>.section.appointment:before,main>.section.workshop:after,main>.section.people:after,main>.section.films-section:after,main>.section.appointment:after,footer:before,footer:after{animation:none!important;will-change:auto!important}}
+/* Ajustes finales de responsive y aurora para fondos oscuros. */
+@media (max-width:760px) {
+  html { scroll-padding-top:calc(88px + env(safe-area-inset-top,0px)); }
+  .hero { height:100svh!important; min-height:790px!important; max-height:none!important; }
+  .hero-copy { padding-top:clamp(260px,34svh,292px)!important; padding-bottom:calc(112px + env(safe-area-inset-bottom,0px))!important; }
+  .hero-bottom { bottom:calc(13px + env(safe-area-inset-bottom,0px))!important; }
+  .films-grid { grid-template-columns:minmax(0,1fr)!important; justify-items:center!important; max-width:100%!important; }
+  .film-card { width:min(100%,360px)!important; margin-inline:auto!important; aspect-ratio:9/16!important; }
+  .gallery .slide-stage,.people .slide-stage { aspect-ratio:4/3!important; }
+  .arrival-photos { grid-template-columns:minmax(0,1fr)!important; gap:14px!important; }
+  .arrival-photos figure:first-child,.arrival-photos figure:nth-child(2) { grid-column:1/-1!important; }
+  .arrival-photos figure img,.arrival-photos figure:nth-child(2) img { width:100%; height:auto!important; aspect-ratio:4/3; object-fit:cover; }
+  .floating-booking { display:none!important; }
+}
+/* Aurora azul/celeste en planos oscuros exclusivamente. */
+main>.section.workshop,main>.section.people,main>.section.films-section,main>.section.appointment,footer {
+  isolation:isolate;
+  overflow:hidden;
+}
+main>.section.workshop:before,main>.section.people:before,main>.section.films-section:before,main>.section.appointment:before,footer:before {
+  will-change:transform;
+  pointer-events:none;
+}
+main>.section.workshop:after,main>.section.people:after,main>.section.films-section:after,main>.section.appointment:after,footer:after {
+  will-change:transform;
+  pointer-events:none;
+}
+@media(prefers-reduced-motion:reduce) {
+  main>.section.workshop:before,main>.section.people:before,main>.section.films-section:before,main>.section.appointment:before,main>.section.workshop:after,main>.section.people:after,main>.section.films-section:after,main>.section.appointment:after,footer:before,footer:after { animation:none!important; will-change:auto!important; }
+}
+
+/* Hace visible la aurora animada solo sobre secciones de fondo oscuro. */
+main>.section:not(.hero).workshop,main>.section:not(.hero).people,main>.section:not(.hero).films-section,main>.section:not(.hero).appointment {
+  position:relative;isolation:isolate;overflow:hidden;
+}
+main>.section:not(.hero).workshop:before,main>.section:not(.hero).people:before,main>.section:not(.hero).films-section:before,main>.section:not(.hero).appointment:before {
+  content:''!important;display:block!important;position:absolute!important;z-index:0!important;inset:-20% -25%!important;pointer-events:none!important;
+  background:radial-gradient(ellipse at 20% 68%,#087d9a52 0,transparent 43%),radial-gradient(ellipse at 77% 30%,#39c3d53b 0,transparent 42%),linear-gradient(118deg,transparent 22%,#1a809020 43%,transparent 61%,#43c6d017 82%,transparent 96%)!important;
+  opacity:.9!important;mix-blend-mode:screen;animation:motorloz-aurora-flow 31s cubic-bezier(.45,.05,.55,.95) infinite alternate!important;will-change:transform;
+}
+main>.section:not(.hero).workshop:after,main>.section:not(.hero).people:after,main>.section:not(.hero).films-section:after,main>.section:not(.hero).appointment:after {
+  content:''!important;display:block!important;position:absolute!important;z-index:0!important;inset:-30% -30%!important;pointer-events:none!important;
+  background:linear-gradient(124deg,transparent 21%,#42c6d017 35%,#1188a933 47%,transparent 62%,#47cfde1f 76%,transparent 89%),radial-gradient(ellipse at 58% 46%,#16799324 0,transparent 58%)!important;
+  opacity:.78!important;mix-blend-mode:screen;animation:motorloz-aurora-sweep 39s cubic-bezier(.45,.05,.55,.95) infinite alternate-reverse!important;will-change:transform;
+}
+@media(prefers-reduced-motion:reduce){main>.section:not(.hero).workshop:before,main>.section:not(.hero).people:before,main>.section:not(.hero).films-section:before,main>.section:not(.hero).appointment:before,main>.section:not(.hero).workshop:after,main>.section:not(.hero).people:after,main>.section:not(.hero).films-section:after,main>.section:not(.hero).appointment:after,footer:before,footer:after{animation:none!important;will-change:auto!important}}
+
+/* Evita que el contenido de acordeones cerrados invada los servicios siguientes. */
+.service-list details:not([open])>.service-body{display:none!important}
