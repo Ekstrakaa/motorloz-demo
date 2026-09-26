@@ -442,3 +442,184 @@ main>.section:not(.hero).workshop:after,main>.section:not(.hero).people:after,ma
 
 /* Evita que el contenido de acordeones cerrados invada los servicios siguientes. */
 .service-list details:not([open])>.service-body{display:none!important}
+
+/* Aurora orgánica más visible: movimiento continuo y brillante en fondos oscuros. */
+@keyframes motorloz-aurora-live-a {
+  0% { transform:translate3d(-12%,5%,0) rotate(-6deg) scale(.96); }
+  48% { transform:translate3d(5%,-7%,0) rotate(2deg) scale(1.08); }
+  100% { transform:translate3d(13%,4%,0) rotate(7deg) scale(1.13); }
+}
+@keyframes motorloz-aurora-live-b {
+  0% { transform:translate3d(12%,-5%,0) rotate(6deg) scale(1.12); }
+  53% { transform:translate3d(-5%,7%,0) rotate(-2deg) scale(1.02); }
+  100% { transform:translate3d(-14%,-4%,0) rotate(-7deg) scale(1.16); }
+}
+main>.section:not(.hero).workshop:before,main>.section:not(.hero).people:before,main>.section:not(.hero).films-section:before,main>.section:not(.hero).appointment:before {
+  background:radial-gradient(ellipse at 22% 62%,#00a9c788 0,transparent 43%),radial-gradient(ellipse at 79% 28%,#50d7e477 0,transparent 44%),linear-gradient(118deg,transparent 18%,#168cae2e 42%,transparent 61%,#37cada24 80%,transparent 96%)!important;
+  opacity:1!important;animation:motorloz-aurora-live-a 9s cubic-bezier(.45,.05,.55,.95) infinite alternate!important;
+}
+main>.section:not(.hero).workshop:after,main>.section:not(.hero).people:after,main>.section:not(.hero).films-section:after,main>.section:not(.hero).appointment:after {
+  background:radial-gradient(ellipse at 60% 45%,#1689ad55 0,transparent 57%),linear-gradient(123deg,transparent 19%,#42d2df2d 35%,#168fb440 48%,transparent 63%,#55dce32b 79%,transparent 91%)!important;
+  opacity:.92!important;animation:motorloz-aurora-live-b 12s cubic-bezier(.45,.05,.55,.95) infinite alternate-reverse!important;
+}
+footer:before { animation:motorloz-aurora-live-a 9s cubic-bezier(.45,.05,.55,.95) infinite alternate!important; }
+footer:after { animation:motorloz-aurora-live-b 12s cubic-bezier(.45,.05,.55,.95) infinite alternate-reverse!important; }
+
+/* Aurora localizada: conserva el fondo oscuro y desplaza focos de luz cian. */
+@keyframes motorloz-aurora-focus-a {
+  0% { transform:translate3d(-10%,2%,0) rotate(-4deg) scale(.98); }
+  50% { transform:translate3d(1%,-5%,0) rotate(1deg) scale(1.04); }
+  100% { transform:translate3d(10%,4%,0) rotate(5deg) scale(1.08); }
+}
+@keyframes motorloz-aurora-focus-b {
+  0% { transform:translate3d(10%,-3%,0) rotate(4deg) scale(1.04); }
+  50% { transform:translate3d(-1%,5%,0) rotate(-1deg) scale(1.1); }
+  100% { transform:translate3d(-10%,-4%,0) rotate(-5deg) scale(1.02); }
+}
+main>.section:not(.hero).workshop:before,main>.section:not(.hero).people:before,main>.section:not(.hero).films-section:before,main>.section:not(.hero).appointment:before {
+  inset:0!important;
+  background:radial-gradient(ellipse 37% 25% at 18% 62%,#058ca59c 0,transparent 100%),radial-gradient(ellipse 30% 20% at 82% 22%,#3ec2d87d 0,transparent 100%),linear-gradient(118deg,transparent 26%,#168cae20 44%,transparent 62%,#37cada18 82%,transparent 97%)!important;
+  opacity:.66!important;animation:motorloz-aurora-focus-a 8s cubic-bezier(.45,.05,.55,.95) infinite alternate!important;
+}
+main>.section:not(.hero).workshop:after,main>.section:not(.hero).people:after,main>.section:not(.hero).films-section:after,main>.section:not(.hero).appointment:after {
+  inset:0!important;
+  background:radial-gradient(ellipse 34% 24% at 74% 76%,#087a9a85 0,transparent 100%),linear-gradient(125deg,transparent 20%,#42c6d01c 38%,#1188a925 49%,transparent 65%,#47cfde20 80%,transparent 92%)!important;
+  opacity:.48!important;animation:motorloz-aurora-focus-b 11s cubic-bezier(.45,.05,.55,.95) infinite alternate-reverse!important;
+}
+footer:before { opacity:.66!important;animation:motorloz-aurora-focus-a 8s cubic-bezier(.45,.05,.55,.95) infinite alternate!important; }
+footer:after { opacity:.44!important;animation:motorloz-aurora-focus-b 11s cubic-bezier(.45,.05,.55,.95) infinite alternate-reverse!important; }
+
+
+/* Experiencia de consulta, galería de ubicación y ritmo de scroll. */
+.arrival-photos{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:20px!important;align-content:start}
+.arrival-slide-figure{min-width:0;width:100%;padding:0!important;margin:0!important}
+.arrival-story{width:100%}
+.arrival-story .slide-stage{aspect-ratio:16/10!important;background:#e4e9e8}
+.arrival-story .slide-frame img{width:100%!important;height:100%!important;left:0!important;top:0!important;transform:none!important;object-fit:cover!important;object-position:center!important}
+.arrival-story .slide-toolbar{color:#21383e;border-color:#b9c9cd;align-items:center;flex-wrap:nowrap;padding:12px 0 8px}
+.arrival-story .slide-toolbar>div:first-child{min-width:0;flex:1}
+.arrival-story .slide-number,.arrival-story .slide-caption{color:#38545c}
+.arrival-story .slide-caption{font-size:12px}
+.arrival-story .slide-buttons button{color:#24404a;border-color:#48636a55;min-width:40px;min-height:40px}
+.arrival-photos figure>figcaption{margin-top:8px;background:transparent;color:#60747a;padding:0;font:10px 'Courier New',monospace;letter-spacing:1.3px}
+.arrival-directions{grid-column:1!important}
+.contact-open{margin-top:30px;max-width:100%;min-height:54px;gap:28px;border-color:#6c99a2!important;color:#dcecef!important}
+.contact-open:hover{background:#4eb5c216!important}
+.contact-open b{font-size:20px;font-weight:400}
+.contact-dialog{position:fixed;inset:0;margin:auto;width:min(560px,calc(100% - 36px));max-width:none;max-height:min(84svh,700px);overflow:auto;padding:clamp(30px,6vw,56px);border:1px solid #5c7d86;background:linear-gradient(145deg,#12232a,#0b151a 70%);color:#eef5f6;box-shadow:0 28px 100px #0009}
+.contact-dialog::backdrop{background:#03090cc9;backdrop-filter:blur(7px)}
+.contact-dialog .dialog-close{position:absolute;top:12px;right:14px;width:42px;height:42px;border:1px solid #577078;background:transparent;color:#e9f2f4;font-size:28px;line-height:1}
+.contact-dialog .eyebrow{color:#6dc9d7;margin-bottom:22px;font-size:10px;letter-spacing:2px}
+.contact-dialog h2{font-size:clamp(2.4rem,7vw,3.7rem);line-height:1.03;margin-bottom:20px}
+.contact-dialog h2 em{font-style:normal;color:#5bc0ce}
+.contact-dialog>p:not(.eyebrow){color:#b9cbd0;line-height:1.65}
+.contact-dialog-links{display:grid;margin-top:28px;border-top:1px solid #46616b}
+.contact-dialog-links a{display:flex;justify-content:space-between;align-items:center;gap:18px;padding:17px 0;border-bottom:1px solid #344b54}
+.contact-dialog-links a span{color:#8fa9b0;font-size:12px}
+.contact-dialog-links a strong{font-size:14px;font-weight:500;text-align:right;overflow-wrap:anywhere}
+.films-grid{grid-template-columns:repeat(2,minmax(0,320px))!important;justify-content:center!important;gap:24px!important;max-width:680px!important;margin-inline:auto!important}
+.film-card{width:100%!important;min-width:0!important;min-height:0!important;aspect-ratio:1/1!important;margin:0!important}
+.film-card video,.film-card>img{width:100%;height:100%;object-fit:cover;object-position:center 55%}
+.film-caption{left:18px!important;right:14px!important;bottom:17px!important;gap:8px!important}
+.film-caption small{font-size:9px!important;letter-spacing:1.1px!important}
+.film-caption strong{font-size:clamp(17px,2.2vw,24px)!important;line-height:1.08}
+.film-caption a{font-size:10px!important;line-height:1.4}
+.scroll-reveal{opacity:0;transform:translate3d(0,24px,0);clip-path:none!important;transition:opacity .7s cubic-bezier(.2,.75,.25,1) var(--reveal-delay,0ms),transform .7s cubic-bezier(.2,.75,.25,1) var(--reveal-delay,0ms);will-change:opacity,transform}
+.scroll-reveal.is-in{opacity:1;transform:none}
+.floating-booking{z-index:20;bottom:calc(22px + env(safe-area-inset-bottom,0px));right:22px;gap:12px;padding:8px 10px 8px 16px;border:1px solid #4e858e;border-radius:999px;background:#0e252b;color:#f2fbfc;box-shadow:0 8px 28px #00131970;font-size:11px;letter-spacing:.5px}
+.floating-booking svg{width:24px;height:24px;fill:none;stroke:#53d18a;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.floating-booking svg path+path{fill:#53d18a;stroke:none}
+.floating-booking b{width:30px;height:30px;border-radius:50%;background:#204650;color:#e9fbfd;font-size:17px}
+.floating-booking:hover{background:#153941;color:#fff}
+@media(max-width:760px){
+ .arrival-grid{grid-template-columns:1fr!important;gap:22px!important}
+ .arrival-grid .map-panel{height:330px!important;min-height:0!important}
+ .arrival-photos{gap:14px!important}
+ .arrival-story .slide-stage{aspect-ratio:4/3!important}
+ .arrival-story .slide-toolbar{gap:7px!important;padding-top:10px!important}
+ .arrival-story .slide-toolbar>div:first-child{gap:8px!important}
+ .arrival-story .slide-caption{font-size:11px!important}
+ .arrival-story .slide-buttons{gap:0!important}
+ .arrival-story .slide-buttons button{min-width:35px!important;min-height:36px!important;font-size:15px!important}
+ .appointment-grid{gap:30px!important}
+ .contact-dialog{width:calc(100% - 28px);padding:42px 24px 26px}
+ .contact-dialog-links a{align-items:flex-start;flex-direction:column;gap:5px}
+ .contact-dialog-links a strong{text-align:left}
+ .films-section{padding-top:65px!important;padding-bottom:65px!important}
+ .films-heading{margin-bottom:26px!important}
+ .films-heading p{margin-top:14px!important}
+ .films-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:16px!important;max-width:620px!important}
+ .film-card{aspect-ratio:1/1!important;min-height:0!important}
+ .film-caption{left:12px!important;right:10px!important;bottom:12px!important;gap:6px!important}
+ .film-caption small{font-size:8px!important}
+ .film-caption strong{font-size:clamp(14px,4.5vw,19px)!important}
+ .film-caption a{font-size:9px!important}
+ .floating-booking{display:flex!important;bottom:calc(14px + env(safe-area-inset-bottom,0px))!important;right:14px!important;gap:8px!important;padding:6px 7px 6px 12px!important;font-size:10px!important}
+ .floating-booking svg{width:22px;height:22px}
+ .floating-booking b{width:28px;height:28px}
+}
+@media(max-width:380px){.films-grid{gap:10px!important}.film-caption{left:9px!important;right:8px!important}.film-caption a{font-size:8px!important}}
+@media(prefers-reduced-motion:reduce){.scroll-reveal{opacity:1;transform:none;transition:none;will-change:auto}.contact-dialog::backdrop{backdrop-filter:none}}
+/* Mejor jerarquía y lectura para los tres principios de trabajo. */
+.precision-rail b{font-size:15px!important;line-height:1.35}
+.precision-rail small{font-size:12px!important;line-height:1.5}
+.precision-icon{flex-basis:40px;width:40px;height:40px}
+.precision-icon svg{width:20px;height:20px}
+@media(max-width:760px){
+ .precision-rail{margin-top:48px!important}
+ .precision-rail article,.precision-rail article+article{gap:16px!important;padding:20px 0!important}
+ .precision-icon{flex-basis:48px;width:48px;height:48px}
+ .precision-icon svg{width:23px;height:23px}
+ .precision-rail b{font-size:16px!important}
+ .precision-rail small{font-size:14px!important}
+}
+/* Videos verticales en paralelo: imagen limpia y rótulo debajo. */
+.films-grid{grid-template-columns:repeat(2,minmax(0,340px))!important;gap:28px!important;max-width:708px!important}
+.film-card{display:flex!important;flex-direction:column!important;aspect-ratio:auto!important;min-height:0!important;overflow:hidden!important;border:0!important;background:transparent!important}
+.film-card:after{display:none!important}
+.film-card video,.film-card>img{position:relative!important;inset:auto!important;display:block;width:100%!important;height:auto!important;aspect-ratio:9/16!important;object-fit:cover!important;object-position:center!important;background:#0a1216;border:1px solid #36515a}
+.film-caption{position:static!important;display:grid!important;gap:6px!important;padding:12px 2px 0!important;color:#f0f4f4}
+.film-caption small{font-size:10px!important;letter-spacing:1.2px!important;color:#8dcbd4}
+.film-caption small:after{content:none!important;display:none!important}
+.film-caption strong{font-size:19px!important;line-height:1.15!important;font-weight:500!important}
+.film-caption a{display:inline-block!important;width:max-content;max-width:100%;font-size:11px!important;color:#b9dce1!important;text-underline-offset:4px}
+.film-caption a:hover{color:#fff!important}
+.film-card .clip-pause,.film-card .film-progress{display:none!important}
+.appointment .contact-open{background:#10323a!important;color:#eef9fa!important;border-color:#62c3d0!important;box-shadow:0 8px 22px #0002}
+.appointment .contact-open:hover{background:#164651!important;color:#fff!important}
+.appointment .contact-open span{color:inherit!important}
+@media(max-width:760px){
+ .films-section{padding-inline:5%!important;padding-top:56px!important;padding-bottom:56px!important}
+ .films-heading{margin-bottom:22px!important}
+ .films-heading h2{font-size:clamp(2.2rem,10vw,3.25rem)!important}
+ .films-heading>p{font-size:13px;line-height:1.5;margin-top:10px!important}
+ .films-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:18px!important;max-width:620px!important}
+ .film-caption{padding:10px 1px 0!important;gap:5px!important}
+ .film-caption small{font-size:9px!important}
+ .film-caption strong{font-size:clamp(15px,4.3vw,18px)!important}
+ .film-caption a{font-size:10px!important}
+}
+@media(max-width:380px){.films-grid{gap:12px!important}.film-caption a{font-size:9px!important}}
+/* Contactos en cabecera: icono compacto junto a Solicitar turno. */
+.header-contact{display:grid;place-items:center;flex:0 0 42px;width:42px;height:42px;padding:0;border:1px solid #ffffff55;background:#112229;color:#dff7fa;transition:background .25s,border-color .25s,color .25s}
+.header-contact svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.header-contact:hover{background:#155064;border-color:#67c5d1;color:white}
+@media(max-width:520px){
+ .header{gap:8px!important;padding-inline:12px!important;overflow:visible!important}
+ .header .brand-lockup .brand-art{width:min(154px,40vw)!important;max-height:54px!important}
+ .header-cta{display:flex!important;align-items:center;gap:4px!important;margin-left:auto!important;padding:8px 9px!important;font-size:10px!important}
+ .header-cta span{margin-left:2px!important}
+ .header-contact{flex-basis:34px;width:34px;height:34px}
+ .header-contact svg{width:19px;height:19px}
+ .menu-toggle{flex:0 0 24px;width:24px;margin:0!important}
+}
+@media(max-width:380px){
+ .header{gap:6px!important;padding-inline:8px!important}
+ .header .brand-lockup .brand-art{width:min(118px,36vw)!important;max-height:46px!important}
+ .header-cta{padding:7px 6px!important;font-size:9px!important}
+ .header-contact{flex-basis:31px;width:31px;height:31px}
+ .menu-toggle{flex-basis:22px;width:22px}
+}
+/* La historia del equipo conserva la proporción natural de cada foto. */
+.team-story .slide-stage{height:auto!important;min-height:0!important;aspect-ratio:auto!important;background:transparent!important}
+.team-story .slide-frame img{width:100%!important;height:100%!important;left:0!important;top:0!important;transform:none!important;object-fit:cover!important;object-position:center!important;background:transparent!important;padding:0!important}
