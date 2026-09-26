@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">Exploración de monograma ML para MOTORLOZ</title>
+  <desc id="desc">Dos alternativas de monograma, ligadura continua y encastre preciso, aplicadas junto a la identidad MOTORLOZ.</desc>
+  <rect width="1600" height="900" fill="#071217"/>
+  <path d="M0 0h1600v900H0z" fill="url(#glow)"/>
+  <defs>
+    <radialGradient id="glow" cx="50%" cy="12%" r="80%"><stop offset="0" stop-color="#17313a" stop-opacity=".62"/><stop offset="1" stop-color="#071217" stop-opacity="0"/></radialGradient>
+  </defs>
+  <text x="90" y="80" fill="#7f9aa3" font-family="Segoe UI,Arial,sans-serif" font-size="17" letter-spacing="5">MOTORLOZ / EXPLORACIÓN DE MONOGRAMA</text>
+  <line x1="800" y1="120" x2="800" y2="805" stroke="#8299a1" stroke-opacity=".22"/>
+
+  <g transform="translate(105 155)">
+    <text x="0" y="0" fill="#42d7e8" font-family="Segoe UI,Arial,sans-serif" font-size="15" letter-spacing="4">01 / LIGADURA FORJADA</text>
+    <g transform="translate(95 50) scale(.82)">
+      <path d="M74 378V134L184 252L294 134V378H398" fill="none" stroke="#f4f7f6" stroke-width="58" stroke-linecap="square" stroke-linejoin="bevel"/>
+      <path d="M398 378H446" fill="none" stroke="#42d7e8" stroke-width="58" stroke-linecap="square"/>
+      <path d="M383 349h30l-18 58h-30z" fill="#071217" opacity=".92"/>
+    </g>
+    <text x="0" y="550" fill="#f4f7f6" font-family="Bahnschrift,Arial Black,sans-serif" font-size="68" font-weight="600" letter-spacing="9">MOTORLOZ</text>
+    <path d="M530 499h31l-15 18h-31z" fill="#42d7e8"/>
+    <text x="5" y="606" fill="#8ea0a7" font-family="Bahnschrift,Segoe UI,sans-serif" font-size="22" letter-spacing="14">PABLO LOZANO</text>
+    <text x="7" y="649" fill="#6f858d" font-family="Segoe UI,Arial,sans-serif" font-size="13" letter-spacing="6">MECÁNICA AUTOMOTRIZ · MONTEVIDEO</text>
+  </g>
+
+  <g transform="translate(855 155)">
+    <text x="0" y="0" fill="#42d7e8" font-family="Segoe UI,Arial,sans-serif" font-size="15" letter-spacing="4">02 / ENCASTRE PRECISO</text>
+    <g transform="translate(95 50) scale(.82)">
+      <path d="M64 390V126h58l99 108 99-108h57v88l-52 56V216L221 329 116 216v174z" fill="#f4f7f6"/>
+      <path d="M325 246l52-56v146h81v54H325z" fill="#42d7e8"/>
+      <path d="M325 246l52-56v58l-52 56z" fill="#b8f5fb"/>
+    </g>
+    <text x="0" y="550" fill="#f4f7f6" font-family="Bahnschrift,Arial Black,sans-serif" font-size="68" font-weight="600" letter-spacing="9">MOTORLOZ</text>
+    <path d="M530 499h31l-15 18h-31z" fill="#42d7e8"/>
+    <text x="5" y="606" fill="#8ea0a7" font-family="Bahnschrift,Segoe UI,sans-serif" font-size="22" letter-spacing="14">PABLO LOZANO</text>
+    <text x="7" y="649" fill="#6f858d" font-family="Segoe UI,Arial,sans-serif" font-size="13" letter-spacing="6">MECÁNICA AUTOMOTRIZ · MONTEVIDEO</text>
+  </g>
+  <line x1="90" y1="818" x2="1510" y2="818" stroke="#8299a1" stroke-opacity=".32"/>
+  <text x="90" y="852" fill="#647c84" font-family="Segoe UI,Arial,sans-serif" font-size="13" letter-spacing="3">NEGRO TINTA · BLANCO TÉCNICO · CELESTE DIAMANTE</text>
+</svg>

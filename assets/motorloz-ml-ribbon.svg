@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">Monograma ML — Ligadura continua</title>
+  <desc id="desc">Las letras M y L construidas como una única pieza mecanizada.</desc>
+  <path d="M74 378V134L184 252L294 134V378H398" fill="none" stroke="#f4f7f6" stroke-width="58" stroke-linecap="square" stroke-linejoin="bevel"/>
+  <path d="M398 378H446" fill="none" stroke="#42d7e8" stroke-width="58" stroke-linecap="square"/>
+  <path d="M383 349h30l-18 58h-30z" fill="#071217" opacity=".92"/>
+</svg>
