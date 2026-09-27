@@ -114,3 +114,273 @@
   .subaru-photo.motion-ready,.subaru-photo.motion-ready.is-visible{opacity:1;transform:none;transition:none}
   .service-card-copy>a{transition:none!important}
 }
+
+/* Google reviews keep scrolling automatically; manual carousel controls are unnecessary. */
+.review-controls{display:none!important}
+
+/* Mobile alignment pass requested from the visual review. */
+@media(max-width:760px){
+  .reviews>.section-label,.location>.section-label{display:grid!important;justify-items:center!important;gap:7px!important;text-align:center!important}
+  .reviews-intro{display:grid!important;grid-template-columns:minmax(0,1fr)!important;justify-items:center!important;text-align:center!important}
+  .reviews-heading{width:100%;max-width:38rem;margin-inline:auto!important;text-align:center!important}
+  .reviews-heading .eyebrow,.reviews-heading h2,.reviews-heading>p:last-child{margin-inline:auto!important;text-align:center!important}
+  .location-top{display:grid!important;justify-items:center!important;text-align:center!important}
+  .location-top h2{width:100%;text-align:center!important}
+  .location-top>div{width:100%;max-width:none!important;margin-top:18px!important;display:grid;justify-items:center;text-align:center}
+  .map-directions-link{margin-inline:auto!important;justify-self:center}
+
+  footer{display:flex!important;flex-direction:column!important;align-items:center!important;text-align:center!important}
+  .footer-brand{margin-inline:auto!important;justify-self:center!important}
+  .footer-links{width:min(100%,440px)!important;margin:24px auto!important;display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;justify-content:center!important;justify-items:center!important;gap:16px 10px!important}
+  .footer-links>a{justify-content:center!important;text-align:center!important}
+  .footer-links>a:last-child:nth-child(odd){grid-column:1/-1}
+  .footer-bottom{width:100%;display:grid!important;grid-template-columns:minmax(0,1fr)!important;justify-items:center!important;gap:10px!important;text-align:center!important}
+
+  .films-heading{text-align:center!important}
+  .films-heading h2,.films-heading>p{margin-inline:auto!important;text-align:center!important}
+  .films-grid{width:calc(100% + 16px)!important;margin-left:-8px!important;margin-right:-8px!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}
+  .film-card{min-height:0!important;aspect-ratio:9/16!important;background:#081315!important}
+  .film-card>img{display:none!important}
+  .film-card>video{position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:contain;background:#081315}
+  .film-caption{z-index:1!important;left:10px!important;right:10px!important;bottom:10px!important;padding:40px 4px 3px!important}
+  .film-caption small,.film-caption strong{color:#39c3d1!important;text-shadow:0 1px 8px #071114!important}
+  .film-caption strong{font-size:clamp(14px,4vw,18px)!important;line-height:1.2!important}
+  .film-caption a{font-size:9px!important;line-height:1.4!important}
+  .films-social{width:100%!important;max-width:500px!important;margin:16px auto 0!important;padding:17px 8px 4px!important;border-top:1px solid #d4dcdb!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:6px!important;text-align:center!important}
+  .films-social .instagram-mark{width:30px!important;height:30px!important;margin:0 auto 2px!important;display:grid!important;place-items:center!important;color:#16aabc!important}
+  .films-social .instagram-mark img{width:25px;height:25px;display:block;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+  .films-social>div{display:grid;justify-items:center;gap:4px}
+  .films-social b{font-size:12px!important}
+  .films-social small,.films-social>a{max-width:none!important;font-size:10px!important;line-height:1.5!important;text-align:center!important}
+  .films-social>a{margin-top:2px;color:#087f91!important;font-weight:650}
+}
+
+/* Slightly quicker brand ticker; keep the movement calm and readable. */
+.brand-lineup-track{animation-duration:45s!important}
+@media(max-width:760px){.brand-lineup-track{animation-duration:23s!important}}
+
+/* Premium dark treatment for the six service principles. */
+.why-motorloz{position:relative;isolation:isolate;overflow:hidden;background:#0a1114!important;color:#eff7f7!important}
+.why-motorloz::before{content:"";position:absolute;z-index:-1;inset:-20%;pointer-events:none;background:radial-gradient(ellipse at 16% 36%,rgba(38,181,200,.13),transparent 37%),radial-gradient(ellipse at 82% 75%,rgba(32,111,128,.12),transparent 34%);animation:why-aurora 20s ease-in-out infinite alternate}
+.why-motorloz>.eyebrow{color:#56c5d1!important}
+.why-motorloz h2{color:#f4f8f6!important}
+.why-motorloz h2 em{color:#39bdcb!important}
+.why-subtitle{color:#b5c4c6!important}
+.why-grid article{position:relative;min-height:172px;padding:21px!important;overflow:hidden;border:1px solid rgba(125,190,197,.2)!important;border-radius:12px!important;background:linear-gradient(145deg,rgba(24,39,43,.96),rgba(13,24,27,.97))!important;box-shadow:0 14px 34px rgba(0,0,0,.18)!important;color:#edf5f5!important;transition:transform .28s ease,border-color .28s ease,box-shadow .28s ease!important}
+.why-grid article::after{content:"";position:absolute;inset:0 auto 0 0;width:2px;background:linear-gradient(180deg,#41c4d1,rgba(65,196,209,0));opacity:.75}
+.why-grid article:hover{transform:translateY(-3px);border-color:rgba(65,196,209,.48)!important;box-shadow:0 18px 38px rgba(0,0,0,.27),0 0 24px rgba(40,170,188,.08)!important}
+.why-grid article>span{width:auto!important;height:auto!important;display:inline-block!important;padding:0!important;border:0!important;border-radius:0!important;background:none!important;color:#55c7d3!important;font:600 11px var(--mono)!important;letter-spacing:.12em}
+.why-grid h3{margin:15px 0 8px!important;color:#f3f8f7!important;font-size:16px!important;line-height:1.25!important}
+.why-grid p{color:#b7c7c9!important;font-size:12px!important;line-height:1.6!important}
+@keyframes why-aurora{from{transform:translate3d(-1%,0,0) scale(1)}to{transform:translate3d(1%,1%,0) scale(1.04)}}
+@media(max-width:760px){
+  .why-motorloz{padding-top:52px!important;padding-bottom:50px!important;text-align:center!important}
+  .why-motorloz>.eyebrow,.why-motorloz>h2,.why-motorloz>.why-subtitle{margin-inline:auto!important;text-align:center!important}
+  .why-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important;text-align:left!important}
+  .why-grid article{min-height:160px!important;padding:16px 14px!important}
+  .why-grid h3{font-size:14px!important;margin:12px 0 7px!important}
+  .why-grid p{font-size:11px!important;line-height:1.5!important}
+}
+@media(prefers-reduced-motion:reduce){.why-motorloz::before{animation:none}.why-grid article{transition:none!important}}
+
+.contact-dialog{width:min(490px,calc(100% - 30px))!important;padding:36px 32px 30px!important;border:1px solid rgba(73,184,195,.34)!important;border-radius:16px!important;background:radial-gradient(ellipse at 50% 0%,rgba(47,150,161,.12),transparent 52%),linear-gradient(145deg,#142528,#0b1417)!important;box-shadow:0 30px 100px rgba(0,0,0,.55)!important}
+.contact-dialog>.eyebrow{text-align:center!important;margin:0 0 13px!important}
+.contact-brand{display:flex;justify-content:center;align-items:center;margin:0 auto 12px}
+.contact-brand img{display:block;width:min(220px,74%);height:58px;object-fit:contain}
+#contact-explanation{max-width:36ch;margin:0 auto!important;text-align:center!important;color:#b9c9c9!important}
+.contact-dialog-links{display:grid!important;gap:10px!important;margin-top:24px!important}
+.contact-dialog-links>a{display:grid!important;grid-template-columns:42px minmax(0,1fr)!important;align-items:center!important;gap:13px!important;padding:12px 14px!important;border:1px solid rgba(151,193,194,.18)!important;border-radius:10px!important;background:linear-gradient(115deg,rgba(255,255,255,.045),rgba(255,255,255,.015))!important;text-decoration:none!important;transition:border-color .2s,background .2s,transform .2s!important}
+.contact-dialog-links>a:hover{border-color:rgba(58,194,207,.55)!important;background:rgba(46,159,172,.1)!important;transform:translateY(-1px)}
+.contact-icon{width:40px;height:40px;display:grid;place-items:center;border:1px solid rgba(62,193,204,.22);border-radius:10px;background:rgba(44,178,192,.07)}
+.contact-icon svg{width:20px;height:20px;fill:none;stroke:#62d2dc;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.contact-icon img{display:block;width:21px;height:21px;object-fit:contain}
+.contact-item-copy{display:grid;gap:4px;min-width:0}
+.contact-item-copy small{color:#91a7a9!important;font-size:11px!important;line-height:1.25}
+.contact-item-copy strong{color:#dcf0f0!important;font-size:14px!important;line-height:1.35;text-align:left!important;overflow-wrap:anywhere}
+.film-card>video{position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:contain;background:#081315}
+.film-caption small,.film-caption strong{color:#39bdcb;text-shadow:0 1px 8px #071114}
+.slide-buttons,.hero-slide-controls{display:none!important}
+@media(max-width:760px){.contact-dialog{padding:32px 19px 24px!important}.contact-brand img{height:54px}.contact-item-copy strong{font-size:14px!important}}
+
+@media(max-width:760px){
+  .appointment .field-shell>span{font:600 15px/1.3 var(--body)!important;letter-spacing:0!important;text-transform:none!important;color:#f1f7f6!important}
+  .appointment .field-shell>span b{font:500 12px/1.3 var(--body)!important;color:#a9c1c3!important}
+  .appointment .priority-choice legend{font:650 15px/1.3 var(--body)!important;letter-spacing:0!important;text-transform:none!important;color:#f1f7f6!important;margin-bottom:11px!important}
+  .appointment .priority-choice label>span{position:relative!important;min-height:68px!important;padding:13px 34px 13px 13px!important;border:1px solid rgba(211,233,232,.3)!important;border-radius:8px!important;background:#172b2e!important;transition:background .18s,border-color .18s,transform .18s,box-shadow .18s!important}
+  .appointment .priority-choice label>span b{font-size:14px!important;line-height:1.3!important;color:#f1f7f6!important}
+  .appointment .priority-choice label>span small{font-size:11px!important;line-height:1.4!important;color:#bfd0d0!important}
+  .appointment .priority-choice input:checked+span{border:2px solid #38c0ce!important;background:linear-gradient(135deg,#40c6d2,#28adbd)!important;box-shadow:0 5px 18px rgba(38,185,200,.22)!important;transform:translateY(-1px)!important}
+  .appointment .priority-choice input:checked+span b,.appointment .priority-choice input:checked+span small{color:#092327!important}
+  .appointment .priority-choice input:checked+span::after{content:"✓";position:absolute;right:12px;top:12px;width:19px;height:19px;display:grid;place-items:center;border-radius:50%;background:#0d5961;color:white;font:700 12px/1 var(--body)}
+  .appointment .priority-choice input:focus-visible+span{outline:3px solid #a5eef3!important;outline-offset:3px!important}
+  .appointment .field-shell small,.appointment .privacy-note,.appointment .form-note{font-size:12px!important;line-height:1.5!important}
+  .appointment .field-shell input,.appointment .field-shell textarea{font-size:15px!important;min-height:50px!important}
+  .intro-feature-copy{text-align:center!important}
+  .intro-feature-copy .eyebrow,.intro-feature-copy h2,.intro-feature-copy>p,.intro-feature-copy>.text-link{margin-inline:auto!important;text-align:center!important}
+  .intro-feature-copy>.text-link{display:inline-flex!important;justify-content:center!important}
+  .intro-proof-row article{display:grid!important;grid-template-columns:1fr!important;justify-items:center!important;gap:6px!important;text-align:center!important}
+  .intro-proof-row article>div{text-align:center!important}
+  .people-text{text-align:center!important}
+  .people-text .eyebrow,.people-text h2,.people-text>p,.people-text>.text-link{margin-inline:auto!important;text-align:center!important}
+  .people-text>.text-link{display:flex!important;justify-content:center!important}
+  .instagram-stories{display:grid!important;grid-template-columns:minmax(0,1fr)!important;justify-items:center!important;gap:10px!important;text-align:center!important}
+  .instagram-stories>.instagram-mark{width:34px!important;height:34px!important;justify-self:center!important}
+  .instagram-stories>.instagram-mark img{width:30px!important;height:30px!important}
+  .instagram-stories>div{width:100%;display:grid;justify-items:center;text-align:center}
+  .instagram-stories>div p,.instagram-stories>div a{margin-inline:auto!important;text-align:center!important}
+  .japan-brand-pair{gap:16px!important}
+  .japan-flag{width:63px!important;height:42px!important}
+  .japan-flag i{width:13px!important;height:13px!important}
+  .subaru-section .subaru-lockup img{width:84px!important;height:35px!important}
+  .subaru-section .brand-separator{height:36px!important}
+  .service-card-copy{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;column-gap:12px!important;row-gap:0!important;align-items:start!important}
+  .service-card-copy>span,.service-card-copy h3,.service-card-copy p{grid-column:1/-1!important}
+  .service-card-copy ul{grid-column:1!important;grid-row:4!important;margin:0!important;align-self:end!important;padding-right:2px!important}
+  .service-card-copy>a{grid-column:2!important;grid-row:4!important;align-self:end!important;justify-self:end!important;margin:0 0 1px!important;min-height:40px!important;padding:0 14px!important;white-space:nowrap!important;font-size:11px!important}
+}
+
+/* The Instagram artwork already contains its own frame; keep the surrounding mark unboxed. */
+.instagram-stories .instagram-mark,.films-social .instagram-mark{width:30px!important;height:30px!important;flex:none!important;border:0!important;border-radius:0!important;background:transparent!important;color:inherit!important}
+.instagram-stories .instagram-mark img,.films-social .instagram-mark img{display:block;width:28px!important;height:28px!important;object-fit:contain}
+
+/* Give each service principle a clear visual cue. */
+.why-grid article{min-height:184px!important}
+.why-grid article>svg{display:block;width:31px;height:31px;margin:10px 0 0;color:#54c7d3;fill:none;stroke:currentColor;stroke-width:1.55;stroke-linecap:round;stroke-linejoin:round}
+.why-grid h3{margin-top:12px!important}
+@media(max-width:760px){.why-grid article{min-height:178px!important}.why-grid article>svg{width:29px;height:29px}}
+
+/* Center the appointment introduction on small screens. */
+@media(max-width:760px){
+  .appointment .section-label{justify-content:center!important;text-align:center!important}
+  .appointment .section-label span{text-align:center!important}
+  .appointment-intro{position:static!important;text-align:center!important}
+  .appointment-intro .eyebrow,.appointment-intro h2,.appointment-intro>p{margin-inline:auto!important;text-align:center!important}
+  .appointment-intro h2{max-width:12ch!important}
+  .appointment-intro>p:not(.eyebrow){max-width:42ch!important}
+  .appointment-steps{max-width:440px;margin:28px auto 0!important;text-align:left!important}
+  .appointment-steps li{justify-content:center!important;text-align:left!important}
+}
+
+/* Keep the real video visible while it buffers or starts playing. */
+.film-card>video{opacity:1!important}
+.contact-hours{margin-top:18px;padding-top:16px;border-top:1px solid rgba(151,193,194,.2);display:grid;gap:5px;text-align:center}
+.contact-hours>span{color:#6ed0d8;font:600 10px var(--mono);letter-spacing:.12em}
+.contact-hours>strong{margin-top:3px;color:#e4f1ef;font-size:13px}
+.contact-hours>p{margin:0;color:#d0dfde;font-size:13px}
+.contact-hours>small{color:#91a7a9;font-size:11px}
+
+/* Films stay cinematic on mobile and preserve the full source frame. */
+main>.section.films-section{background:#0d191c!important;color:#f1f6f5!important}
+main>.section.films-section .section-label,main>.section.films-section .films-heading h2{color:#f1f6f5!important}
+main>.section.films-section .films-heading>p{color:#b7c4c4!important}
+main>.section.films-section .film-card{background:#081315!important}
+main>.section.films-section .film-card>video{object-fit:contain!important;object-position:center!important;background:#081315!important;opacity:1!important;border:0!important}
+.contact-dialog-links .instagram-contact-icon{border:0!important;border-radius:0!important;background:transparent!important}
+.contact-dialog-links .instagram-contact-icon img{width:25px!important;height:25px!important}
+
+/* Unificar la tinta de las superficies oscuras y darles una aurora lenta, sin tocar secciones claras. */
+:root{--motorloz-ink:#0b1112;--motorloz-cyan:#39bdcb}
+@keyframes motorloz-aurora-flow{0%{background-position:0% 45%,100% 55%,50% 50%}50%{background-position:75% 20%,18% 82%,50% 50%}100%{background-position:100% 65%,0% 28%,50% 50%}}
+.hero,.workshop,.people,.films-section,.why-motorloz,.diagnostic-story,footer{background-color:var(--motorloz-ink)!important;background-image:radial-gradient(ellipse at 18% 14%,rgba(31,157,166,.16),transparent 42%),radial-gradient(ellipse at 83% 82%,rgba(19,103,116,.16),transparent 44%),linear-gradient(145deg,#0b1112,#0b1112 72%)!important;background-size:155% 160%,155% 160%,100% 100%!important;animation:motorloz-aurora-flow 24s ease-in-out infinite alternate!important}
+/* La imagen repetida sale del fondo de Personas; ahora el carrusel muestra las tomas elegidas. */
+.people{background-image:radial-gradient(ellipse at 18% 14%,rgba(31,157,166,.16),transparent 42%),radial-gradient(ellipse at 83% 82%,rgba(19,103,116,.16),transparent 44%),linear-gradient(145deg,#0b1112,#0b1112 72%)!important}
+.appointment:before,.reference-bridge-card{background-color:var(--motorloz-ink)!important;background-image:radial-gradient(ellipse at 14% 20%,rgba(31,157,166,.14),transparent 43%),radial-gradient(ellipse at 86% 80%,rgba(19,103,116,.13),transparent 46%),linear-gradient(145deg,#0b1112,#0b1112 72%)!important;background-size:155% 160%,155% 160%,100% 100%!important;animation:motorloz-aurora-flow 24s ease-in-out infinite alternate!important}
+@media(prefers-reduced-motion:reduce){.hero,.workshop,.people,.films-section,.why-motorloz,.diagnostic-story,footer,.appointment:before,.reference-bridge-card{animation:none!important;background-position:50% 50%,50% 50%,50% 50%!important}}
+/* Tarjetas 01–06: número lateral, lectura clara y detalles bajo demanda. */
+.why-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:14px!important}
+.why-card{display:block!important;min-width:0;border:1px solid rgba(120,176,181,.24)!important;border-left:2px solid rgba(57,189,203,.62)!important;border-radius:15px!important;background:linear-gradient(145deg,rgba(21,38,40,.92),rgba(12,23,25,.96))!important;overflow:hidden!important;transition:border-color .2s,background .25s,transform .2s!important}
+.why-card:hover,.why-card[open]{border-color:rgba(57,189,203,.55)!important;background:linear-gradient(145deg,rgba(23,47,50,.98),rgba(11,23,25,.98))!important}
+.why-card summary{display:grid!important;grid-template-columns:58px minmax(0,1fr) 22px!important;align-items:start!important;gap:13px!important;padding:19px 15px 17px!important;min-height:148px!important;list-style:none!important;cursor:pointer!important}
+.why-card summary::-webkit-details-marker{display:none!important}
+.why-number{padding-top:1px;color:#5bd0db!important;font:700 38px/.95 var(--mono)!important;letter-spacing:-.08em!important}
+.why-card-main{display:grid!important;gap:8px!important;min-width:0}
+.why-card-main>svg{display:block!important;width:29px!important;height:29px!important;margin:0!important;fill:none!important;stroke:#5bd0db!important;stroke-width:1.6!important;stroke-linecap:round!important;stroke-linejoin:round!important}
+.why-card-copy h3{margin:0!important;color:#f3f7f6!important;font-size:16px!important;line-height:1.22!important;font-weight:700!important}
+.why-card-copy p{margin:5px 0 0!important;color:#c0cece!important;font-size:12.5px!important;line-height:1.48!important}
+.why-toggle{display:grid;place-items:center;width:22px;height:22px;border:1px solid rgba(132,191,196,.35);border-radius:50%;color:#7bd8e0;font:18px/1 var(--body)!important;transition:transform .2s,background .2s!important}
+.why-card[open] .why-toggle{transform:rotate(45deg);background:rgba(57,189,203,.13)}
+.why-card summary:focus-visible{outline:3px solid #93e4e9!important;outline-offset:-4px!important;border-radius:14px}
+.why-detail{margin:0 15px 16px 86px!important;padding:12px 0 0!important;border-top:1px solid rgba(132,191,196,.2)!important;color:#d5e2e1!important;font-size:13px!important;line-height:1.55!important;animation:why-detail-in .22s ease-out both}
+@keyframes why-detail-in{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:900px){.why-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+@media(max-width:540px){.why-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px!important}.why-card summary{grid-template-columns:38px minmax(0,1fr) 18px!important;gap:8px!important;padding:15px 9px!important;min-height:166px!important}.why-number{font-size:31px!important}.why-card-main{gap:7px!important}.why-card-main>svg{width:26px!important;height:26px!important}.why-card-copy h3{font-size:13px!important;line-height:1.2!important}.why-card-copy p{font-size:11px!important;line-height:1.4!important}.why-toggle{width:18px;height:18px;font-size:15px!important}.why-detail{margin:0 10px 13px 55px!important;padding-top:10px!important;font-size:11px!important;line-height:1.45!important}}
+/* Ubicación: apilar y centrar las dos etiquetas para evitar una fila descompensada. */
+@media(max-width:760px){.location>.section-label{grid-template-columns:minmax(0,1fr)!important;justify-items:center!important;gap:7px!important;text-align:center!important}.location>.section-label>*{text-align:center!important}.location-top{gap:0!important}.location-top h2{margin-inline:auto!important}.location-top>div{margin-top:18px!important}.location-top p{font-size:14px!important;line-height:1.65!important}.location .map-directions-link{margin:15px auto 0!important}}
+/* Lectura y jerarquía en el cierre y en el panel de contacto. */
+.footer-links>a{font-size:12px!important;gap:9px!important}.footer-icon{width:18px!important;height:18px!important}
+.footer-bottom{font-size:10px!important;line-height:1.55!important;letter-spacing:.1em!important;gap:12px!important}.footer-bottom a{font-size:12px!important}
+.contact-dialog>.eyebrow{font-size:12px!important;letter-spacing:.16em!important;margin-bottom:17px!important}
+.contact-brand img{width:min(244px,82%)!important;height:66px!important}
+#contact-explanation{font-size:16px!important;line-height:1.55!important;max-width:34ch!important}
+.contact-item-copy small{font-size:12px!important}.contact-item-copy strong{font-size:16px!important;line-height:1.35!important}
+.contact-hours>span{font-size:11px!important}.contact-hours>strong,.contact-hours>p{font-size:14px!important}.contact-hours>small{font-size:12px!important}
+@media(max-width:760px){.contact-dialog{padding:40px 20px 28px!important}.contact-brand img{height:62px!important}.footer-bottom{font-size:10px!important}.footer-links>a{font-size:12px!important}}
+/* Estrellas y puntuación destacadas sin alterar el promedio publicado. */
+.place-rating{display:flex!important;align-items:center!important;gap:9px!important;flex-wrap:wrap!important}
+.place-rating>b{font-size:15px!important;font-weight:700!important}
+.place-rating .gold-stars{font-size:22px!important;line-height:1!important;letter-spacing:.055em!important;color:#e2a313!important;text-shadow:0 0 12px rgba(226,163,19,.24)!important}
+.place-rating>span:last-child{font-size:11px!important}
+/* Bloque de Instagram: marca visible, texto legible y acción compacta. */
+.films-social{width:min(100%,560px)!important;margin:24px auto 0!important;padding:20px 14px!important;display:grid!important;grid-template-columns:minmax(0,1fr)!important;justify-items:center!important;gap:9px!important;border-top:1px solid rgba(151,193,194,.22)!important;text-align:center!important}
+.films-social .instagram-mark{width:30px!important;height:30px!important;margin:0!important}
+.films-social>div{display:grid!important;justify-items:center!important;gap:5px!important}
+.films-social>div>b{color:#f0f6f5!important;font-size:15px!important;font-weight:700!important}
+.films-social>div>small{max-width:38ch!important;color:#bdcece!important;font-size:12px!important;line-height:1.5!important}
+.films-social>a{display:inline-flex!important;align-items:center!important;justify-content:center!important;margin-top:3px!important;padding:7px 13px!important;color:#63d4df!important;font-size:12px!important;font-weight:700!important}
+/* Pasos de turno: tipografía legible, menor espacio muerto y acabado de panel. */
+.appointment-steps{margin:24px 0 0!important;padding:0 12px!important;border:1px solid rgba(115,169,175,.18)!important;border-radius:12px!important;background:linear-gradient(145deg,rgba(255,255,255,.025),rgba(255,255,255,.008))!important;overflow:hidden!important}
+.appointment-steps li{min-height:47px!important;padding:9px 4px!important;gap:14px!important;font-size:14px!important;line-height:1.4!important;border-bottom:1px solid rgba(115,169,175,.14)!important}
+.appointment-steps li:last-child{border-bottom:0!important}
+.appointment-steps li span{flex:0 0 28px!important;color:#55cad5!important;font-size:14px!important;font-weight:700!important;text-align:center!important}
+@media(max-width:760px){.appointment-steps{max-width:100%!important;margin-top:22px!important;padding-inline:10px!important}.appointment-steps li{min-height:44px!important;padding:8px 2px!important;font-size:13px!important}}
+/* Narrow screens: keep the six principles readable in a single, compact column. */
+@media(max-width:540px){
+  .why-grid{grid-template-columns:minmax(0,1fr)!important;gap:9px!important}
+  .why-card summary{grid-template-columns:52px minmax(0,1fr) 22px!important;gap:11px!important;padding:14px 13px!important;min-height:0!important;align-items:center!important}
+  .why-number{font-size:34px!important}
+  .why-card-main{grid-template-columns:25px minmax(0,1fr)!important;align-items:start!important;column-gap:10px!important;row-gap:0!important}
+  .why-card-main>svg{width:24px!important;height:24px!important;margin-top:1px!important}
+  .why-card-copy h3{font-size:15px!important;line-height:1.25!important}
+  .why-card-copy p{font-size:12px!important;line-height:1.45!important;margin-top:4px!important}
+  .why-toggle{width:22px;height:22px;font-size:18px!important}
+  .why-detail{margin:0 14px 13px 77px!important;padding-top:10px!important;font-size:12px!important;line-height:1.5!important}
+  .appointment-steps li{font-size:14px!important}
+  .reviews>.section-label{grid-template-columns:minmax(0,1fr)!important;justify-items:center!important;text-align:center!important}
+}.reviews-rating{display:flex!important;align-items:center!important;justify-content:center!important;gap:10px!important;margin:18px auto 20px!important;flex-wrap:wrap!important;color:#172326!important}
+.reviews-rating>strong{font-size:22px!important;line-height:1!important;font-weight:750!important}
+.reviews-rating>.gold-stars{font-size:30px!important;line-height:1!important;letter-spacing:.055em!important;color:#e2a313!important;text-shadow:0 2px 12px rgba(226,163,19,.2)!important}
+.reviews-rating>small{color:#667578!important;font-size:12px!important}
+.reviews-heading h2{margin-bottom:15px!important}
+@media(max-width:760px){.reviews-rating{margin:14px auto 18px!important;gap:8px!important}.reviews-rating>.gold-stars{font-size:27px!important}.reviews-rating>strong{font-size:20px!important}.reviews-rating>small{font-size:11px!important}}
+/* Compact editorial rows replace the cramped expanding card grid. */
+.why-grid{width:min(100%,1060px)!important;margin:34px auto 0!important;display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;column-gap:34px!important;row-gap:0!important}
+.why-card{width:100%!important;min-width:0!important;min-height:112px!important;display:grid!important;grid-template-columns:58px 34px minmax(0,1fr) 20px!important;align-items:center!important;gap:13px!important;padding:17px 5px!important;border:0!important;border-bottom:1px solid rgba(154,193,194,.18)!important;border-radius:0!important;background:transparent!important;color:#f1f6f5!important;text-align:left!important;font:inherit!important;overflow:visible!important;cursor:pointer!important;transition:background .22s,border-color .22s,padding .22s!important}
+.why-card:hover,.why-card:focus-visible{background:linear-gradient(90deg,rgba(44,164,175,.1),transparent 92%)!important;border-bottom-color:rgba(73,195,205,.5)!important;transform:none!important}
+.why-card:focus-visible{outline:2px solid #71d8e0!important;outline-offset:2px!important}
+.why-number{display:block!important;padding:0!important;color:#54c9d4!important;font:700 36px/.95 var(--mono)!important;letter-spacing:-.09em!important}
+.why-card>svg{display:block!important;width:29px!important;height:29px!important;margin:0!important;color:#5acbd6!important;fill:none!important;stroke:currentColor!important;stroke-width:1.5!important;stroke-linecap:round!important;stroke-linejoin:round!important}
+.why-card-copy{display:grid!important;gap:5px!important;min-width:0!important}
+.why-card-copy strong{display:block!important;color:#f2f6f5!important;font-size:16px!important;font-weight:700!important;line-height:1.22!important}
+.why-card-copy small{display:block!important;color:#bccbcb!important;font-size:12.5px!important;line-height:1.45!important}
+.why-arrow{color:#56cbd6!important;font-size:17px!important;line-height:1!important;transition:transform .18s!important}
+.why-card:hover .why-arrow{transform:translate(2px,-2px)!important}
+@media(max-width:900px){.why-grid{column-gap:22px!important}.why-card{grid-template-columns:48px 30px minmax(0,1fr) 18px!important;gap:10px!important}.why-number{font-size:32px!important}.why-card-copy strong{font-size:15px!important}}
+@media(max-width:600px){.why-grid{grid-template-columns:minmax(0,1fr)!important;column-gap:0!important;margin-top:26px!important}.why-card{grid-template-columns:48px 30px minmax(0,1fr) 20px!important;gap:11px!important;min-height:90px!important;padding:14px 2px!important}.why-number{font-size:34px!important}.why-card>svg{width:25px!important;height:25px!important}.why-card-copy strong{font-size:15px!important}.why-card-copy small{font-size:12px!important;line-height:1.45!important}}
+.why-dialog{position:fixed!important;inset:0!important;margin:auto!important;width:min(520px,calc(100% - 32px))!important;max-width:none!important;max-height:min(80svh,600px)!important;overflow:auto!important;padding:46px clamp(24px,6vw,48px) 38px!important;border:1px solid rgba(92,164,171,.42)!important;border-radius:18px!important;background:radial-gradient(ellipse at 15% 0,rgba(40,154,164,.15),transparent 48%),linear-gradient(145deg,#101d20,#0b1112 72%)!important;color:#f1f6f5!important;box-shadow:0 28px 110px rgba(0,0,0,.62)!important}
+.why-dialog::backdrop{background:rgba(1,7,9,.78)!important;backdrop-filter:blur(6px)}
+.why-dialog>.eyebrow{margin:0 38px 14px 0!important;color:#62ced8!important;font-size:11px!important;letter-spacing:.16em!important}
+.why-dialog h2{margin:0 0 16px!important;color:#f4f8f7!important;font-size:clamp(30px,7vw,43px)!important;line-height:1.08!important}
+.why-dialog>p:not(.eyebrow){max-width:42ch!important;margin:0 0 25px!important;color:#c8d6d5!important;font-size:16px!important;line-height:1.65!important}
+.why-dialog .button{border:0!important;border-radius:40px!important;background:#39bdcb!important;color:#081416!important;font-size:13px!important}
+.why-dialog-close{position:absolute!important;top:14px!important;right:14px!important;width:38px!important;height:38px!important;display:grid!important;place-items:center!important;border:1px solid rgba(151,193,194,.28)!important;border-radius:50%!important;background:transparent!important;color:#dce9e8!important;font-size:25px!important;line-height:1!important}
+.why-dialog-close:hover{background:rgba(57,189,203,.15)!important;border-color:#39bdcb!important}
+@media(max-width:600px){.why-dialog{padding:42px 23px 28px!important}.why-dialog>p:not(.eyebrow){font-size:15px!important}}
+/* El video y su leyenda comparten un velo a todo el ancho, sin panel rectangular. */
+@media(max-width:760px){
+  .films-grid .film-caption{left:0!important;right:0!important;bottom:0!important;width:100%!important;max-width:none!important;padding:56px 13px 13px!important;gap:5px!important;background:linear-gradient(0deg,rgba(4,13,15,.94) 0%,rgba(4,13,15,.68) 48%,rgba(4,13,15,0) 100%)!important;border:0!important;border-radius:0!important;box-shadow:none!important}
+  .films-grid .film-caption small{color:#67d2dc!important;font-size:9px!important;letter-spacing:.11em!important}
+  .films-grid .film-caption strong{color:#f4f8f7!important;font-size:clamp(15px,4vw,18px)!important;line-height:1.2!important;text-shadow:0 1px 8px rgba(0,0,0,.72)!important}
+  .films-grid .film-caption a{display:block!important;color:#d4e0df!important;font-size:10px!important;line-height:1.35!important;overflow-wrap:anywhere!important;text-shadow:0 1px 8px rgba(0,0,0,.8)!important}
+}
+/* Evitar una cola vacía bajo el bloque de ubicación en móvil. */
+@media(max-width:760px){.location.section{height:auto!important;min-height:0!important;padding-bottom:24px!important;margin-bottom:0!important}}

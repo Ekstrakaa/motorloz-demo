@@ -35,28 +35,6 @@
 
   document.querySelector('#contact-open')?.addEventListener('click', () => document.querySelector('#contact-dialog')?.showModal());
 
-  document.querySelectorAll('.slide-expand').forEach(button => {
-    button.addEventListener('click', () => {
-      const slideshow = button.closest('[data-slideshow]');
-      const image = slideshow?.querySelector('.slide-frame.is-current img');
-      if (!image) return;
-      const dialog = document.querySelector('#photo-dialog');
-      const photo = dialog?.querySelector('.photo-source');
-      if (!dialog || !photo) return;
-      photo.className = 'photo-source';
-      photo.style.backgroundImage = `url("${image.currentSrc || image.src}")`;
-      photo.style.aspectRatio = `${image.naturalWidth || 4} / ${image.naturalHeight || 3}`;
-      photo.style.minHeight = '0';
-      photo.style.height = 'min(66svh, 640px)';
-      photo.style.backgroundSize = 'contain';
-      photo.style.backgroundRepeat = 'no-repeat';
-      photo.setAttribute('role', 'img');
-      photo.setAttribute('aria-label', image.alt);
-      document.querySelector('#photo-caption').textContent = `${image.alt} · MOTORLOZ`;
-      dialog.showModal();
-    });
-  });
-
   if (!reduced.matches && 'IntersectionObserver' in window) {
     const revealObserver = new IntersectionObserver(entries => entries.forEach(entry => {
       if (entry.isIntersecting) {

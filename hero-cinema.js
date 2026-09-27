@@ -31,21 +31,12 @@
     {
       type: 'video',
       src: 'assets/motorloz-subaru-wrx.mp4',
-      poster: 'assets/hero-subaru.png',
+      poster: 'assets/hero-subaru.webp',
       start: 1.5,
       end: 8,
       playbackRate: .78,
       duration: 8500,
       label: 'MECÁNICA, DE CERCA'
-    },
-    {
-      type: 'image',
-      src: 'assets/hero-subaru.webp',
-      focus: '55% 48%',
-      zoomStart: 1.035,
-      zoomEnd: 1.075,
-      duration: 5000,
-      label: 'SUBARU, PASIÓN QUE NOS MUEVE'
     },
     {
       type: 'image',

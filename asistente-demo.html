@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0b1113">
+  <title>Asistente MOTORLOZ · Demostración</title>
+  <style>
+    :root{color-scheme:dark;--ink:#0b1113;--panel:#10191b;--line:#26383b;--cyan:#39bdcb;--text:#f1f6f5;--muted:#b5c4c4}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100svh;background:radial-gradient(ellipse at 50% 0%,rgba(35,116,119,.3),transparent 47%),var(--ink);color:var(--text);font:15px/1.55 "Segoe UI",sans-serif}
+    a{color:inherit}
+    .page{width:min(1100px,calc(100% - 40px));margin:auto;padding:34px 0 60px}
+    .topbar{display:flex;justify-content:space-between;align-items:center;gap:20px;border-bottom:1px solid var(--line);padding-bottom:18px}
+    .brand{display:flex;align-items:center;gap:12px;font-weight:800;letter-spacing:.035em}
+    .brand-mark{font-size:28px;letter-spacing:-.09em}.brand small{display:block;color:#93a8a9;font:9px/1.2 Consolas,monospace;letter-spacing:.21em}
+    .back{font-size:12px;color:#9eafb0;text-decoration:none}.back:hover{color:#fff}
+    .layout{display:grid;grid-template-columns:minmax(250px,.78fr) minmax(0,1.22fr);gap:34px;align-items:center;padding-top:46px}
+    .intro .eyebrow{color:var(--cyan);font:10px/1.5 Consolas,monospace;letter-spacing:.18em;text-transform:uppercase}
+    h1{font-size:clamp(38px,5.4vw,66px);line-height:1.02;letter-spacing:-.055em;margin:15px 0 18px}
+    h1 em{font-style:normal;color:var(--cyan)}
+    .intro>p:not(.eyebrow){max-width:43ch;color:#b9c7c7;font-size:16px}
+    .promise{margin-top:26px;padding:16px 17px;border-left:2px solid var(--cyan);background:linear-gradient(90deg,rgba(57,189,203,.1),transparent);color:#e5efed;font-size:13px}
+    .promise b{display:block;margin-bottom:5px;color:#6cd3dc;font:10px Consolas,monospace;letter-spacing:.12em}
+    .guardrail{margin-top:17px;color:#8fa1a2;font-size:11px;line-height:1.55}
+    .chat{height:min(700px,calc(100svh - 145px));min-height:570px;display:grid;grid-template-rows:auto 1fr auto;overflow:hidden;border:1px solid #2c464a;border-radius:20px;background:linear-gradient(150deg,rgba(20,37,39,.97),rgba(12,21,23,.98));box-shadow:0 24px 80px #0007,0 0 0 1px #5ac6d012}
+    .chat-head{display:flex;align-items:center;gap:12px;padding:18px 20px;border-bottom:1px solid rgba(170,204,204,.12)}
+    .avatar{width:39px;height:39px;display:grid;place-items:center;border-radius:50%;background:rgba(57,189,203,.12);border:1px solid rgba(83,207,216,.28);color:#68d4dd;font-size:17px}
+    .chat-head strong{display:block;font-size:14px}.chat-head small{display:block;color:#a0b4b4;font-size:11px}
+    .online{margin-left:auto;display:flex;align-items:center;gap:6px;color:#9cb6b4;font:9px Consolas,monospace;letter-spacing:.1em}
+    .online i{width:7px;height:7px;border-radius:50%;background:#56cf9d;box-shadow:0 0 10px #56cf9d77}
+    .messages{overflow:auto;padding:20px;display:flex;flex-direction:column;gap:14px;scroll-behavior:smooth}
+    .message{max-width:min(88%,510px);padding:13px 15px;border:1px solid rgba(175,208,208,.11);border-radius:4px 15px 15px 15px;background:#152326;color:#e3ecea;font-size:13px;line-height:1.55;white-space:pre-wrap}
+    .message.user{align-self:flex-end;border-radius:15px 4px 15px 15px;border-color:rgba(57,189,203,.25);background:rgba(32,116,123,.2);color:#eef9f8}
+    .message.assistant strong{color:#73d0d9}
+    .choices{display:flex;flex-wrap:wrap;gap:8px;margin-top:1px}
+    .choice{border:1px solid rgba(79,199,209,.36);border-radius:99px;background:rgba(15,37,39,.65);padding:8px 12px;color:#cdf0ef;font:11px "Segoe UI",sans-serif;cursor:pointer;transition:background .2s,border-color .2s}
+    .choice:hover{background:rgba(57,189,203,.16);border-color:#65d0d7}
+    .result{align-self:stretch;padding:15px;border:1px solid rgba(71,187,196,.28);border-radius:14px;background:linear-gradient(135deg,rgba(34,91,94,.28),rgba(14,29,31,.72))}
+    .result small{color:#70d0d8;font:9px Consolas,monospace;letter-spacing:.13em}
+    .result p{margin:7px 0 12px;color:#d4e2e1;font-size:12px}
+    .result a{display:inline-flex;align-items:center;gap:8px;text-decoration:none;border-radius:999px;padding:10px 14px;background:#39bdcb;color:#082326;font-size:11px;font-weight:750}
+    .result a:hover{background:#66d1d8}
+    .composer{padding:12px 14px 14px;border-top:1px solid rgba(170,204,204,.12)}
+    .examples{display:flex;gap:7px;overflow-x:auto;padding:0 2px 10px;scrollbar-width:thin}
+    .example{flex:none;border:1px solid rgba(175,208,208,.16);border-radius:99px;background:transparent;padding:7px 10px;color:#a9bbbb;font:10px "Segoe UI",sans-serif;cursor:pointer}
+    .example:hover{color:#fff;border-color:#56c4ce}
+    .input-row{display:flex;align-items:flex-end;gap:8px;padding:7px 7px 7px 12px;border:1px solid rgba(182,211,211,.19);border-radius:14px;background:rgba(3,10,11,.35)}
+    textarea{flex:1;min-width:0;max-height:105px;resize:vertical;border:0;outline:0;background:transparent;color:#f1f6f5;font:13px/1.4 "Segoe UI",sans-serif;padding:7px 0}
+    textarea::placeholder{color:#8da0a1}
+    .send{flex:none;width:39px;height:39px;border:0;border-radius:11px;background:var(--cyan);color:#092124;font-size:18px;font-weight:800;cursor:pointer}
+    .send:disabled{opacity:.45;cursor:default}
+    .privacy{margin:8px 2px 0;color:#84999a;font-size:9px}
+    .foot{margin-top:24px;text-align:center;color:#819394;font:9px Consolas,monospace;letter-spacing:.09em}
+    @media(max-width:760px){.page{width:min(100% - 24px,560px);padding:15px 0 24px}.topbar{padding-bottom:12px}.brand-mark{font-size:24px}.layout{display:flex;flex-direction:column;gap:18px;align-items:stretch;padding-top:23px}.intro .eyebrow{font-size:9px}.intro h1{font-size:38px;margin:8px 0 8px}.intro>p:not(.eyebrow){font-size:12px;line-height:1.5;margin:0}.promise{display:none}.guardrail{margin-top:7px;font-size:10px}.chat{height:calc(100svh - 244px);min-height:430px;border-radius:16px}.chat-head{padding:12px 14px}.messages{padding:14px;gap:11px}.message{max-width:94%;font-size:12px}.composer{padding:10px}.examples{padding-bottom:8px}.foot{margin-top:12px;font-size:8px}}
+    @media(max-width:370px){.intro h1{font-size:34px}.online{font-size:8px}.chat{height:calc(100svh - 230px)}}
+    @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important}}
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark" aria-hidden="true">ML</span><span>MOTORLOZ<small>PABLO LOZANO</small></span></div>
+      <a class="back" href="/?redesign=final#inicio">← Volver al sitio</a>
+    </header>
+    <div class="layout">
+      <section class="intro">
+        <p class="eyebrow">PROTOTIPO · RECEPCIÓN VIRTUAL</p>
+        <h1>Tu auto da señales.<br><em>Las escuchamos.</em></h1>
+        <p>Contá lo que notás con tus palabras. El asistente ordena la consulta y te orienta para dar el próximo paso con el taller.</p>
+        <div class="promise"><b>ATENCIÓN MOTORLOZ</b>Primero escuchamos. Después revisamos con criterio y te explicamos qué sigue.</div>
+        <p class="guardrail">Este prototipo no confirma averías ni estima precios. La causa se define con la revisión del vehículo.</p>
+      </section>
+      <section class="chat" aria-label="Asistente virtual de MOTORLOZ">
+        <header class="chat-head">
+          <span class="avatar" aria-hidden="true">✳</span>
+          <span><strong>Asistente MOTORLOZ</strong><small>Recepción y orientación inicial</small></span>
+          <span class="online"><i></i> DISPONIBLE</span>
+        </header>
+        <div class="messages" id="messages" aria-live="polite"></div>
+        <form class="composer" id="composer">
+          <div class="examples" aria-label="Probar una consulta">
+            <button class="example" type="button" data-example="start">Probar: arranque + vibración</button>
+            <button class="example" type="button" data-example="smoke">Probar: humo blanco continuo</button>
+          </div>
+          <div class="input-row">
+            <textarea id="message-input" rows="1" maxlength="800" aria-label="Contanos qué notaste" placeholder="Contame qué notaste en el auto…"></textarea>
+            <button class="send" type="submit" aria-label="Enviar consulta">↑</button>
+          </div>
+          <p class="privacy">La demo responde en este navegador. No guarda ni envía lo que escribís.</p>
+        </form>
+      </section>
+    </div>
+    <p class="foot">DEMOSTRACIÓN LOCAL · RESPUESTAS GUIADAS · SIN API NI ENVÍO DE DATOS</p>
+  </main>
+  <script>
+    (function(){
+      const messages=document.getElementById('messages');
+      const form=document.getElementById('composer');
+      const input=document.getElementById('message-input');
+      let turns=0;
+      let currentSummary='';
+      let intent='general';
+      let safety='';
+      const normalize=value=>String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+      function bubble(text,role){
+        const node=document.createElement('div');
+        node.className='message '+role;
+        node.textContent=text;
+        messages.append(node);
+        messages.scrollTop=messages.scrollHeight;
+      }
+      function chips(items,callback){
+        const row=document.createElement('div');
+        row.className='choices';
+        items.forEach(item=>{
+          const button=document.createElement('button');
+          button.type='button';button.className='choice';button.textContent=item;
+          button.addEventListener('click',()=>{row.remove();bubble(item,'user');callback(item)});
+          row.append(button);
+        });
+        messages.append(row);messages.scrollTop=messages.scrollHeight;
+      }
+      function finish(){
+        const card=document.createElement('div');
+        card.className='result';
+        const label=document.createElement('small');label.textContent='SIGUIENTE PASO';
+        const copy=document.createElement('p');
+        copy.textContent='La causa no se puede confirmar por chat. En MOTORLOZ podemos revisar el vehículo, escuchar el síntoma y explicarte con claridad cómo seguir.';
+        const link=document.createElement('a');link.href='/?redesign=final#turno';link.textContent='Coordinar una revisión ↗';
+        link.addEventListener('click',()=>{try{sessionStorage.setItem('motorloz-assistant-draft',currentSummary)}catch(e){}});
+        card.append(label,copy,link);messages.append(card);messages.scrollTop=messages.scrollHeight;
+      }
+      function followup(){
+        if(turns===1){
+          chips(['También en ralentí','Solo al acelerar','No estoy seguro'],answer=>{
+            currentSummary+=' Respuesta: '+answer+'.';
+            bubble('Gracias, ese dato ayuda a describir cuándo aparece. Por sí solo no confirma qué pieza está fallando. ¿Se encendió la luz de Check Engine?','assistant');
+            turns=2;
+            chips(['Sí','No','No estoy seguro'],answer2=>{
+              currentSummary+=' Check Engine: '+answer2+'.';
+              bubble('Perfecto, ya tengo la consulta mejor ordenada. El equipo puede revisarla con el contexto que nos diste.','assistant');
+              turns=3;finish();
+            });
+          });
+        }else if(turns===2){
+          chips(['Sí','No','No estoy seguro'],answer=>{
+            currentSummary+=' Check Engine: '+answer+'.';
+            bubble('Gracias. Anoto ese dato para que el equipo tenga más contexto al revisar el auto.','assistant');
+            turns=3;finish();
+          });
+        }else finish();
+      }
+      function respond(text){
+        currentSummary=text;
+        const q=normalize(text);
+        const smoke=/humo|humareda|sale humo/.test(q);
+        const fuel=/nafta|combustible|gasolina|olor a gas|olor fuerte/.test(q);
+        const start=/arranc|encend|prend|tose|tos|le cuesta|cuesta prender/.test(q);
+        const shake=/vibr|tiemb|tirone|sacud/.test(q);
+        const brake=/freno|no frena|pedal de freno/.test(q);
+        const overheat=/temperatura|recalent|calienta|hirviendo/.test(q);
+        if(smoke){
+          intent='humo';safety='prioridad';
+          bubble('Entiendo. Si el humo blanco es abundante y continuo, no lo aceleres: detené el auto en un lugar seguro y apagá el motor. No abras el sistema de refrigeración mientras esté caliente. No puedo confirmar la causa a distancia; lo más prudente es coordinar una revisión y pedir asistencia si no es seguro moverlo. ¿El humo aparece apenas lo encendés o sigue saliendo después?','assistant');
+          turns=1;
+          chips(['Solo al encender','Sigue saliendo','No estoy seguro'],answer=>{
+            currentSummary+=' Humo: '+answer+'.';
+            bubble('Gracias. Ese dato orienta la revisión, pero no alcanza para confirmar el origen del humo. Si sigue saliendo, mantenelo apagado y coordiná asistencia para revisarlo.','assistant');
+            turns=3;finish();
+          });
+          return;
+        }
+        if(brake||overheat){
+          intent=brake?'frenos':'temperatura';safety='prioridad';
+          bubble(brake?'Si el freno no responde como siempre, no sigas circulando. Estacioná en un lugar seguro y coordiná asistencia para que el vehículo llegue al taller sin riesgo. No puedo determinar la causa por chat.':'Si la temperatura está en zona roja o el auto está recalentando, detenete en un lugar seguro y apagá el motor. No abras el sistema de refrigeración mientras esté caliente. Conviene revisarlo antes de seguir circulando.','assistant');
+          turns=1;
+          chips(['Entendido, quiero coordinar','Quiero agregar un dato'],answer=>{
+            currentSummary+=' Prioridad: requiere revisión antes de seguir circulando.';
+            bubble('Claro. En MOTORLOZ podemos revisar el vehículo y explicarte el próximo paso con el auto presente.','assistant');
+            turns=3;finish();
+          });
+          return;
+        }
+        if(start&&shake&&fuel){
+          intent='encendido';safety='combustible';
+          bubble('Te entiendo: le cuesta arrancar, vibra al acelerar y sentís olor a nafta. Puede haber más de una causa posible, incluso en el encendido o la combustión, pero no sería responsable asegurar por chat que sea una bujía, una bobina u otra pieza. En MOTORLOZ escuchamos el caso, lo revisamos con criterio y te explicamos cómo seguir. Si el olor a combustible es fuerte o persiste, estacioná en un lugar seguro y no lo sigas usando. Para ordenar la consulta: ¿la vibración aparece con el auto quieto en ralentí o solo al acelerar?','assistant');
+          turns=1;followup();return;
+        }
+        if(start||shake||fuel){
+          intent=start?'arranque':shake?'vibracion':'combustible';
+          bubble('Entiendo. Lo que notás puede tener distintas causas; con una descripción no se puede confirmar qué componente falla ni conviene cambiar piezas a ciegas. En MOTORLOZ podemos escuchar el síntoma, revisar el vehículo con el equipo del taller y explicarte el próximo paso. ¿Cuándo aparece más: al arrancar, al acelerar o durante todo el trayecto?','assistant');
+          turns=1;
+          chips(['Al arrancar','Al acelerar','Durante todo el trayecto','No estoy seguro'],answer=>{
+            currentSummary+=' Se nota principalmente: '+answer+'.';
+            bubble('Gracias, ese contexto le sirve al equipo para preparar la revisión. ¿Querés coordinar una evaluación con MOTORLOZ?','assistant');
+            turns=3;finish();
+          });
+          return;
+        }
+        intent='general';
+        bubble('Gracias por contármelo. Puede haber varias causas y no quiero adivinar una pieza sin revisar el auto. En MOTORLOZ podemos escucharte, evaluar el síntoma con herramientas de diagnóstico y explicarte el siguiente paso. ¿Desde cuándo lo notás?','assistant');
+        turns=1;
+        chips(['Empezó hoy','Hace unos días','Hace más tiempo','No estoy seguro'],answer=>{
+          currentSummary+=' Lo nota desde: '+answer+'.';
+          bubble('Perfecto. Ya tengo un poco más de contexto para ordenar la consulta.','assistant');
+          turns=3;finish();
+        });
+      }
+      function send(text){
+        const value=String(text||'').trim();
+        if(!value)return;
+        bubble(value,'user');input.value='';respond(value);
+      }
+      bubble('Hola, soy la recepción virtual de MOTORLOZ. Contame con tus palabras qué notaste; no necesitás saber de mecánica. Te ayudo a ordenar la consulta para que el equipo pueda revisarla.','assistant');
+      form.addEventListener('submit',event=>{event.preventDefault();send(input.value)});
+      input.addEventListener('keydown',event=>{if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();form.requestSubmit()}});
+      document.querySelectorAll('.example').forEach(button=>button.addEventListener('click',()=>{
+        messages.innerHTML='';turns=0;currentSummary='';
+        send(button.dataset.example==='smoke'?'Está saliendo humo blanco todo el tiempo, no para aunque acelero.':'Me cuesta prenderlo; cuando lo saco y acelero vibra, tiene olor a nafta, tose y no responde bien.');
+      }));
+    })();
+  </script>
+</body>
+</html>

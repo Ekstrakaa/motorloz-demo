@@ -19,7 +19,9 @@
     corvette:photo('corvette-taller','Corvette en el taller',true),
     space:photo('instalaciones','Una mirada al interior del taller',true),
     front:photo('fachada-vehiculos','Puertas abiertas a la pasión por los autos',true),
-    mechanic:photo('equipo-mecanica','Mecánico revisando un motor en MOTORLOZ',true,'50% 38%'),
+    engineRepair:photo('equipo-revision-multimarca','Mecánico revisando un vehículo multimarca en el taller',true),
+    workbench:photo('equipo-trabajo-detalle','Mecánico trabajando en el banco de servicio',true),
+    facadeSubaru:photo('fachada-subaru-frente','Fachada de MOTORLOZ con un Subaru al frente',true),
     diagnostic:photo('equipo-diagnostico','Tecnología y atención al detalle',false,'56% 45%'),
     tools:photo('herramientas-taller','Herramientas listas para cada diagnóstico',true),
     subaruFront:photo('subaru-frente','Subaru y atención especializada',true)
@@ -29,8 +31,8 @@
     intro:{items:[pictures.subaruWide,pictures.front],interval:3000},
     vehicles:{items:[pictures.ferrari,pictures.corvette],interval:3000},
     spaces:{items:[pictures.space,pictures.reception,pictures.subaruWide],interval:3000},
-    arrival:{items:[pictures.workshopWide],interval:5000},
-    team:{items:[pictures.planning,pictures.mechanic],interval:3000}
+    arrival:{items:[pictures.localAereo,pictures.facadeSubaru],interval:3000},
+    team:{items:[pictures.engineRepair,pictures.workbench],interval:3000}
   };
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   document.querySelectorAll('[data-slideshow]').forEach(root => {
@@ -55,7 +57,6 @@
     const firstImage=frames[0].querySelector('img');fitPhoto(firstImage);if(!firstImage.complete)firstImage.addEventListener('load',()=>fitPhoto(firstImage),{once:true});firstImage.alt=items[0].alt;firstImage.style.objectPosition=items[0].position;frames[0].style.backgroundImage=`url("${items[0].src}")`;frames[0].classList.toggle('clean-photo',items[0].clean);
     new IntersectionObserver(entries=>{visible=entries[0].isIntersecting;if(visible)load(items[(index+1)%items.length]);schedule();},{threshold:.15}).observe(root);
     document.addEventListener('visibilitychange',schedule);reduced.addEventListener('change',()=>{paused=reduced.matches;updateLabels();schedule();});
-    root.querySelector('.slide-expand')?.addEventListener('click',()=>{const dialog=document.querySelector('#photo-dialog');const container=dialog.querySelector('.lightbox-photo');container.className='lightbox-photo slideshow-lightbox';const frame=document.createElement('div');frame.className='slide-frame is-current';const image=new Image();image.src=items[index].src;paint(frame,items[index],image);container.replaceChildren(frame);container.setAttribute('role','img');container.setAttribute('aria-label',items[index].alt);document.querySelector('#photo-caption').textContent=items[index].alt+' · MOTORLOZ';dialog.showModal();});
     updateLabels();
   });
 })();
