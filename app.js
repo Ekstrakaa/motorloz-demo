@@ -1,6 +1,5 @@
 'use strict';
 const config = window.MOTORLOZ;
-document.querySelectorAll('.slide-expand').forEach(button => button.remove());
 document.querySelectorAll('[data-instagram]').forEach(a => a.href = config.instagram);
 document.querySelectorAll('[data-maps]').forEach(a => a.href = config.maps);
 document.querySelectorAll('[data-directions]').forEach(a => a.href = config.directions);

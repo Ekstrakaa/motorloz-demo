@@ -623,3 +623,56 @@ footer:after { opacity:.44!important;animation:motorloz-aurora-focus-b 11s cubic
 /* La historia del equipo conserva la proporción natural de cada foto. */
 .team-story .slide-stage{height:auto!important;min-height:0!important;aspect-ratio:auto!important;background:transparent!important}
 .team-story .slide-frame img{width:100%!important;height:100%!important;left:0!important;top:0!important;transform:none!important;object-fit:cover!important;object-position:center!important;background:transparent!important;padding:0!important}
+
+/* Botón flotante de ayuda, como burbuja de WhatsApp. */
+.floating-booking{display:flex;align-items:center;gap:8px!important;width:auto!important;min-height:0!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;color:#23333a!important;letter-spacing:0!important}
+.floating-booking .floating-help-label{display:block;padding:10px 13px;border-radius:3px;background:#fff;color:#29373e;font-size:12px;line-height:1.25;white-space:nowrap;box-shadow:0 3px 12px #00101824}
+.floating-booking .floating-whatsapp{display:grid;place-items:center;flex:0 0 56px;width:56px;height:56px;border-radius:50%;background:#20b94b;box-shadow:0 4px 13px #00101842;transition:transform .2s,background .2s}
+.floating-booking .floating-whatsapp svg{display:block;width:29px;height:29px;fill:none;stroke:#fff;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.floating-booking .floating-whatsapp svg path+path{fill:none;stroke:#fff}
+.floating-booking:hover .floating-whatsapp{transform:scale(1.04);background:#18a943}
+.floating-booking:hover .floating-help-label{color:#18272e}
+@media(max-width:760px){.floating-booking{gap:7px!important;bottom:calc(14px + env(safe-area-inset-bottom,0px))!important;right:14px!important}.floating-booking .floating-help-label{padding:9px 11px;font-size:11px}.floating-booking .floating-whatsapp{flex-basis:54px;width:54px;height:54px}.floating-booking .floating-whatsapp svg{width:27px;height:27px}}
+@media(max-width:340px){.floating-booking .floating-help-label{padding:8px 9px;font-size:10px}.floating-booking .floating-whatsapp{flex-basis:50px;width:50px;height:50px}}
+
+/* Banda de marcas estática con los activos disponibles de MOTORLOZ. */
+.brand-experience{position:relative;overflow:hidden;padding-block:49px 39px!important;background:#e9edec!important;color:#20292c!important}
+.brand-experience-head{display:flex;align-items:center;gap:32px;margin-bottom:14px}
+.brand-experience-head h2{font:600 clamp(16px,1.35vw,20px)/1.35 'Segoe UI',Arial,sans-serif;letter-spacing:.025em;color:#25343b;white-space:nowrap}
+.brand-experience-head>span{height:1px;flex:1;background:#b7c5c8}
+.brand-lineup{position:relative;overflow:hidden;margin-inline:-10.5%;padding:11px 0 16px;mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent)}
+.brand-lineup-grid{display:grid;width:100%;grid-template-columns:repeat(4,minmax(0,1fr));align-items:center}
+
+.brand-wordmark{height:105px;min-width:206px;padding:12px 26px;display:flex;align-items:center;justify-content:center;gap:12px;color:#17272d;white-space:nowrap}
+.brand-wordmark>span:last-child{font-weight:750;letter-spacing:.16em;font-size:15px}
+.brand-subaru img{width:43px;height:43px;object-fit:contain}.brand-subaru>span:last-child{font-size:14px;letter-spacing:.2em}
+
+
+.brand-hyundai img{width:37px;height:37px;object-fit:contain}.brand-hyundai>span:last-child{letter-spacing:.12em}
+.brand-ferrari>span:last-child{font:700 21px/1 Georgia,serif;letter-spacing:.18em;border-block:2px solid #25373c;padding:8px 0}
+
+.brand-experience-note{max-width:none;margin:0 auto;text-align:center;color:#58686d;font-size:13px;letter-spacing:.005em}
+
+@media(max-width:760px){.brand-experience{padding-block:36px 30px!important}.brand-experience-head{gap:14px;margin-bottom:5px}.brand-experience-head h2{font-size:15px;white-space:normal}.brand-lineup{margin-inline:-8%;padding:6px 0 8px}.brand-wordmark{min-width:158px;height:84px;padding-inline:17px;gap:9px}.brand-wordmark>span:last-child{font-size:12px}.brand-subaru img{width:35px;height:35px}.brand-subaru>span:last-child{font-size:12px}.brand-hyundai img{width:31px;height:31px}.brand-ferrari>span:last-child{font-size:17px}.brand-experience-note{font-size:11px;line-height:1.65;max-width:54ch}}
+
+/* La franja de marcas queda estática: lectura clara, sin carrusel ni adornos móviles. */
+.brand-lineup{overflow:visible;margin-inline:0;padding:12px 0 16px;mask-image:none}
+.brand-lineup-grid{display:grid;width:100%;grid-template-columns:repeat(4,minmax(0,1fr));align-items:center;}
+.brand-wordmark{min-width:0;border-right:1px solid #c9d2d3;height:78px;padding-inline:14px}
+.brand-wordmark:nth-child(4){border-right:0}
+.brand-wordmark:nth-child(n+5){display:none}
+
+.brand-toyota>span:last-child{font:700 18px/1 'Segoe UI',Arial,sans-serif;letter-spacing:.2em}
+.brand-ferrari>span:last-child{font:700 19px/1 Georgia,serif;letter-spacing:.15em}
+@media(max-width:760px){.brand-lineup{overflow:visible;margin-inline:0;padding:8px 0 11px}.brand-lineup-grid{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:2px}.brand-wordmark{height:67px;padding-inline:7px;border-right:0}.brand-wordmark:nth-child(odd){border-right:1px solid #c9d2d3}.brand-wordmark:nth-child(4){border-right:0}.brand-wordmark>span:last-child{font-size:11px}.brand-subaru img{width:30px;height:30px}.brand-subaru>span:last-child{font-size:11px}.brand-hyundai img{width:28px;height:28px}.brand-toyota>span:last-child,.brand-ferrari>span:last-child{font-size:15px}}
+/* Diagnóstico: problema cotidiano, respuesta del taller y salida directa al formulario. */
+.diagnostic-story{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.04fr);align-items:stretch;padding:0!important;background:#0b1519!important;color:#edf4f4!important}
+.diagnostic-story-image{min-height:460px;overflow:hidden;background:#15262b}
+.diagnostic-story-image img{display:block;width:100%;height:100%;min-height:460px;object-fit:cover;object-position:center 48%}
+.diagnostic-story-copy{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;padding:74px clamp(36px,7vw,110px)}
+.diagnostic-story-copy .eyebrow{color:#75c5d2;font-size:10px;letter-spacing:1.8px}
+.diagnostic-story-copy h2{margin-top:25px;font-size:clamp(38px,4.5vw,64px);line-height:1.02;letter-spacing:-.05em;text-wrap:balance}
+.diagnostic-story-copy>p:not(.eyebrow){max-width:48ch;margin-top:22px;color:#b9c9cd;line-height:1.75}
+.diagnostic-story-copy .button{margin-top:29px;min-height:52px}
+.diagnostic-story-note{margin-top:42px;padding-top:13px;width:100%;border-top:1px solid #33494f;color:#849da3;font:9px/1.5 'Segoe UI',sans-serif;letter-spacing:1.3px}
+@media(max-width:760px){.diagnostic-story{grid-template-columns:1fr}.diagnostic-story-image{min-height:0;aspect-ratio:1.28}.diagnostic-story-image img{min-height:0}.diagnostic-story-copy{padding:40px 7% 37px}.diagnostic-story-copy h2{font-size:clamp(36px,10vw,48px);margin-top:18px}.diagnostic-story-copy>p:not(.eyebrow){margin-top:16px;font-size:14px}.diagnostic-story-copy .button{margin-top:22px}.diagnostic-story-note{margin-top:30px}}

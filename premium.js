@@ -1,25 +1,92 @@
 'use strict';
 (() => {
-  const reduced=matchMedia('(prefers-reduced-motion: reduce)');
-  const header=document.querySelector('.header');const progress=document.querySelector('.reading-progress');let queued=false;
-  function scrollState(){queued=false;header.classList.toggle('header-scrolled',scrollY>90);const distance=document.documentElement.scrollHeight-innerHeight;progress.style.transform=`scaleX(${distance>0?scrollY/distance:0})`;}
-  addEventListener('scroll',()=>{if(!queued){queued=true;requestAnimationFrame(scrollState);}},{passive:true});scrollState();
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  const header = document.querySelector('.header');
+  const progress = document.querySelector('.reading-progress');
+  let queued = false;
 
-  const appointmentInfo=document.querySelector('.appointment-grid>div');
-  const appointmentForm=document.querySelector('#appointment-form');
+  function scrollState() {
+    queued = false;
+    header?.classList.toggle('header-scrolled', scrollY > 90);
+    const distance = document.documentElement.scrollHeight - innerHeight;
+    if (progress) progress.style.transform = `scaleX(${distance > 0 ? scrollY / distance : 0})`;
+  }
+  addEventListener('scroll', () => {
+    if (!queued) { queued = true; requestAnimationFrame(scrollState); }
+  }, { passive: true });
+  scrollState();
 
-  if(appointmentForm){const context=appointmentForm.querySelector('[name="contexto"]');if(context)context.closest('label')?.remove();const availability=appointmentForm.querySelector('[name="disponibilidad"]');if(availability&&!appointmentForm.querySelector('[name="prioridad"]')){const priority=document.createElement('label');priority.className='field-shell field-priority';priority.dataset.step='+';priority.innerHTML='<span>¿Necesitás una atención prioritaria?</span><select name="prioridad" aria-label="Prioridad de la consulta"><option value="Consulta coordinada">Consulta coordinada</option><option value="Urgente">Es urgente</option></select><small>Marcá urgente si el auto no puede esperar; recepción evalúa la prioridad.</small>';availability.closest('label')?.before(priority);}if(availability){const label=availability.closest('label');if(label){const title=label.querySelector('span');if(title)title.innerHTML='Disponibilidad para coordinar <b>/ Opcional</b>';availability.placeholder='Ej.: martes por la mañana';}}}
-  const privacyNote=appointmentForm?.querySelector('.privacy-note');if(privacyNote)privacyNote.textContent='Se abre WhatsApp con tu consulta ordenada. Esta web no guarda tus datos.';
-  if(appointmentInfo&&!appointmentInfo.querySelector('.appointment-photo')){const figure=document.createElement('figure');figure.className='appointment-photo';figure.innerHTML='<img src="assets/equipo-diagnostico.png" alt="Diagnóstico y planificación frente a los vehículos en MOTORLOZ"><figcaption><span>ATENCIÓN COORDINADA</span><b>Escuchamos el caso y ordenamos el próximo paso.</b></figcaption>';appointmentInfo.append(figure);}
-  const peopleTitle=document.querySelector('.people-text h2');if(peopleTitle)peopleTitle.innerHTML='Te escuchamos.<br>Entendemos<br><em>tu auto.</em>';
-  const hyundaiCopy=document.querySelector('.hyundai-copy');if(hyundaiCopy&&!hyundaiCopy.querySelector('.hyundai-badge')){const badge=document.createElement('div');badge.className='hyundai-badge';badge.setAttribute('aria-label','Hyundai, servicio oficial');badge.innerHTML='<svg viewBox="0 0 62 30" aria-hidden="true"><ellipse cx="31" cy="15" rx="29" ry="12"></ellipse><path d="M20 8v14M42 8v14M20 15h22"></path></svg><span>HYUNDAI</span><i>SERVICIO OFICIAL</i>';hyundaiCopy.querySelector('.eyebrow')?.after(badge);}
-  const peopleParagraphs=document.querySelectorAll('.people-text>p');if(peopleParagraphs[0])peopleParagraphs[0].textContent='Cada ruido, aviso o cambio en la respuesta del vehículo es información. El equipo la escucha, la ordena y te explica qué conviene revisar.';if(peopleParagraphs[1])peopleParagraphs[1].textContent='Experiencia multimarca, tecnología de diagnóstico y una atención cercana para que sepas qué se hizo y por qué.';
-  const japanNote=document.querySelector('.japan-note');if(japanNote)japanNote.textContent='ESPECIALISTAS SUBARU · ATENCIÓN MULTIMARCA';
-  const films=document.querySelector('.films-section');const workshopSection=document.querySelector('#mirada');if(films&&workshopSection)workshopSection.parentNode.insertBefore(films,workshopSection);
-  const contactDialog=document.querySelector('#contact-dialog');document.querySelector('#contact-open')?.addEventListener('click',()=>contactDialog.showModal());
-  if(!reduced.matches){const revealObserver=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add('is-in');revealObserver.unobserve(entry.target);}}),{threshold:.08,rootMargin:'0px 0px -5%'});const revealSelector='.section-label>*,.intro-grid>*,.intro-copy>*,.care-statement>*,.precision-rail article,.services-heading>*,.service-list details,.workshop-title>*,.gallery-main,.gallery-secondary,.japan-gallery>*,.people-editorial>*,.films-heading>*,.film-card,.hyundai-image,.hyundai-copy>*,.reviews-intro>*,.review-verification,.appointment-grid>*,.appointment-steps li,.location-top>*,.arrival-grid>*,.map-footer>*,footer .footer-links>*';[...document.querySelectorAll(revealSelector)].forEach((node,index)=>{node.classList.add('scroll-reveal');node.style.setProperty('--reveal-delay',`${(index%4)*65}ms`);revealObserver.observe(node);});}
-  const images=[['mecanica-subaru.png','Diagnóstico y mecánica general en MOTORLOZ'],['elevadores.png','Alineación y balanceo en el taller'],['subaru-taller.jpg','Revisión del tren delantero y la suspensión'],['equipo-diagnostico.png','Diagnóstico de sistemas eléctricos y electrónicos'],['toyota-frente.png','Revisión de ruedas y cubiertas'],['equipo-mecanica.png','Mantenimiento preventivo y cambio de aceite']];
-  const image=document.querySelector('#service-image');let current=0,version=0;
-  document.querySelectorAll('.service-list details').forEach((detail,index)=>{const figure=document.createElement('figure');figure.className='service-mobile-image';const mobileImage=document.createElement('img');mobileImage.src=`assets/${images[index][0]}`;mobileImage.alt=images[index][1];mobileImage.loading='lazy';mobileImage.decoding='async';figure.append(mobileImage);detail.querySelector('.service-body').prepend(figure);detail.addEventListener('toggle',async()=>{if(!detail.open||index===current)return;current=index;const request=++version;document.querySelector('#service-visual-index').textContent=`${String(index+1).padStart(2,'0')} / 06`;const next=new Image();next.src=`assets/${images[index][0]}`;try{await next.decode();}catch{return;}if(request!==version)return;image.src=next.src;image.alt=images[index][1];if(!reduced.matches)image.animate([{opacity:.3,filter:'blur(4px)',transform:'scale(1.018)'},{opacity:1,filter:'blur(0)',transform:'scale(1)'}],{duration:650,easing:'cubic-bezier(.2,.75,.25,1)'});});});
-  const booking=document.querySelector('.floating-booking');let heroVisible=true,formVisible=false,locationVisible=false,filmsVisible=false;const update=()=>booking.classList.toggle('is-visible',!heroVisible&&!formVisible&&!locationVisible&&!filmsVisible);new IntersectionObserver(entries=>{for(const e of entries){if(e.target.id==='inicio')heroVisible=e.isIntersecting;if(e.target.id==='turno')formVisible=e.isIntersecting;}update();},{threshold:.1}).observe(document.querySelector('#inicio'));new IntersectionObserver(entries=>{formVisible=entries[0].isIntersecting;update();},{threshold:.1}).observe(document.querySelector('#turno'));new IntersectionObserver(entries=>{locationVisible=entries[0].isIntersecting;update();},{threshold:.1}).observe(document.querySelector('#ubicacion'));new IntersectionObserver(entries=>{filmsVisible=entries[0].isIntersecting;update();},{threshold:.1}).observe(document.querySelector('.films-section'));
+  document.querySelector('#contact-open')?.addEventListener('click', () => document.querySelector('#contact-dialog')?.showModal());
+
+  document.querySelectorAll('.slide-expand').forEach(button => {
+    button.addEventListener('click', () => {
+      const slideshow = button.closest('[data-slideshow]');
+      const image = slideshow?.querySelector('.slide-frame.is-current img');
+      if (!image) return;
+      const dialog = document.querySelector('#photo-dialog');
+      const photo = dialog?.querySelector('.photo-source');
+      if (!dialog || !photo) return;
+      photo.className = 'photo-source';
+      photo.style.backgroundImage = `url("${image.currentSrc || image.src}")`;
+      photo.style.aspectRatio = `${image.naturalWidth || 4} / ${image.naturalHeight || 3}`;
+      photo.style.minHeight = '0';
+      photo.style.height = 'min(66svh, 640px)';
+      photo.style.backgroundSize = 'contain';
+      photo.style.backgroundRepeat = 'no-repeat';
+      photo.setAttribute('role', 'img');
+      photo.setAttribute('aria-label', image.alt);
+      document.querySelector('#photo-caption').textContent = `${image.alt} · MOTORLOZ`;
+      dialog.showModal();
+    });
+  });
+
+  if (!reduced.matches && 'IntersectionObserver' in window) {
+    const revealObserver = new IntersectionObserver(entries => entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('is-in');
+        revealObserver.unobserve(entry.target);
+      }
+    }), { threshold: .08, rootMargin: '0px 0px -4%' });
+    const revealSelector = [
+      '.section-label > *', '.brand-experience-head > *', '.brand-experience-note',
+      '.intro-feature > *', '.intro-proof-row article', '.hyundai-image', '.hyundai-copy > *',
+      '.diagnostic-story-image', '.diagnostic-story-copy > *', '.diagnostic-mosaic > *',
+      '.reference-bridge-card > *', '.why-motorloz > *', '.services-intro > *',
+      '.service-card', '.workshop-title > *', '.gallery-main', '.gallery-secondary',
+      '.japan-gallery > *', '.people-editorial > *', '.reviews-intro > *',
+      '.review-verification', '.contact-bridge > *', '.films-heading > *', '.film-card',
+      '.films-social > *', '.appointment-grid > *', '.appointment-steps li',
+      '.location-top > *', '.arrival-grid > *', '.map-footer > *', 'footer .footer-links > *'
+    ].join(',');
+    document.querySelectorAll(revealSelector).forEach((node, index) => {
+      node.classList.add('scroll-reveal');
+      node.style.setProperty('--reveal-delay', `${(index % 4) * 65}ms`);
+      revealObserver.observe(node);
+    });
+  } else {
+    document.querySelectorAll('.scroll-reveal').forEach(node => node.classList.add('is-in'));
+  }
+
+  const floating = document.querySelector('.floating-booking');
+  const hero = document.querySelector('#inicio');
+  const form = document.querySelector('#turno');
+  const services = document.querySelector('#servicios');
+  const gallery = document.querySelector('#mirada');
+  const people = document.querySelector('.people');
+  const reviews = document.querySelector('.reviews');
+  const contactBridge = document.querySelector('.contact-bridge');
+  const referenceBridge = document.querySelector('.reference-bridge');
+  const diagnosticStory = document.querySelector('.diagnostic-story');
+  const films = document.querySelector('.films-section');
+  const location = document.querySelector('#ubicacion');
+  if (floating && hero && form && 'IntersectionObserver' in window) {
+    const key = section => section.id || section.className;
+    const targets = [hero, services, gallery, people, reviews, referenceBridge, diagnosticStory, contactBridge, films, form, location].filter(Boolean);
+    const visible = new Map(targets.map(section => [key(section), section === hero]));
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => visible.set(key(entry.target), entry.isIntersecting));
+      floating.classList.toggle('is-visible', !targets.some(section => visible.get(key(section))));
+    }, { threshold: .12 });
+    targets.forEach(section => observer.observe(section));
+  }
 })();

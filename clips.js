@@ -55,19 +55,21 @@
     video.addEventListener('progress', startWhenReady);
     video.addEventListener('waiting', () => {
       card.dataset.buffering = 'true';
+      card.classList.remove('is-playing');
     });
     video.addEventListener('playing', () => {
       delete card.dataset.buffering;
+      card.classList.add('is-playing');
     });
     video.addEventListener('error', () => {
       video.pause();
       video.removeAttribute('src');
       video.load();
       video.remove();
+      card.classList.remove('is-playing');
       if (posterImage) posterImage.hidden = false;
     });
 
-    if (posterImage) posterImage.hidden = true;
     card.prepend(video);
 
     const observer = new IntersectionObserver(entries => {
