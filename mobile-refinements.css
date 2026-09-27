@@ -384,3 +384,182 @@ main>.section.films-section .film-card>video{object-fit:contain!important;object
 }
 /* Evitar una cola vacía bajo el bloque de ubicación en móvil. */
 @media(max-width:760px){.location.section{height:auto!important;min-height:0!important;padding-bottom:24px!important;margin-bottom:0!important}}
+
+/* Atmósfera MOTORLOZ: aurora visible en los fondos oscuros y cuadrícula de taller en los claros. */
+:root{--motorloz-ink:#0b1112;--motorloz-cyan:#39bdcb}
+@keyframes motorloz-aurora-wave-a{
+  0%{transform:translate3d(-8%,4%,0) rotate(-4deg) scale(1.02)}
+  50%{transform:translate3d(3%,-4%,0) rotate(1deg) scale(1.1)}
+  100%{transform:translate3d(9%,3%,0) rotate(5deg) scale(1.06)}
+}
+@keyframes motorloz-aurora-wave-b{
+  0%{transform:translate3d(8%,-3%,0) rotate(4deg) scale(1.08)}
+  50%{transform:translate3d(-3%,5%,0) rotate(-1deg) scale(1.02)}
+  100%{transform:translate3d(-9%,-3%,0) rotate(-5deg) scale(1.12)}
+}
+main>.section.workshop,main>.section.people,main>.section.films-section,
+main>.section.why-motorloz,main>.section.diagnostic-story,footer{
+  position:relative!important;isolation:isolate!important;overflow:hidden;
+  background-color:var(--motorloz-ink)!important;
+}
+main>.section.workshop:before,main>.section.people:before,main>.section.films-section:before,
+main>.section.why-motorloz:before,main>.section.diagnostic-story:before,footer:before{
+  content:"";position:absolute;z-index:0;inset:-24% -22%;display:block;pointer-events:none;
+  background:radial-gradient(ellipse 43% 33% at 20% 62%,rgba(29,157,174,.23),transparent 100%),
+    radial-gradient(ellipse 34% 29% at 77% 24%,rgba(42,190,203,.2),transparent 100%),
+    linear-gradient(118deg,transparent 22%,rgba(21,130,151,.09) 43%,transparent 62%,rgba(54,188,200,.08) 82%,transparent 96%);
+  opacity:.78;mix-blend-mode:screen;animation:motorloz-aurora-wave-a 19s ease-in-out infinite alternate;will-change:transform;
+}
+main>.section.workshop:after,main>.section.people:after,main>.section.films-section:after,
+main>.section.why-motorloz:after,main>.section.diagnostic-story:after,footer:after{
+  content:"";position:absolute;z-index:0;inset:-24% -20%;display:block;pointer-events:none;
+  background:radial-gradient(ellipse 36% 28% at 73% 75%,rgba(14,116,143,.23),transparent 100%),
+    linear-gradient(126deg,transparent 20%,rgba(45,190,202,.07) 38%,rgba(12,120,144,.12) 50%,transparent 66%,rgba(52,188,203,.075) 81%,transparent 93%);
+  opacity:.68;mix-blend-mode:screen;animation:motorloz-aurora-wave-b 27s ease-in-out infinite alternate;will-change:transform;
+}
+main>.section.workshop>*,main>.section.people>*,main>.section.films-section>*,
+main>.section.why-motorloz>*,main>.section.diagnostic-story>*,footer>*{position:relative;z-index:1}
+/* La cita tiene una tarjeta oscura sobre una sección clara; conserva su marco y mueve el reflejo dentro. */
+.appointment:before{
+  background-image:radial-gradient(ellipse at 16% 22%,rgba(28,155,170,.2),transparent 47%),
+    radial-gradient(ellipse at 85% 78%,rgba(18,104,121,.2),transparent 46%),
+    linear-gradient(145deg,#0b1112,#0b1112 72%)!important;
+  background-size:155% 160%,155% 160%,100% 100%!important;
+  animation:motorloz-aurora-flow 20s ease-in-out infinite alternate!important;
+}
+.reference-bridge-card{background-size:155% 160%,155% 160%,100% 100%!important;animation:motorloz-aurora-flow 20s ease-in-out infinite alternate!important}
+
+/* La cuadrícula recuerda el piso modular del taller: queda solo sobre planos claros. */
+.intro,.services,.reviews,.location,.subaru-section,.hyundai-section,.appointment{
+  background-image:
+    linear-gradient(rgba(34,66,72,.035) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(34,66,72,.035) 1px,transparent 1px),
+    linear-gradient(rgba(34,66,72,.018) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(34,66,72,.018) 1px,transparent 1px)!important;
+  background-size:48px 48px,48px 48px,192px 192px,192px 192px!important;
+  background-position:0 0,0 0,0 0,0 0!important;
+}
+.intro,.services,.reviews,.location,.subaru-section,.hyundai-section,.appointment{position:relative;isolation:isolate}
+@media(hover:hover) and (pointer:fine){
+  .intro:after,.services:after,.reviews:after,.location:after,.subaru-section:after,.hyundai-section:after,.appointment:after{
+    content:"";position:absolute;z-index:0;inset:0;pointer-events:none;opacity:0;
+    background:radial-gradient(ellipse 290px 230px at var(--surface-x,50%) var(--surface-y,50%),rgba(34,161,173,.085),transparent 72%);
+    transition:opacity .35s ease;
+  }
+  .intro:hover:after,.services:hover:after,.reviews:hover:after,.location:hover:after,.subaru-section:hover:after,.hyundai-section:hover:after,.appointment:hover:after{opacity:1}
+  .intro>*,.services>*,.reviews>*,.location>*,.subaru-section>*,.hyundai-section>*,.appointment>*{position:relative;z-index:1}
+}
+@media(max-width:760px){
+  .intro,.services,.reviews,.location,.subaru-section,.hyundai-section,.appointment{background-size:38px 38px,38px 38px,152px 152px,152px 152px!important}
+}
+@media(prefers-reduced-motion:reduce){
+  main>.section.workshop:before,main>.section.workshop:after,main>.section.people:before,main>.section.people:after,
+  main>.section.films-section:before,main>.section.films-section:after,main>.section.why-motorloz:before,main>.section.why-motorloz:after,
+  main>.section.diagnostic-story:before,main>.section.diagnostic-story:after,footer:before,footer:after,.appointment:before,.reference-bridge-card{animation:none!important}
+}
+
+/* Card de consulta: aurora perceptible y CTA con reflejo móvil, sin competir con el contenido. */
+@keyframes bridge-card-aurora{
+  0%{transform:translate3d(-9%,5%,0) rotate(-3deg) scale(1.02)}
+  48%{transform:translate3d(3%,-4%,0) rotate(1deg) scale(1.09)}
+  100%{transform:translate3d(10%,3%,0) rotate(4deg) scale(1.04)}
+}
+@keyframes bridge-card-rim{
+  from{box-shadow:0 26px 60px rgba(8,16,20,.14),0 0 0 rgba(48,190,204,0)}
+  to{box-shadow:0 30px 72px rgba(8,16,20,.2),0 0 34px rgba(48,190,204,.16)}
+}
+@keyframes bridge-cta-gradient{to{background-position:220% center}}
+@keyframes bridge-cta-glint{
+  0%,35%{transform:translateX(-145%) skewX(-18deg);opacity:0}
+  48%{opacity:.55}
+  68%,100%{transform:translateX(245%) skewX(-18deg);opacity:0}
+}
+.reference-bridge-card{
+  isolation:isolate;border-color:rgba(91,177,187,.38)!important;
+  box-shadow:0 26px 60px rgba(8,16,20,.14),0 0 0 rgba(48,190,204,0)!important;
+  animation:motorloz-aurora-flow 20s ease-in-out infinite alternate,bridge-card-rim 5s ease-in-out infinite alternate!important;
+  transition:border-color .35s ease,box-shadow .35s ease!important;
+}
+.reference-bridge-card:before{
+  content:"";position:absolute;z-index:0;inset:-32% -12%;border-radius:inherit;pointer-events:none;
+  background:radial-gradient(ellipse 42% 44% at 20% 57%,rgba(35,179,194,.36),transparent 100%),
+    radial-gradient(ellipse 36% 38% at 79% 32%,rgba(25,126,151,.35),transparent 100%),
+    linear-gradient(116deg,transparent 25%,rgba(69,208,218,.11) 45%,transparent 63%);
+  opacity:.72;mix-blend-mode:screen;animation:bridge-card-aurora 13s ease-in-out infinite alternate;will-change:transform;
+}
+.reference-bridge-card:after{z-index:2!important;border-color:rgba(164,223,225,.1)!important;transition:border-color .35s ease,box-shadow .35s ease}
+.reference-bridge-card>*{position:relative;z-index:1}
+.reference-bridge-card:hover,.reference-bridge-card:focus-within{
+  border-color:rgba(81,207,216,.62)!important;
+  box-shadow:0 32px 78px rgba(8,16,20,.23),0 0 42px rgba(40,183,197,.2)!important;
+}
+.reference-bridge-card:hover:after,.reference-bridge-card:focus-within:after{
+  border-color:rgba(164,223,225,.2)!important;box-shadow:inset 0 0 26px rgba(42,179,192,.05);
+}
+.reference-bridge-card .button.primary{
+  position:relative;isolation:isolate;overflow:hidden;
+  border:1px solid rgba(163,246,248,.38)!important;
+  background:linear-gradient(108deg,#25afbf 0%,#42c5d0 36%,#69d9dd 52%,#2db7c7 73%,#25afbf 100%)!important;
+  background-size:220% 100%!important;background-position:0% center;
+  box-shadow:0 8px 20px rgba(25,174,190,.2),inset 0 1px rgba(255,255,255,.28);
+  transition:transform .28s cubic-bezier(.2,.8,.2,1),box-shadow .28s ease,filter .28s ease!important;
+  animation:bridge-cta-gradient 6s linear infinite;
+}
+.reference-bridge-card .button.primary:before{
+  content:"";position:absolute;z-index:0;top:-45%;bottom:-45%;left:0;width:34%;pointer-events:none;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.34),transparent);
+  animation:bridge-cta-glint 5.8s cubic-bezier(.45,.05,.55,.95) infinite;
+}
+.reference-bridge-card .button.primary:hover,.reference-bridge-card .button.primary:focus-visible{
+  transform:translateY(-3px)!important;filter:saturate(1.08) brightness(1.06);
+  box-shadow:0 13px 30px rgba(30,183,197,.32),inset 0 1px rgba(255,255,255,.38)!important;
+}
+.reference-bridge-card .button.primary:active{transform:translateY(0) scale(.985)!important}
+@media(max-width:760px){
+  .reference-bridge-card:before{inset:-24% -35%;opacity:.62}
+  .reference-bridge-card{animation:motorloz-aurora-flow 20s ease-in-out infinite alternate,bridge-card-rim 5s ease-in-out infinite alternate!important}
+  .reference-bridge-card .button.primary{min-height:50px}
+}
+@media(prefers-reduced-motion:reduce){
+  .reference-bridge-card,.reference-bridge-card:before,.reference-bridge-card .button.primary,.reference-bridge-card .button.primary:before{animation:none!important}
+  .reference-bridge-card{background-position:50% 50%,50% 50%,50% 50%!important;box-shadow:0 26px 60px rgba(8,16,20,.14)!important}
+}
+
+/* Cristal ahumado MOTORLOZ: transparencia, canto frío y reflejo fino. */
+.reference-bridge-card{
+  background-color:rgba(8,20,23,.82)!important;
+  background-image:radial-gradient(ellipse at 14% 18%,rgba(44,174,185,.18),transparent 46%),
+    radial-gradient(ellipse at 88% 86%,rgba(22,117,133,.2),transparent 48%),
+    linear-gradient(136deg,rgba(16,39,42,.88),rgba(7,16,18,.91) 58%,rgba(13,30,33,.86))!important;
+  -webkit-backdrop-filter:blur(22px) saturate(145%);backdrop-filter:blur(22px) saturate(145%);
+  border:1px solid rgba(168,231,233,.36)!important;
+  box-shadow:inset 0 1px rgba(255,255,255,.17),inset 0 -1px rgba(71,190,198,.13),
+    0 26px 60px rgba(8,16,20,.2),0 0 0 1px rgba(255,255,255,.035)!important;
+}
+.reference-bridge-card:before{
+  background:linear-gradient(132deg,rgba(245,255,255,.15) 0%,rgba(231,255,255,.045) 19%,transparent 39%,transparent 72%,rgba(105,218,224,.08) 100%),
+    radial-gradient(ellipse 42% 44% at 20% 57%,rgba(35,179,194,.33),transparent 100%),
+    radial-gradient(ellipse 36% 38% at 79% 32%,rgba(25,126,151,.31),transparent 100%),
+    linear-gradient(116deg,transparent 25%,rgba(69,208,218,.11) 45%,transparent 63%)!important;
+  opacity:.82!important;
+}
+.reference-bridge-card:after{
+  border:1px solid rgba(222,250,250,.13)!important;
+  box-shadow:inset 0 1px rgba(255,255,255,.075),0 0 18px rgba(103,215,222,.035);
+}
+.reference-bridge-card .button.primary{
+  background-image:linear-gradient(145deg,rgba(107,233,237,.88),rgba(53,192,205,.78) 46%,rgba(29,154,171,.86)),
+    linear-gradient(110deg,transparent 34%,rgba(255,255,255,.31) 49%,transparent 64%)!important;
+  background-size:220% 100%,240% 100%!important;
+  -webkit-backdrop-filter:blur(10px) saturate(165%);backdrop-filter:blur(10px) saturate(165%);
+  border:1px solid rgba(226,255,255,.56)!important;
+  box-shadow:inset 0 1px rgba(255,255,255,.44),inset 0 -1px rgba(0,73,81,.16),
+    0 8px 22px rgba(19,159,175,.25)!important;
+}
+.reference-bridge-card .button.primary:hover,.reference-bridge-card .button.primary:focus-visible{
+  box-shadow:inset 0 1px rgba(255,255,255,.55),0 13px 30px rgba(30,183,197,.36),
+    0 0 24px rgba(94,228,235,.22)!important;
+}
+@media(prefers-reduced-motion:reduce){
+  .reference-bridge-card{background-position:50% 50%!important}
+}
