@@ -13,24 +13,27 @@
     const { canvas, ctx, width, height } = state;
     if (!width || !height) return;
     ctx.clearRect(0, 0, width, height);
+    const t = time * (reduced.matches ? .52 : 1);
     const span = Math.max(width, height) * .92;
     const fields = [
-      { color: '20,115,132', alpha: .14, x: .28 + .12 * Math.sin(time * .12), y: .34 + .15 * Math.cos(time * .1), sx: 1.65, sy: .76 },
-      { color: '43,171,183', alpha: .12, x: .73 + .14 * Math.cos(time * .095 + 1.7), y: .56 + .17 * Math.sin(time * .11 + 1.7), sx: 1.45, sy: .9 },
-      { color: '18,91,111', alpha: .13, x: .48 + .18 * Math.sin(time * .075 + 3.1), y: .73 + .12 * Math.cos(time * .13 + 2.4), sx: 1.8, sy: .72 },
-      { color: '70,190,195', alpha: .075, x: .53 + .16 * Math.cos(time * .08 + 4.2), y: .29 + .14 * Math.sin(time * .09 + 3.8), sx: 1.35, sy: .82 }
+      { color: '20,115,132', alpha: .18, x: .28 + .19 * Math.sin(t * .34), y: .34 + .23 * Math.cos(t * .27), sx: 1.65, sy: .76 },
+      { color: '43,171,183', alpha: .15, x: .73 + .22 * Math.cos(t * .29 + 1.7), y: .56 + .22 * Math.sin(t * .32 + 1.7), sx: 1.45, sy: .9 },
+      { color: '18,91,111', alpha: .17, x: .48 + .23 * Math.sin(t * .21 + 3.1), y: .73 + .19 * Math.cos(t * .31 + 2.4), sx: 1.8, sy: .72 },
+      { color: '70,190,195', alpha: .12, x: .53 + .2 * Math.cos(t * .25 + 4.2), y: .29 + .18 * Math.sin(t * .28 + 3.8), sx: 1.35, sy: .82 }
     ];
-    fields.forEach(field => {
+    fields.forEach((field, index) => {
       const x = width * field.x;
       const y = height * field.y;
-      const radius = span / field.sx;
+      const pulse = .88 + .12 * Math.sin(t * .38 + index * 1.45);
+      const radius = span / field.sx * (.92 + .09 * pulse);
+      const alpha = field.alpha * pulse * (reduced.matches ? .76 : 1);
       ctx.save();
       ctx.translate(x, y);
       ctx.scale(field.sx, field.sy);
       const glow = ctx.createRadialGradient(0, 0, 0, 0, 0, radius);
-      glow.addColorStop(0, `rgba(${field.color},${field.alpha})`);
-      glow.addColorStop(.38, `rgba(${field.color},${field.alpha * .66})`);
-      glow.addColorStop(.72, `rgba(${field.color},${field.alpha * .2})`);
+      glow.addColorStop(0, `rgba(${field.color},${alpha})`);
+      glow.addColorStop(.38, `rgba(${field.color},${alpha * .66})`);
+      glow.addColorStop(.72, `rgba(${field.color},${alpha * .2})`);
       glow.addColorStop(1, `rgba(${field.color},0)`);
       ctx.fillStyle = glow;
       ctx.fillRect(-radius, -radius, radius * 2, radius * 2);
@@ -54,21 +57,12 @@
       state.ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
       if (reduced.matches || !state.active) paintAurora(state);
     };
-    const animate = now => {
-      state.frame = 0;
-      if (!state.active || document.hidden) return;
-      if (now - state.last >= 32) {
-        state.last = now;
-        paintAurora(state, now / 1000);
-      }
-      state.frame = requestAnimationFrame(animate);
-    };
     auroraStates.push(state);
     new ResizeObserver(resize).observe(surface);
     resize();
   });
 
-  if (auroraStates.length && !reduced.matches && 'IntersectionObserver' in window) {
+  if (auroraStates.length && 'IntersectionObserver' in window) {
     const auroraObserver = new IntersectionObserver(entries => entries.forEach(entry => {
       const state = auroraStates.find(item => item.surface === entry.target);
       if (!state) return;
@@ -87,11 +81,25 @@
       };
       auroraObserver.observe(state.surface);
     });
+  } else {
+    auroraStates.forEach(state => {
+      state.active = true;
+      state.animate = now => {
+        state.frame = 0;
+        if (document.hidden) return;
+        if (now - state.last >= 32) {
+          state.last = now;
+          paintAurora(state, now / 1000);
+        }
+        state.frame = requestAnimationFrame(state.animate);
+      };
+      state.frame = requestAnimationFrame(state.animate);
+    });
   }
   document.addEventListener('visibilitychange', () => auroraStates.forEach(state => {
     if (document.hidden && state.frame) cancelAnimationFrame(state.frame);
     state.frame = 0;
-    if (!document.hidden && state.active && !reduced.matches) state.frame = requestAnimationFrame(state.animate);
+    if (!document.hidden && state.active) state.frame = requestAnimationFrame(state.animate);
   }));
 
   const principles = [...document.querySelectorAll('.why-grid article')];
