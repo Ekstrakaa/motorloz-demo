@@ -16,9 +16,9 @@
     ctx.save();
     ctx.globalCompositeOperation = 'screen';
     const bands = [
-      { y: .31, amp: .055, thick: .17, phase: .15, speed: .38, color: '27,151,169' },
-      { y: .53, amp: .075, thick: .20, phase: 2.1, speed: -.27, color: '49,190,199' },
-      { y: .76, amp: .06, thick: .16, phase: 4.3, speed: .22, color: '20,118,143' }
+      { y: .31, amp: .075, thick: .2, phase: .15, speed: .58, color: '27,151,169' },
+      { y: .53, amp: .095, thick: .23, phase: 2.1, speed: -.43, color: '49,190,199' },
+      { y: .76, amp: .08, thick: .19, phase: 4.3, speed: .36, color: '20,118,143' }
     ];
     bands.forEach((band, index) => {
       const center = height * band.y;
@@ -28,10 +28,10 @@
         Math.sin(x / Math.max(88, width * .105) - time * band.speed * .62 + band.phase * 1.55) * amplitude * .24;
       const glow = ctx.createLinearGradient(0, center - thickness, 0, center + thickness);
       glow.addColorStop(0, `rgba(${band.color},0)`);
-      glow.addColorStop(.25, `rgba(${band.color},.014)`);
-      glow.addColorStop(.48, `rgba(${band.color},${index === 1 ? '.105' : '.075'})`);
-      glow.addColorStop(.56, `rgba(${band.color},${index === 1 ? '.085' : '.06'})`);
-      glow.addColorStop(.82, `rgba(${band.color},.018)`);
+      glow.addColorStop(.25, `rgba(${band.color},.025)`);
+      glow.addColorStop(.48, `rgba(${band.color},${index === 1 ? '.21' : '.16'})`);
+      glow.addColorStop(.56, `rgba(${band.color},${index === 1 ? '.17' : '.13'})`);
+      glow.addColorStop(.82, `rgba(${band.color},.03)`);
       glow.addColorStop(1, `rgba(${band.color},0)`);
 
       ctx.beginPath();
@@ -59,12 +59,12 @@
       }
       const crest = ctx.createLinearGradient(0, center - amplitude, 0, center + amplitude);
       crest.addColorStop(0, `rgba(${band.color},0)`);
-      crest.addColorStop(.5, `rgba(91,210,218,${index === 1 ? '.13' : '.09'})`);
+      crest.addColorStop(.5, `rgba(91,210,218,${index === 1 ? '.25' : '.18'})`);
       crest.addColorStop(1, `rgba(${band.color},0)`);
       ctx.strokeStyle = crest;
       ctx.lineWidth = Math.max(1, height * .002);
       ctx.shadowColor = 'rgba(46,184,198,.34)';
-      ctx.shadowBlur = Math.min(28, Math.max(10, height * .025));
+      ctx.shadowBlur = Math.min(38, Math.max(14, height * .032));
       ctx.stroke();
     });
     ctx.restore();
