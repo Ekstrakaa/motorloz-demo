@@ -430,7 +430,7 @@ main>.section.why-motorloz>*,main>.section.diagnostic-story>*,footer>*{position:
 .reference-bridge-card{background-size:155% 160%,155% 160%,100% 100%!important;animation:motorloz-aurora-flow 20s ease-in-out infinite alternate!important}
 
 /* La cuadrícula recuerda el piso modular del taller: queda solo sobre planos claros. */
-.intro,.services,.reviews,.location,.subaru-section,.hyundai-section,.appointment{
+.intro,.services,.reviews,.location,.subaru-section,.hyundai-section{
   background-image:
     linear-gradient(rgba(34,66,72,.035) 1px,transparent 1px),
     linear-gradient(90deg,rgba(34,66,72,.035) 1px,transparent 1px),
@@ -563,3 +563,43 @@ main>.section.why-motorloz>*,main>.section.diagnostic-story>*,footer>*{position:
 @media(prefers-reduced-motion:reduce){
   .reference-bridge-card{background-position:50% 50%!important}
 }
+
+/* Renovación de superficies: junta ancha en claro y aurora ondulante contenida en cada plano oscuro. */
+.intro,.services,.reviews,.location,.subaru-section,.hyundai-section{
+  background-image:
+    linear-gradient(rgba(29,60,64,.052) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(29,60,64,.052) 1px,transparent 1px),
+    linear-gradient(rgba(29,60,64,.075) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(29,60,64,.075) 1px,transparent 1px)!important;
+  background-size:300px 300px,300px 300px,900px 900px,900px 900px!important;
+  background-position:center center!important;
+}
+@media(max-width:760px){
+  .intro,.services,.reviews,.location,.subaru-section,.hyundai-section{
+    background-size:260px 260px,260px 260px,780px 780px,780px 780px!important;
+  }
+}
+main>.section.workshop,main>.section.people,main>.section.films-section,
+main>.section.why-motorloz,main>.section.diagnostic-story,main>.section.appointment,footer{
+  position:relative!important;isolation:isolate!important;overflow:hidden!important;
+  background-color:#0b1112!important;
+}
+main>.section.workshop:before,main>.section.people:before,main>.section.films-section:before,
+main>.section.why-motorloz:before,main>.section.diagnostic-story:before,main>.section.appointment:before,footer:before,
+main>.section.workshop:after,main>.section.people:after,main>.section.films-section:after,
+main>.section.why-motorloz:after,main>.section.diagnostic-story:after,main>.section.appointment:after,footer:after{
+  content:none!important;animation:none!important;
+}
+.motorloz-aurora-canvas{
+  position:absolute!important;z-index:0!important;inset:0!important;display:block!important;
+  width:100%!important;height:100%!important;pointer-events:none!important;opacity:.88!important;
+  mix-blend-mode:screen!important;
+}
+main>.section.workshop>*,main>.section.people>*,main>.section.films-section>*,
+main>.section.why-motorloz>*,main>.section.diagnostic-story>*,main>.section.appointment>*,footer>*{position:relative;z-index:1}
+.appointment:before,.reference-bridge-card{background-size:auto!important;animation:none!important}
+main>.section.appointment:before{content:none!important}
+.reference-bridge-card{position:relative!important;isolation:isolate;overflow:hidden!important}
+.reference-bridge-card:before{animation:none!important}
+.reference-bridge-card>*{position:relative;z-index:1}
+@media(prefers-reduced-motion:reduce){.motorloz-aurora-canvas{opacity:.5!important}}
