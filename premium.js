@@ -4,17 +4,34 @@
   const header = document.querySelector('.header');
   const progress = document.querySelector('.reading-progress');
   let queued = false;
+  let scrollRange = 1;
+  let headerScrolled = null;
+
+  function measureScrollRange() {
+    scrollRange = Math.max(1, document.documentElement.scrollHeight - innerHeight);
+    queueScrollState();
+  }
 
   function scrollState() {
     queued = false;
-    header?.classList.toggle('header-scrolled', scrollY > 90);
-    const distance = document.documentElement.scrollHeight - innerHeight;
-    if (progress) progress.style.transform = `scaleX(${distance > 0 ? scrollY / distance : 0})`;
+    const nextHeaderState = scrollY > 90;
+    if (header && nextHeaderState !== headerScrolled) {
+      header.classList.toggle('header-scrolled', nextHeaderState);
+      headerScrolled = nextHeaderState;
+    }
+    if (progress) progress.style.transform = `scaleX(${Math.min(1, Math.max(0, scrollY / scrollRange))})`;
   }
-  addEventListener('scroll', () => {
+  function queueScrollState() {
     if (!queued) { queued = true; requestAnimationFrame(scrollState); }
-  }, { passive: true });
-  scrollState();
+  }
+  addEventListener('scroll', queueScrollState, { passive: true });
+  addEventListener('resize', measureScrollRange, { passive: true });
+  addEventListener('load', measureScrollRange, { once: true });
+  if ('ResizeObserver' in window && document.body) {
+    new ResizeObserver(measureScrollRange).observe(document.body);
+  }
+  document.fonts?.ready.then(measureScrollRange).catch(() => {});
+  measureScrollRange();
 
   document.querySelector('#contact-open')?.addEventListener('click', () => document.querySelector('#contact-dialog')?.showModal());
 
@@ -48,15 +65,8 @@
       }
     }), { threshold: .08, rootMargin: '0px 0px -4%' });
     const revealSelector = [
-      '.section-label > *', '.brand-experience-head > *', '.brand-experience-note',
-      '.intro-feature > *', '.intro-proof-row article', '.hyundai-image', '.hyundai-copy > *',
-      '.diagnostic-story-image', '.diagnostic-story-copy > *', '.diagnostic-mosaic > *',
-      '.reference-bridge-card > *', '.why-motorloz > *', '.services-intro > *',
-      '.service-card', '.workshop-title > *', '.gallery-main', '.gallery-secondary',
-      '.japan-gallery > *', '.people-editorial > *', '.reviews-intro > *',
-      '.review-verification', '.contact-bridge > *', '.films-heading > *', '.film-card',
-      '.films-social > *', '.appointment-grid > *', '.appointment-steps li',
-      '.location-top > *', '.arrival-grid > *', '.map-footer > *', 'footer .footer-links > *'
+      '.intro-feature-image', '.service-card', '.hyundai-image', '.diagnostic-mosaic .diagnostic-tile',
+      '.film-card', '.google-place-card', '.appointment-office', '.map-panel', '.arrival-slide-figure'
     ].join(',');
     document.querySelectorAll(revealSelector).forEach((node, index) => {
       node.classList.add('scroll-reveal');

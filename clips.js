@@ -2,7 +2,17 @@
 (() => {
   const section = document.querySelector('.films-section');
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+  const players = [];
+  let activePlayer = null;
   let hasClip = false;
+
+  function chooseActivePlayer() {
+    const next = players
+      .filter(player => player.visible && player.ratio >= .2 && !document.hidden && !reducedMotion.matches)
+      .sort((a, b) => b.ratio - a.ratio)[0] || null;
+    activePlayer = next;
+    players.forEach(player => player === next ? player.start() : player.pause());
+  }
 
   document.querySelectorAll('[data-clip]').forEach(card => {
     const source = window.MOTORLOZ.clips?.[card.dataset.clip];
@@ -17,7 +27,7 @@
     video.muted = true;
     video.defaultMuted = true;
     video.loop = true;
-    video.autoplay = true;
+    video.autoplay = false;
     video.playsInline = true;
     video.preload = 'none';
     video.poster = posterImage?.src || '';
@@ -27,11 +37,10 @@
     video.setAttribute('playsinline', '');
     video.setAttribute('aria-label', `${card.querySelector('strong')?.textContent || 'MOTORLOZ'} — video completo del taller, sin audio`);
 
-    let visible = false;
     let sourceAttached = false;
 
     function startWhenReady() {
-      if (!visible || document.hidden || reducedMotion.matches) {
+      if (!player.visible || activePlayer !== player || document.hidden || reducedMotion.matches) {
         video.pause();
         return;
       }
@@ -48,6 +57,14 @@
       if (bufferedAhead < 1.25 && video.readyState < HTMLMediaElement.HAVE_ENOUGH_DATA) return;
       video.play().catch(() => {});
     }
+
+    const player = {
+      visible: false,
+      ratio: 0,
+      start: startWhenReady,
+      pause: () => { video.pause(); card.classList.remove('is-playing'); }
+    };
+    players.push(player);
 
     video.addEventListener('loadeddata', startWhenReady);
     video.addEventListener('canplay', startWhenReady);
@@ -73,14 +90,14 @@
     card.prepend(video);
 
     const observer = new IntersectionObserver(entries => {
-      visible = entries[0].isIntersecting;
-      if (visible) startWhenReady();
-      else video.pause();
-    }, { threshold: 0.18, rootMargin: '120px 0px' });
+      player.visible = entries[0].isIntersecting;
+      player.ratio = entries[0].intersectionRatio;
+      chooseActivePlayer();
+    }, { threshold: [0, .2, .45, .7, 1], rootMargin: '0px' });
     observer.observe(card);
 
-    document.addEventListener('visibilitychange', startWhenReady);
-    reducedMotion.addEventListener('change', startWhenReady);
+    document.addEventListener('visibilitychange', chooseActivePlayer);
+    reducedMotion.addEventListener('change', chooseActivePlayer);
   });
 
   if (hasClip) section.hidden = false;

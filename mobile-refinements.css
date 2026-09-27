@@ -42,6 +42,8 @@
 .services-controls [data-services-next]::before,.review-controls #review-next::before{transform:rotate(45deg)}
 
 @media(max-width:760px){
+  .cinema-grain{display:none!important}
+  .header.header-scrolled{backdrop-filter:none!important;transition:background .22s ease,box-shadow .22s ease!important}
   main>.section:not(.reference-bridge):not(.diagnostic-story):not(.hyundai-section){min-height:0!important;padding-block:48px!important}
   .intro.section{padding-bottom:42px!important}
   .subaru-section.section{padding-top:42px!important;padding-bottom:46px!important}
@@ -89,6 +91,13 @@
   .services-controls button{width:38px!important;height:38px!important}
   .service-card-copy li,.service-card-copy p{overflow-wrap:anywhere}
 
+  /* Mobile: expose the complete service list instead of a one-card carousel. */
+  .services-carousel,.services-viewport{overflow:visible!important}
+  .services-viewport{scroll-snap-type:none!important}
+  .services-track{display:grid!important;grid-template-columns:minmax(0,1fr)!important;width:100%!important;gap:14px!important;padding:0!important}
+  .service-card{flex:none!important;scroll-snap-align:none!important}
+  .services-controls,.services-pagination{display:none!important}
+
   .films-grid{gap:14px!important}
   .film-caption small,.film-caption a{font-size:10px!important;line-height:1.45!important}
   .film-caption strong{font-size:clamp(15px,4.4vw,19px)!important}
@@ -98,6 +107,7 @@
   .reviews-intro{gap:18px!important;margin-top:24px!important}
   .review-verification{margin:13px 0 0!important;font-size:10px!important;line-height:1.5!important}
   .contact-bridge{min-height:0!important}
+  .scroll-reveal{will-change:auto!important;clip-path:none!important;transition-duration:.38s!important}
 }
 
 @media(prefers-reduced-motion:reduce){
