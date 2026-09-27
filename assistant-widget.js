@@ -1,0 +1,326 @@
+(() => {
+  const launcher = document.querySelector('#assistant-launcher');
+  const panel = document.querySelector('#assistant-window');
+  if (!launcher || !panel) return;
+
+  const messagesEl = document.querySelector('#assistant-messages');
+  const form = document.querySelector('#assistant-composer');
+  const input = document.querySelector('#assistant-input');
+  const sendButton = document.querySelector('.assistant-submit');
+  const micButton = document.querySelector('#assistant-mic');
+  const statusEl = document.querySelector('#assistant-status');
+  const workingEl = document.querySelector('#assistant-working');
+  const hintEl = document.querySelector('#assistant-composer-hint');
+  const booking = document.querySelector('#assistant-booking');
+  const reservationPrompt = document.querySelector('#assistant-reservation-prompt');
+  const bookingForm = document.querySelector('#assistant-booking-form');
+  const resetDialog = document.querySelector('#assistant-reset-confirm');
+  let history = [];
+  let configured = false;
+  let busy = false;
+  let mediaRecorder = null;
+  let audioChunks = [];
+  let recordingStart = 0;
+  let recordingTimer = null;
+  let maxRecordTimer = null;
+  let reservationDismissedAt = 0;
+
+  const esc = value => String(value).replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[character]));
+  const getMessageCount = () => history.filter(item => item.role === 'user').length;
+
+  function bubble(text, role, extra = {}) {
+    const row = document.createElement('div');
+    row.className = `assistant-message assistant-message-${role}`;
+    if (extra.audio) {
+      row.innerHTML = `<span class="assistant-audio-pill"><span class="assistant-audio-wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span><span>Nota de voz · ${esc(extra.duration || 'audio')}</span></span>`;
+    } else {
+      const copy = document.createElement('p');
+      copy.textContent = text;
+      row.append(copy);
+    }
+    if (extra.pending) row.classList.add('is-pending');
+    messagesEl.append(row);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+    return row;
+  }
+
+  function welcome() {
+    messagesEl.replaceChildren();
+    booking.hidden = true;
+    reservationPrompt.hidden = true;
+    history = [];
+    reservationDismissedAt = 0;
+    bubble('Hola, soy tu asistente MOTORLOZ. Estoy acá para escucharte. Mandame un audio corto con la marca, el modelo y el kilometraje del auto, y contame qué notaste. Así entiendo mejor la historia y te oriento con el próximo paso.', 'assistant');
+    if (!configured) bubble('La conexión con la inteligencia artificial todavía no está configurada. El formulario de consulta sigue disponible en la página.', 'assistant');
+    messagesEl.scrollTop = 0;
+  }
+
+  async function checkStatus() {
+    try {
+      const response = await fetch('/api/assistant/status', { cache: 'no-store' });
+      const status = await response.json();
+      configured = Boolean(status.configured);
+      statusEl.textContent = configured ? 'Disponible para conversar' : 'Falta conectar la IA';
+      panel.classList.toggle('is-offline', !configured);
+      input.disabled = !configured;
+      sendButton.disabled = !configured;
+      micButton.disabled = !configured;
+      if (!configured) hintEl.textContent = 'El asistente se activa al configurar la conexión privada.';
+      welcome();
+    } catch {
+      statusEl.textContent = 'Conexión no disponible';
+      configured = false;
+      input.disabled = true;
+      sendButton.disabled = true;
+      micButton.disabled = true;
+      welcome();
+    }
+  }
+
+  function setBusy(value) {
+    busy = value;
+    workingEl.hidden = !value;
+    sendButton.disabled = value || !configured;
+    micButton.disabled = value || !configured;
+    input.disabled = value || !configured;
+  }
+
+  function maybeShowBooking() {
+    const count = getMessageCount();
+    if (count >= 1 && (reservationDismissedAt === 0 || count >= reservationDismissedAt + 2)) reservationPrompt.hidden = false;
+  }
+
+  async function requestReply(userMessage, endpoint = '/api/assistant/chat', audioPayload = null) {
+    if (!configured || busy) return;
+    history.push({ role: 'user', content: userMessage });
+    const pending = bubble('Dame un momento, ya te leo…', 'assistant', { pending: true });
+    setBusy(true);
+    try {
+      const response = await fetch(endpoint, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(audioPayload ? { messages: history.slice(0, -1), audio: audioPayload } : { messages: history })
+      });
+      const result = await response.json();
+      pending.remove();
+      if (!response.ok) throw new Error(result.message || 'No pude responder en este momento.');
+      history.push({ role: 'assistant', content: result.reply });
+      bubble(result.reply, 'assistant');
+      maybeShowBooking();
+    } catch (error) {
+      pending.remove();
+      history.pop();
+      bubble(error.message || 'No pude responder ahora. Probá de nuevo o escribinos por el formulario.', 'assistant');
+    } finally {
+      setBusy(false);
+      input.focus({ preventScroll: true });
+    }
+  }
+
+  function sendText(value) {
+    const text = String(value || '').trim();
+    if (!text || busy) return;
+    bubble(text, 'user');
+    input.value = '';
+    input.style.height = 'auto';
+    requestReply(text);
+  }
+
+  function encodeWav(audioBuffer) {
+    const targetRate = 24000;
+    const ratio = audioBuffer.sampleRate / targetRate;
+    const count = Math.max(1, Math.floor(audioBuffer.length / ratio));
+    const pcm = new Int16Array(count);
+    const channels = Array.from({ length: audioBuffer.numberOfChannels }, (_, index) => audioBuffer.getChannelData(index));
+    for (let i = 0; i < count; i += 1) {
+      const from = Math.floor(i * ratio);
+      const to = Math.min(audioBuffer.length, Math.floor((i + 1) * ratio));
+      let sample = 0;
+      let samples = 0;
+      for (let source = from; source < to; source += 1) {
+        for (const channel of channels) sample += channel[source] || 0;
+        samples += channels.length;
+      }
+      sample = samples ? sample / samples : 0;
+      pcm[i] = Math.max(-1, Math.min(1, sample)) * (sample < 0 ? 32768 : 32767);
+    }
+    const wav = new ArrayBuffer(44 + pcm.length * 2);
+    const view = new DataView(wav);
+    const write = (offset, value) => { for (let i = 0; i < value.length; i += 1) view.setUint8(offset + i, value.charCodeAt(i)); };
+    write(0, 'RIFF'); view.setUint32(4, 36 + pcm.length * 2, true); write(8, 'WAVE'); write(12, 'fmt ');
+    view.setUint32(16, 16, true); view.setUint16(20, 1, true); view.setUint16(22, 1, true);
+    view.setUint32(24, targetRate, true); view.setUint32(28, targetRate * 2, true); view.setUint16(32, 2, true); view.setUint16(34, 16, true); write(36, 'data'); view.setUint32(40, pcm.length * 2, true);
+    new Uint8Array(wav, 44).set(new Uint8Array(pcm.buffer));
+    return new Blob([wav], { type: 'audio/wav' });
+  }
+
+  async function finishRecording() {
+    clearInterval(recordingTimer);
+    clearTimeout(maxRecordTimer);
+    const recorder = mediaRecorder;
+    mediaRecorder = null;
+    document.querySelector('#assistant-recording').hidden = true;
+    micButton.classList.remove('is-recording');
+    if (!recorder) return;
+    await new Promise(resolve => {
+      recorder.addEventListener('stop', resolve, { once: true });
+      if (recorder.state !== 'inactive') recorder.stop(); else resolve();
+    });
+    recorder.stream.getTracks().forEach(track => track.stop());
+    if (!audioChunks.length) return;
+    setBusy(true);
+    const duration = Math.max(1, Math.round((Date.now() - recordingStart) / 1000));
+    bubble('', 'user', { audio: true, duration: `00:${String(duration).padStart(2, '0')}` });
+    bubble('Estoy escuchando tu nota de voz…', 'assistant', { pending: true });
+    try {
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const raw = await new Blob(audioChunks).arrayBuffer();
+      const decoded = await audioContext.decodeAudioData(raw);
+      const wav = encodeWav(decoded);
+      await audioContext.close();
+      const base64 = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result).split(',')[1]);
+        reader.onerror = reject;
+        reader.readAsDataURL(wav);
+      });
+      const pending = messagesEl.querySelector('.assistant-message.is-pending:last-child');
+      const voiceMarker = `[La persona mandó una nota de voz de ${duration} segundos. Respondé usando el contenido que escuchaste.]`;
+      history.push({ role: 'user', content: voiceMarker });
+      const historyForVoice = history.slice(0, -1);
+      const response = await fetch('/api/assistant/voice', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: historyForVoice, audio: base64 })
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.message || 'No pude escuchar ese audio. Probá grabarlo otra vez.');
+      pending?.remove();
+      history.push({ role: 'assistant', content: result.reply });
+      bubble(result.reply, 'assistant');
+      maybeShowBooking();
+    } catch (error) {
+      messagesEl.querySelector('.assistant-message.is-pending:last-child')?.remove();
+      if (history.at(-1)?.role === 'user' && history.at(-1).content.startsWith('[La persona mandó una nota')) history.pop();
+      bubble(error.message || 'No pude procesar la nota de voz. Probá de nuevo o escribí tu consulta.', 'assistant');
+    } finally {
+      audioChunks = [];
+      setBusy(false);
+      input.focus({ preventScroll: true });
+    }
+  }
+
+  async function startRecording() {
+    if (!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) {
+      bubble('Este navegador no permite grabar audio. Podés escribir tu consulta en el chat.', 'assistant');
+      return;
+    }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const candidates = ['audio/webm;codecs=opus', 'audio/mp4', 'audio/webm'];
+      const mimeType = candidates.find(type => MediaRecorder.isTypeSupported(type));
+      mediaRecorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
+      audioChunks = [];
+      mediaRecorder.addEventListener('dataavailable', event => { if (event.data.size) audioChunks.push(event.data); });
+      mediaRecorder.start();
+      recordingStart = Date.now();
+      micButton.classList.add('is-recording');
+      document.querySelector('#assistant-recording').hidden = false;
+      hintEl.hidden = true;
+      recordingTimer = setInterval(() => {
+        const seconds = Math.min(60, Math.floor((Date.now() - recordingStart) / 1000));
+        document.querySelector('#assistant-recording-time').textContent = `00:${String(seconds).padStart(2, '0')}`;
+      }, 250);
+      maxRecordTimer = setTimeout(finishRecording, 60_000);
+    } catch {
+      bubble('No pude acceder al micrófono. Revisá el permiso del navegador o escribí tu consulta.', 'assistant');
+    }
+  }
+
+  function open() {
+    panel.hidden = false;
+    requestAnimationFrame(() => panel.classList.add('is-open'));
+    panel.setAttribute('aria-hidden', 'false');
+    launcher.setAttribute('aria-expanded', 'true');
+    checkStatus();
+    window.setTimeout(() => (configured ? input : document.querySelector('#assistant-close')).focus({ preventScroll: true }), 90);
+  }
+
+  function close() {
+    if (mediaRecorder) {
+      mediaRecorder.stream.getTracks().forEach(track => track.stop());
+      if (mediaRecorder.state !== 'inactive') mediaRecorder.stop();
+      mediaRecorder = null;
+    }
+    clearInterval(recordingTimer);
+    clearTimeout(maxRecordTimer);
+    panel.classList.remove('is-open');
+    panel.setAttribute('aria-hidden', 'true');
+    launcher.setAttribute('aria-expanded', 'false');
+    resetDialog.hidden = true;
+    window.setTimeout(() => { panel.hidden = true; welcome(); }, 220);
+    launcher.focus({ preventScroll: true });
+  }
+
+  launcher.addEventListener('click', () => panel.hidden ? open() : close());
+  document.querySelector('#assistant-close').addEventListener('click', close);
+  document.querySelector('#assistant-new').addEventListener('click', () => { resetDialog.hidden = false; });
+  document.querySelector('#assistant-reset-no').addEventListener('click', () => { resetDialog.hidden = true; });
+  document.querySelector('#assistant-reset-yes').addEventListener('click', () => { resetDialog.hidden = true; welcome(); input.focus(); });
+  document.querySelector('#assistant-stop-recording').addEventListener('click', finishRecording);
+  document.querySelector('#assistant-mic').addEventListener('click', () => mediaRecorder ? finishRecording() : startRecording());
+  document.querySelector('#assistant-privacy-link').addEventListener('click', event => { event.preventDefault(); close(); document.querySelector('#turno').scrollIntoView({ behavior: 'smooth' }); });
+  document.querySelector('#assistant-booking-close').addEventListener('click', () => { booking.hidden = true; messagesEl.scrollTop = messagesEl.scrollHeight; });
+  form.addEventListener('submit', event => { event.preventDefault(); sendText(input.value); });
+  input.addEventListener('input', () => { input.style.height = 'auto'; input.style.height = `${Math.min(input.scrollHeight, 112)}px`; });
+  input.addEventListener('keydown', event => { if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); form.requestSubmit(); } });
+  document.addEventListener('keydown', event => { if (event.key === 'Escape' && !panel.hidden) close(); });
+
+  document.querySelector('#assistant-reserve-start').addEventListener('click', () => {
+    reservationPrompt.hidden = true;
+    booking.hidden = false;
+    booking.scrollTop = 0;
+    bookingForm.querySelector('[name="name"]').focus({ preventScroll: true });
+  });
+  document.querySelector('#assistant-reserve-later').addEventListener('click', () => {
+    reservationDismissedAt = getMessageCount();
+    reservationPrompt.hidden = true;
+  });
+  bookingForm.addEventListener('submit', async event => {
+    event.preventDefault();
+    const data = new FormData(bookingForm);
+    const values = Object.fromEntries(data.entries());
+    const submitButton = bookingForm.querySelector('.assistant-send-whatsapp');
+    const originalButtonText = submitButton.innerHTML;
+    submitButton.disabled = true;
+    submitButton.textContent = 'Ordenando la consulta…';
+    let issueSummary = '';
+    try {
+      const response = await fetch('/api/assistant/summary', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: history })
+      });
+      const result = await response.json();
+      if (response.ok) issueSummary = String(result.summary || '').trim();
+    } catch {}
+    if (!issueSummary) {
+      issueSummary = history.filter(item => item.role === 'assistant').slice(-2).map(item => item.content).join(' ').slice(0, 420);
+    }
+    const lines = [
+      'Hola, quiero coordinar una revisión con MOTORLOZ.',
+      `Nombre: ${values.name}`,
+      `Teléfono: ${values.phone}`,
+      `Coordinación: ${values.priority}`,
+      values.availability ? `Disponibilidad: ${values.availability}` : '',
+      `Resumen para el mecánico: ${issueSummary.slice(0, 600)}`,
+      'Resumen inicial basado en lo relatado; no es un diagnóstico confirmado.'
+    ].filter(Boolean);
+    const url = `https://wa.me/${window.MOTORLOZ?.whatsapp || '59891888288'}?text=${encodeURIComponent(lines.join('\n'))}`;
+    window.open(url, '_blank', 'noopener,noreferrer');
+    booking.hidden = true;
+    bookingForm.reset();
+    submitButton.disabled = false;
+    submitButton.innerHTML = originalButtonText;
+  });
+
+  welcome();
+  if (new URLSearchParams(location.search).get('asistente') === '1') open();
+})();
