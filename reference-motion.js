@@ -1,8 +1,8 @@
 'use strict';
 (() => {
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-  // Aurora de taller: ondas dibujadas en cada superficie oscura, sin trasladar
-  // una capa por encima de los límites de las secciones.
+  // Aurora difusa de taller: el color se transforma dentro del fondo, sin
+  // líneas, bandas ni formas delimitadas.
   const auroraSurfaces = document.querySelectorAll(
     'main>.section.workshop,main>.section.people,main>.section.films-section,' +
     'main>.section.why-motorloz,main>.section.diagnostic-story,main>.section.appointment,footer,.reference-bridge-card'
@@ -13,61 +13,29 @@
     const { canvas, ctx, width, height } = state;
     if (!width || !height) return;
     ctx.clearRect(0, 0, width, height);
-    ctx.save();
-    ctx.globalCompositeOperation = 'screen';
-    const bands = [
-      { y: .31, amp: .075, thick: .2, phase: .15, speed: .58, color: '27,151,169' },
-      { y: .53, amp: .095, thick: .23, phase: 2.1, speed: -.43, color: '49,190,199' },
-      { y: .76, amp: .08, thick: .19, phase: 4.3, speed: .36, color: '20,118,143' }
+    const span = Math.max(width, height) * .92;
+    const fields = [
+      { color: '20,115,132', alpha: .14, x: .28 + .12 * Math.sin(time * .12), y: .34 + .15 * Math.cos(time * .1), sx: 1.65, sy: .76 },
+      { color: '43,171,183', alpha: .12, x: .73 + .14 * Math.cos(time * .095 + 1.7), y: .56 + .17 * Math.sin(time * .11 + 1.7), sx: 1.45, sy: .9 },
+      { color: '18,91,111', alpha: .13, x: .48 + .18 * Math.sin(time * .075 + 3.1), y: .73 + .12 * Math.cos(time * .13 + 2.4), sx: 1.8, sy: .72 },
+      { color: '70,190,195', alpha: .075, x: .53 + .16 * Math.cos(time * .08 + 4.2), y: .29 + .14 * Math.sin(time * .09 + 3.8), sx: 1.35, sy: .82 }
     ];
-    bands.forEach((band, index) => {
-      const center = height * band.y;
-      const amplitude = Math.max(14, height * band.amp);
-      const thickness = Math.max(28, height * band.thick);
-      const wave = x => center + Math.sin(x / Math.max(145, width * .22) + time * band.speed + band.phase) * amplitude +
-        Math.sin(x / Math.max(88, width * .105) - time * band.speed * .62 + band.phase * 1.55) * amplitude * .24;
-      const glow = ctx.createLinearGradient(0, center - thickness, 0, center + thickness);
-      glow.addColorStop(0, `rgba(${band.color},0)`);
-      glow.addColorStop(.25, `rgba(${band.color},.025)`);
-      glow.addColorStop(.48, `rgba(${band.color},${index === 1 ? '.21' : '.16'})`);
-      glow.addColorStop(.56, `rgba(${band.color},${index === 1 ? '.17' : '.13'})`);
-      glow.addColorStop(.82, `rgba(${band.color},.03)`);
-      glow.addColorStop(1, `rgba(${band.color},0)`);
-
-      ctx.beginPath();
-      const samples = Math.max(48, Math.ceil(width / 18));
-      for (let i = 0; i <= samples; i++) {
-        const x = width * i / samples;
-        const y = wave(x);
-        if (!i) ctx.moveTo(x, y - thickness * .5);
-        else ctx.lineTo(x, y - thickness * .5);
-      }
-      for (let i = samples; i >= 0; i--) {
-        const x = width * i / samples;
-        ctx.lineTo(x, wave(x) + thickness * .5);
-      }
-      ctx.closePath();
+    fields.forEach(field => {
+      const x = width * field.x;
+      const y = height * field.y;
+      const radius = span / field.sx;
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.scale(field.sx, field.sy);
+      const glow = ctx.createRadialGradient(0, 0, 0, 0, 0, radius);
+      glow.addColorStop(0, `rgba(${field.color},${field.alpha})`);
+      glow.addColorStop(.38, `rgba(${field.color},${field.alpha * .66})`);
+      glow.addColorStop(.72, `rgba(${field.color},${field.alpha * .2})`);
+      glow.addColorStop(1, `rgba(${field.color},0)`);
       ctx.fillStyle = glow;
-      ctx.fill();
-
-      ctx.beginPath();
-      for (let i = 0; i <= samples; i++) {
-        const x = width * i / samples;
-        const y = wave(x);
-        if (!i) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-      }
-      const crest = ctx.createLinearGradient(0, center - amplitude, 0, center + amplitude);
-      crest.addColorStop(0, `rgba(${band.color},0)`);
-      crest.addColorStop(.5, `rgba(91,210,218,${index === 1 ? '.25' : '.18'})`);
-      crest.addColorStop(1, `rgba(${band.color},0)`);
-      ctx.strokeStyle = crest;
-      ctx.lineWidth = Math.max(1, height * .002);
-      ctx.shadowColor = 'rgba(46,184,198,.34)';
-      ctx.shadowBlur = Math.min(38, Math.max(14, height * .032));
-      ctx.stroke();
+      ctx.fillRect(-radius, -radius, radius * 2, radius * 2);
+      ctx.restore();
     });
-    ctx.restore();
   };
 
   auroraSurfaces.forEach(surface => {
