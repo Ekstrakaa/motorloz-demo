@@ -1,0 +1,72 @@
+/* Responsive refinements for consistent framing and spacing. */
+
+.intro-story .slide-stage{aspect-ratio:1.55}
+.photo-story .slide-frame img{width:100%;height:100%;object-fit:cover}
+.intro-story .slide-frame img{width:100%;height:100%;object-fit:cover}
+.intro-story .slide-toolbar{padding:11px 14px;background:#101719;color:#f3f6f5;border:0}
+.intro-story .slide-caption{color:#f3f6f5}
+.intro-story .slide-buttons button{border-color:#ffffff55;color:#fff;background:#ffffff12}
+.gallery-main .slide-stage{aspect-ratio:1}
+.gallery-secondary .slide-stage{aspect-ratio:1.48}
+.arrival-story .slide-stage{aspect-ratio:1.49}
+.team-story .slide-stage{aspect-ratio:1.2}
+.workshop .slide-frame img{object-fit:cover}
+.japan-flag{width:57px;height:38px;aspect-ratio:3/2}
+.japan-heading{text-align:center}
+.japan-brand-pair{justify-content:center}
+.japan-heading>p{max-width:44ch;margin-inline:auto}
+.japan-gallery>a img{display:block;width:100%;aspect-ratio:4/5;object-fit:cover}
+.brand-ferrari span{display:none}
+
+.films-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:stretch;gap:clamp(14px,2vw,24px);max-width:1120px;margin-inline:auto}
+.film-card{position:relative;width:100%;aspect-ratio:.76;min-height:0;overflow:hidden;border-radius:8px}
+.film-card>img{width:100%;height:100%;object-fit:cover}
+
+.services-track{grid-auto-rows:auto;align-items:stretch}
+.service-card{height:auto;min-height:490px}
+.service-card-copy{display:flex;flex:1 1 auto;flex-direction:column;min-height:0}
+.service-card-copy>span{min-height:1.3em}
+.service-card-copy h3{min-height:2.3em}
+.service-card-copy p{min-height:4.8em}
+.service-card-copy ul{min-height:4.5em}
+.service-card-copy>a{margin-top:auto;align-self:flex-start}
+.service-card>img{width:100%;height:auto;aspect-ratio:1.48;object-fit:cover}
+
+@media(max-width:760px){
+  .header{grid-template-columns:minmax(0,1fr) auto auto auto;gap:7px;padding-inline:15px}
+  .brand{min-width:0}
+  .brand-art{width:clamp(108px,33vw,126px);height:auto}
+  .header-cta{min-width:0;min-height:34px;padding:0 9px;font-size:9px;gap:5px;white-space:nowrap}
+  .header-cta span{margin-left:3px}
+  .header-contact,.menu-toggle{width:34px;height:34px}
+  .brand-experience-note{text-align:center;margin-inline:auto}
+  .intro-story .slide-stage{aspect-ratio:1.55}
+  .gallery-main .slide-stage{aspect-ratio:1}
+  .gallery-secondary .slide-stage{aspect-ratio:1.48}
+  .arrival-story .slide-stage{aspect-ratio:1.49}
+  .films-heading{text-align:center}
+  .films-heading>p{margin-inline:auto}
+  .films-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  .film-card{aspect-ratio:.7}
+  .film-caption strong{font-size:clamp(12px,3.2vw,16px)}
+  .service-card-copy>span{min-height:0}
+  .service-card{min-height:530px}
+  .service-card-copy h3{min-height:2.2em}
+  .service-card-copy p{min-height:5.1em}
+  .service-card-copy ul{min-height:4.2em}
+  .people-text{text-align:center;margin-inline:auto}
+  .people-text>p:not(.eyebrow){margin-inline:auto}
+  .people-text .instagram-stories{justify-content:center;text-align:left;max-width:420px;margin-inline:auto}
+  .people-text>.text-link{justify-content:center}
+  .contact-bridge{text-align:center}
+  .contact-bridge>p{margin-inline:auto}
+  .contact-bridge-actions{justify-content:center}
+}
+@media(max-width:390px){
+  .header{gap:5px;padding-inline:12px}
+  .brand-art{width:104px}
+  .header-cta{padding-inline:7px;font-size:8px}
+  .header-contact,.menu-toggle{width:32px;height:32px}
+  .service-card-copy p{min-height:5.5em}
+  .service-card{min-height:490px}
+}

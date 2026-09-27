@@ -1,0 +1,68 @@
+/* Focused corrections for original marks, stable cards and readable location actions. */
+.brand-experience{overflow:hidden}
+.brand-lineup-track{width:max-content;animation:brand-drift 54s linear infinite}
+.brand-wordmark{min-width:154px;height:90px;padding:12px 24px;flex-direction:row;border-right:0}
+.brand-wordmark img{display:block;width:108px;height:54px;max-width:100%;object-fit:contain}
+.brand-lineup-track[aria-hidden="true"]{pointer-events:none}
+@media(max-width:760px){.brand-wordmark{min-width:112px;height:70px;padding:8px 14px}.brand-wordmark img{width:78px;height:42px}}
+.subaru-section{background:#eef1ef;color:#151d20}
+.subaru-section .section-label{color:#56676b}
+.subaru-section .japan-gallery{grid-template-columns:minmax(260px,1.1fr) repeat(2,minmax(0,.75fr));align-items:center;max-width:1180px;margin:0 auto;padding:0;border:0;gap:clamp(18px,3vw,40px)}
+.subaru-section .japan-heading{text-align:center;padding:0 12px}
+.subaru-section .japan-heading h2{margin:22px 0 14px;font-size:clamp(32px,3.2vw,48px);line-height:1.04}
+.subaru-section .japan-heading>p{max-width:42ch;margin:0 auto;color:#536166;font-size:14px;line-height:1.7}
+.subaru-section .japan-note{display:block;margin-top:18px;color:#188c9c}
+.subaru-section .subaru-lockup img{width:58px;height:38px;filter:none}
+.subaru-section .subaru-wordmark{display:none}
+.subaru-photo{min-width:0;margin:0}
+.subaru-photo img{display:block;width:100%;height:auto;aspect-ratio:1;object-fit:contain;background:#e2e7e5;border-radius:8px}
+.subaru-photo figcaption{margin-top:9px;color:#57666a;font:9px var(--mono);letter-spacing:.08em}
+@media(max-width:760px){.subaru-section .japan-gallery{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.subaru-section .japan-heading{grid-column:1/-1;padding:0 6px 12px}.subaru-section .japan-heading h2{font-size:clamp(30px,8vw,40px)}.subaru-section .japan-heading>p{font-size:13px}.subaru-photo img{aspect-ratio:1;object-fit:contain}}
+.intro-story .slide-frame img{object-fit:contain!important;background:#101719}
+.google-place-card{grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr)!important;min-width:0;overflow:hidden}
+.place-photo{min-width:0;height:auto!important;min-height:0!important;aspect-ratio:1.1;overflow:hidden}
+.place-photo img{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;object-fit:cover!important;object-position:center!important}
+.place-content{min-width:0;overflow:hidden;overflow-wrap:anywhere}
+.place-name{font-size:clamp(16px,1.8vw,24px)!important;line-height:1.2;overflow-wrap:anywhere}
+.place-rating{min-width:0;gap:6px}
+.place-category,.place-action{overflow-wrap:anywhere}
+@media(max-width:520px){.google-place-card{grid-template-columns:minmax(0,1fr)!important}.place-photo{aspect-ratio:1.9}.place-content{padding:17px!important}.place-name{font-size:19px!important}.place-rating .gold-stars{font-size:16px}.place-category,.place-action{font-size:11px!important}}
+.location-top{align-items:start}
+.location-top>div{min-width:0}
+.location-top p,.location-top p strong{color:#344347!important}
+.location-top .location-hours{color:#56666a}
+.map-directions-link{display:inline-flex;align-items:center;gap:11px;margin-top:18px;padding:12px 16px;border-radius:6px;background:#11191c;color:#fff;font-weight:650;font-size:13px;line-height:1.25}
+.map-directions-link:hover,.map-open-link:hover{background:#138b9b;color:#fff}
+.map-directions-link svg,.map-open-link svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.map-directions-link small{color:#c4d4d6;font-size:10px;font-weight:400}
+.map-directions-link>b{margin-left:8px;color:#52c3d0}
+.map-panel{isolation:isolate}
+.map-panel iframe{position:absolute;inset:0;z-index:0}
+.map-address{z-index:1!important;left:14px!important;right:14px!important;bottom:14px!important;top:auto!important;max-width:360px;padding:15px 17px!important;background:#101719f2!important;border:1px solid #ffffff36;border-radius:8px;color:#fff!important;box-shadow:0 8px 24px #10171945}
+.map-address small{display:block;color:#62cfdb!important;font-size:9px;letter-spacing:.12em}
+.map-address strong{display:block;margin:5px 0;color:#fff!important;font-size:16px}
+.map-address>span{color:#d1dddf!important;font-size:12px}
+.map-open-link{display:inline-flex;align-items:center;gap:7px;margin-top:10px;padding:8px 10px;background:#31b8c8;border-radius:5px;color:#0b2023!important;font-size:11px;font-weight:700}
+.map-footer{align-items:center;flex-wrap:wrap}
+.map-footer a{color:#087f91!important;font-weight:650;text-decoration:underline;text-underline-offset:3px}
+.appointment-grid{grid-template-columns:minmax(0,.82fr) minmax(0,.66fr) minmax(360px,1.2fr)!important;gap:clamp(18px,3vw,42px)!important;align-items:start}
+.appointment-office{min-width:0;align-self:center;margin:0;overflow:hidden;border-radius:9px;background:#202629}
+.appointment-office img{display:block;width:100%;height:auto;aspect-ratio:1.15;object-fit:cover;object-position:center}
+.appointment-office figcaption{padding:10px 12px;color:#e3e9e9;font-size:11px;line-height:1.4}
+@media(max-width:900px){.appointment-grid{grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr)!important}.appointment-office{grid-column:1;grid-row:2}.appointment #appointment-form{grid-column:2;grid-row:1/span 2}}
+@media(max-width:680px){.appointment-grid{grid-template-columns:minmax(0,1fr)!important;gap:22px!important}.appointment-office,.appointment #appointment-form{grid-column:auto;grid-row:auto}.appointment-office img{aspect-ratio:1.55;object-fit:cover}.appointment-office figcaption{font-size:10px}.location-top{gap:22px}.map-panel{height:340px!important}}
+@media(max-width:390px){.map-address{left:8px!important;right:8px!important;bottom:8px!important;padding:11px!important}.map-address strong{font-size:14px}.map-open-link{font-size:10px}}
+
+@media(max-width:760px){.services-track{grid-template-columns:minmax(0,1fr)!important;max-width:100%}.services-carousel,.services-viewport{min-width:0;max-width:100%;overflow:hidden}.service-card{width:100%;max-width:100%;min-width:0}.service-card>img{aspect-ratio:1.48}.intro-feature-image{min-width:0}.intro-story .slide-stage{aspect-ratio:1.45}}
+html,body{max-width:100%;overflow-x:clip}
+
+
+.diagnostic-mosaic .diagnostic-tile img{aspect-ratio:1;object-fit:cover}
+
+
+.subaru-photo{display:block;color:#57666a}.subaru-photo>span{display:block;margin-top:9px;color:#57666a;font:9px var(--mono);letter-spacing:.08em}.subaru-photo:hover>span{color:#087f91}
+.map-footer{color:#526267;font-size:10px}.arrival-directions{min-height:44px;padding:12px 14px;background:#fff;font-weight:650}.arrival-directions:hover{background:#e7f6f5;color:#087f91}
+
+
+.place-photo img{height:190%!important;transform:translateX(-50%) scale(1.01);transform-origin:top center;left:50%!important;object-fit:cover!important}.place-photo{background:#e0e6e6}.place-photo:after{inset:45% 0 0}
+

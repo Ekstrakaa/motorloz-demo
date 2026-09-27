@@ -19,17 +19,17 @@
     corvette:photo('corvette-taller','Corvette en el taller',true),
     space:photo('instalaciones','Una mirada al interior del taller',true),
     front:photo('fachada-vehiculos','Puertas abiertas a la pasión por los autos',true),
-    mechanic:photo('equipo-mecanica','Mecánica en acción',true,'50% 38%'),
-    diagnostic:photo('equipo-diagnostico','Tecnología y atención al detalle',false,'56% 45%')
-    ,tools:photo('herramientas-taller','Herramientas listas para cada diagnóstico',true)
-    ,mechanic:photo('equipo-mecanica','Mecánico revisando un motor en MOTORLOZ',true)
-    ,subaruFront:photo('subaru-frente','Subaru y atención especializada',true)
+    mechanic:photo('equipo-mecanica','Mecánico revisando un motor en MOTORLOZ',true,'50% 38%'),
+    diagnostic:photo('equipo-diagnostico','Tecnología y atención al detalle',false,'56% 45%'),
+    tools:photo('herramientas-taller','Herramientas listas para cada diagnóstico',true),
+    subaruFront:photo('subaru-frente','Subaru y atención especializada',true)
   };
   const groups = {
-    hero:{items:[pictures.classics,pictures.salon,pictures.workshopWide,pictures.ferrariWide,pictures.subaruWide,pictures.panorama],interval:5900},
+    hero:{items:[pictures.salon,pictures.workshopWide,pictures.subaruFront,pictures.panorama,pictures.space],interval:5900},
+    intro:{items:[pictures.subaruWide,pictures.front],interval:6500},
     vehicles:{items:[pictures.ferrari,pictures.corvette],interval:7300},
-    spaces:{items:[pictures.space,pictures.reception,pictures.subaruFront],interval:6200},
-    arrival:{items:[pictures.localAereo,pictures.workshopWide],interval:5000},
+    spaces:{items:[pictures.space,pictures.reception,pictures.subaruWide],interval:6200},
+    arrival:{items:[pictures.workshopWide],interval:5000},
     team:{items:[pictures.planning,pictures.mechanic],interval:7900}
   };
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
@@ -45,7 +45,7 @@
     const cache=new Map();
     function load(item){if(cache.has(item.src))return cache.get(item.src);const image=new Image();image.src=item.src;const promise=image.decode().then(()=>image).catch(()=>null);cache.set(item.src,promise);return promise;}
     const stage=root.querySelector('.slide-stage');
-    function fitPhoto(image){if(image?.naturalWidth&&image?.naturalHeight)stage.style.setProperty('aspect-ratio',`${image.naturalWidth} / ${image.naturalHeight}`);}
+    function fitPhoto(){/* El encuadre lo define CSS para mantener todas las fotos del carrusel iguales. */}
     function paint(frame,item,image){fitPhoto(image);if(!image.complete)image.addEventListener('load',()=>fitPhoto(image),{once:true});image.alt=item.alt;image.loading='eager';image.decoding='async';image.style.objectPosition=item.position;frame.style.backgroundImage=`url("${item.src}")`;frame.classList.toggle('clean-photo',item.clean);frame.replaceChildren(image);}
     function updateLabels(){root.dataset.slideIndex=String(index);if(isHero){document.querySelector('#hero-counter').textContent=`${String(index+1).padStart(2,'0')} / ${String(items.length).padStart(2,'0')}`;document.querySelector('#hero-photo-label').textContent=items[index].alt;}else{root.querySelector('.slide-number').textContent=`${String(index+1).padStart(2,'0')} / ${String(items.length).padStart(2,'0')}`;root.querySelector('.slide-caption').textContent=items[index].alt;}pause.textContent=paused?'▷':'Ⅱ';pause.setAttribute('aria-pressed',String(paused));pause.setAttribute('aria-label',`${paused?'Reanudar':'Pausar'} fotos de ${isHero?'portada':root.getAttribute('aria-label')}`);root.classList.toggle('slideshow-paused',paused);}
     function schedule(){clearTimeout(timer);if(items.length<2||paused||!visible||document.hidden)return;timer=setTimeout(async()=>{if(!root.matches(':focus-within')&&!controlRoot.matches(':focus-within')&&!document.querySelector('dialog[open]'))await show(1);schedule();},interval);}

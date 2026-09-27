@@ -7,24 +7,17 @@
   const frames = [...root.querySelectorAll('.cinema-frame')];
   const counter = document.querySelector('#hero-counter');
   const label = document.querySelector('#hero-photo-label');
-  const title = document.querySelector('#hero-title');
-  const description = document.querySelector('.hero-description');
-  const dots = [...document.querySelectorAll('[data-hero-index]')];
-  const previous = document.querySelector('[data-hero-prev]');
-  const next = document.querySelector('[data-hero-next]');
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
   const sequence = [
     {
       type: 'video',
       src: 'assets/motorloz-stock.mp4',
-      poster: 'assets/taller-panoramica.png',
+      poster: 'assets/salon-panoramica.png',
       start: 18.05,
       end: 20.65,
       playbackRate: .72,
       duration: 3900,
-      label: 'EL TALLER, EN MOVIMIENTO',
-      title: 'Tu auto.<br>Nuestra<br><em>pasión.</em>',
-      description: 'Mecánica, tecnología y atención al detalle. Para lo que te mueve, todos los días.'
+      label: 'EL TALLER, EN MOVIMIENTO'
     },
     {
       type: 'image',
@@ -33,21 +26,17 @@
       zoomStart: 1.025,
       zoomEnd: 1.07,
       duration: 5000,
-      label: 'HERRAMIENTAS, DIAGNÓSTICO Y OFICIO',
-      title: 'Diagnóstico<br>con criterio.<br><em>Trabajo preciso.</em>',
-      description: 'Herramientas, experiencia y una conversación clara para entender qué necesita tu vehículo.'
+      label: 'HERRAMIENTAS, DIAGNÓSTICO Y OFICIO'
     },
     {
       type: 'video',
       src: 'assets/motorloz-subaru-wrx.mp4',
-      poster: 'assets/mecanica-subaru.png',
+      poster: 'assets/hero-subaru.png',
       start: 1.5,
       end: 8,
       playbackRate: .78,
       duration: 8500,
-      label: 'MECÁNICA, DE CERCA',
-      title: 'Mecánica<br>de cerca.<br><em>Con criterio.</em>',
-      description: 'Escuchamos lo que notaste, revisamos el vehículo y coordinamos el próximo paso.'
+      label: 'MECÁNICA, DE CERCA'
     },
     {
       type: 'image',
@@ -56,9 +45,7 @@
       zoomStart: 1.035,
       zoomEnd: 1.075,
       duration: 5000,
-      label: 'SUBARU, PASIÓN QUE NOS MUEVE',
-      title: 'Subaru.<br>Pasión que<br><em>nos mueve.</em>',
-      description: 'Una afinidad especial por Subaru y la misma dedicación para cada marca que llega al taller.'
+      label: 'SUBARU, PASIÓN QUE NOS MUEVE'
     },
     {
       type: 'image',
@@ -67,9 +54,7 @@
       zoomStart: 1.025,
       zoomEnd: 1.065,
       duration: 5000,
-      label: 'PASIÓN MULTIMARCA',
-      title: 'Atención<br>multimarca.<br><em>Un mismo cuidado.</em>',
-      description: 'Mecánica y mantenimiento para vehículos particulares y utilitarios en Montevideo.'
+      label: 'PASIÓN MULTIMARCA'
     },
     {
       type: 'image',
@@ -78,9 +63,7 @@
       zoomStart: 1.015,
       zoomEnd: 1.055,
       duration: 5000,
-      label: 'SUBARU, EN EL CORAZÓN',
-      title: 'El oficio<br>evoluciona.<br><em>El cuidado permanece.</em>',
-      description: 'Formación, tecnología y atención cercana detrás de cada trabajo de MOTORLOZ.'
+      label: 'SUBARU, EN EL CORAZÓN'
     }
   ];
 
@@ -100,14 +83,8 @@
     const scene = sequence[index];
     counter.textContent = `${String(index + 1).padStart(2, '0')} / ${String(sequence.length).padStart(2, '0')}`;
     label.textContent = scene.label;
-    if (title && scene.title) title.innerHTML = scene.title;
-    if (description && scene.description) description.textContent = scene.description;
     root.setAttribute('aria-label', scene.label);
     root.dataset.currentKind = scene.type;
-    dots.forEach((dot, dotIndex) => {
-      if (dotIndex === index) dot.setAttribute('aria-current', 'true');
-      else dot.removeAttribute('aria-current');
-    });
   }
 
   function stopFrame(frame) {
@@ -209,12 +186,6 @@
   updateMeta();
   schedule();
 
-  previous?.addEventListener('click', () => advance(-1));
-  next?.addEventListener('click', () => advance(1));
-  dots.forEach((dot, dotIndex) => dot.addEventListener('click', () => {
-    const delta = (dotIndex - index + sequence.length) % sequence.length;
-    if (delta) advance(delta);
-  }));
   reducedMotion.addEventListener?.('change', schedule);
 
   new IntersectionObserver(entries => {
