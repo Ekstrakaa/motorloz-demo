@@ -26,11 +26,11 @@
   };
   const groups = {
     hero:{items:[pictures.salon,pictures.workshopWide,pictures.subaruFront,pictures.panorama,pictures.space],interval:5900},
-    intro:{items:[pictures.subaruWide,pictures.front],interval:6500},
-    vehicles:{items:[pictures.ferrari,pictures.corvette],interval:7300},
-    spaces:{items:[pictures.space,pictures.reception,pictures.subaruWide],interval:6200},
+    intro:{items:[pictures.subaruWide,pictures.front],interval:3000},
+    vehicles:{items:[pictures.ferrari,pictures.corvette],interval:3000},
+    spaces:{items:[pictures.space,pictures.reception,pictures.subaruWide],interval:3000},
     arrival:{items:[pictures.workshopWide],interval:5000},
-    team:{items:[pictures.planning,pictures.mechanic],interval:7900}
+    team:{items:[pictures.planning,pictures.mechanic],interval:3000}
   };
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   document.querySelectorAll('[data-slideshow]').forEach(root => {
