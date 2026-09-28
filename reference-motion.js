@@ -114,13 +114,10 @@
   const subaruPhotos = [...document.querySelectorAll('.subaru-photo')];
   const targets = [...principles, ...subaruPhotos];
 
-  // Una sola capa de fondo y una sola pieza interactiva mantienen la trama alineada.
+  // Cada celda tocada deja una huella breve que se desvanece al avanzar el cursor.
   const paper = document.querySelector('main#contenido');
   if (paper && matchMedia('(hover: hover) and (pointer: fine)').matches) {
-    const tile = document.createElement('span');
-    tile.className = 'background-tile-hover';
-    tile.setAttribute('aria-hidden', 'true');
-    paper.prepend(tile);
+    const traces = new Map();
     const patternWidth = 590;
     const patternHeight = 154;
     const skew = Math.tan(8 * Math.PI / 180);
@@ -129,15 +126,25 @@
       { y: 78, x: [-55, 63, 181, 299, 417, 535] }
     ];
     let frame = 0;
-    const clearTile = () => {
-      tile.classList.remove('is-active');
+    function fadeTrace(key, trace) {
+      clearTimeout(trace.releaseTimer);
+      clearTimeout(trace.removeTimer);
+      trace.element.classList.remove('is-active');
+      trace.removeTimer = setTimeout(() => {
+        trace.element.remove();
+        traces.delete(key);
+      }, 520);
+    }
+
+    const clearTraces = () => {
+      traces.forEach((trace, key) => fadeTrace(key, trace));
       paper.style.setProperty('--tile-x', '0px');
     };
     paper.addEventListener('pointermove', event => {
       if (frame) cancelAnimationFrame(frame);
       frame = requestAnimationFrame(() => {
         const lightSurface = event.target.closest('.intro,.services,.reviews,.location,.subaru-section,.hyundai-section,.reference-bridge,.contact-bridge,.customer-gallery');
-        if (!lightSurface) { tile.classList.remove('is-active'); frame = 0; return; }
+        if (!lightSurface) { frame = 0; return; }
         const rect = paper.getBoundingClientRect();
         const x = event.clientX - rect.left;
         const y = event.clientY - rect.top;
@@ -147,7 +154,6 @@
         const rowY = ((y % patternHeight) + patternHeight) % patternHeight;
         const row = rows.find(candidate => rowY >= candidate.y && rowY <= candidate.y + 68);
         if (!row) {
-          tile.classList.remove('is-active');
           frame = 0;
           return;
         }
@@ -161,14 +167,29 @@
           }
         }
         if (match) {
-          tile.style.left = `${match.left + shift - skew * row.y}px`;
-          tile.style.top = `${Math.floor(y / patternHeight) * patternHeight + row.y}px`;
-          tile.classList.add('is-active');
-        } else tile.classList.remove('is-active');
+          const rowTop = Math.floor(y / patternHeight) * patternHeight + row.y;
+          const left = match.left + shift - skew * row.y;
+          const key = `${rowTop}:${match.repeat}:${match.left}`;
+          let trace = traces.get(key);
+          if (!trace) {
+            const element = document.createElement('span');
+            element.className = 'background-tile-trace';
+            element.setAttribute('aria-hidden', 'true');
+            paper.prepend(element);
+            trace = { element, releaseTimer: 0, removeTimer: 0 };
+            traces.set(key, trace);
+          }
+          clearTimeout(trace.releaseTimer);
+          clearTimeout(trace.removeTimer);
+          trace.element.style.left = `${left}px`;
+          trace.element.style.top = `${rowTop}px`;
+          trace.element.classList.add('is-active');
+          trace.releaseTimer = setTimeout(() => fadeTrace(key, trace), 180);
+        }
         frame = 0;
       });
     }, { passive: true });
-    paper.addEventListener('pointerleave', clearTile, { passive: true });
+    paper.addEventListener('pointerleave', clearTraces, { passive: true });
   }
 
   if (!targets.length) return;
