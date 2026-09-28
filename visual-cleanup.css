@@ -262,3 +262,52 @@
   .films-grid{grid-auto-columns:min(80vw,320px)!important;gap:14px!important}
   .why-number{font-size:14px!important}
 }
+
+/* CTA bridge: una sola superficie, sin marco interior ni desplazamiento entre secciones. */
+.reference-bridge{
+  padding-top:clamp(54px,7vw,88px)!important;
+  padding-bottom:clamp(54px,7vw,88px)!important;
+}
+.reference-bridge-card{
+  transform:none!important;
+  margin:0 auto!important;
+  min-height:0!important;
+  padding:clamp(34px,5vw,58px) clamp(22px,5vw,64px)!important;
+  overflow:hidden!important;
+  border:1px solid rgba(104,167,173,.3)!important;
+  border-radius:18px!important;
+  background:radial-gradient(ellipse at 50% 0%,rgba(28,105,112,.22),transparent 68%),linear-gradient(145deg,#0d1a1c,#0a1113 78%)!important;
+  box-shadow:0 20px 48px rgba(9,20,22,.16)!important;
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+  animation:none!important;
+}
+.reference-bridge-card:before,.reference-bridge-card:after{content:none!important;display:none!important}
+.reference-bridge-card>*{position:relative!important;z-index:1!important}
+.reference-bridge-card .button.primary{
+  min-height:50px!important;
+  padding-inline:24px!important;
+  border:1px solid rgba(204,250,252,.42)!important;
+  border-radius:999px!important;
+  background:linear-gradient(135deg,#43c2cc,#28aeba)!important;
+  background-size:auto!important;
+  color:#071719!important;
+  box-shadow:0 8px 22px rgba(32,157,169,.23)!important;
+  animation:none!important;
+  transition:transform .2s ease,background-color .2s ease,box-shadow .2s ease!important;
+}
+.reference-bridge-card .button.primary:before{content:none!important;display:none!important}
+.reference-bridge-card .button.primary:hover,.reference-bridge-card .button.primary:focus-visible{
+  transform:translateY(-2px)!important;
+  filter:brightness(1.04)!important;
+  box-shadow:0 11px 25px rgba(32,157,169,.28)!important;
+}
+@media(max-width:760px){
+  .reference-bridge{padding-inline:16px!important}
+  .reference-bridge-card{padding:32px 20px!important;border-radius:15px!important}
+  .reference-bridge-card h2{margin:8px 0 12px!important}
+  .reference-bridge-card>p:not(.eyebrow){margin-bottom:20px!important}
+}
+@media(prefers-reduced-motion:reduce){
+  .reference-bridge-card,.reference-bridge-card .button.primary{animation:none!important;transition:none!important}
+}
