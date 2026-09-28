@@ -298,3 +298,5 @@
 .service-card:hover { transform:translateY(-4px)!important;box-shadow:0 23px 42px rgba(13,39,43,.17),0 5px 12px rgba(13,39,43,.08),inset 0 1px 0 #fff!important; }
 .customer-gallery-heading h3 em { color:#2bb6c5!important;font-style:normal!important; }
 @media(prefers-reduced-motion:reduce) { :is(a.button,button.button,.header-cta,.contact-open,.map-open-link,.text-link,.service-card-copy>a,[data-service],.slide-buttons button,.review-controls button,.services-controls button,.services-pagination button,.why-card):hover { transform:none!important; } }
+
+#subaru-title .subaru-cyan-word { color:#26b7c6!important;-webkit-text-fill-color:#26b7c6!important; }
