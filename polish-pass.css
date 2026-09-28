@@ -313,9 +313,9 @@ main#contenido>:not(.background-tile-hover) {position:relative;z-index:1}
 .hyundai-badge span { font-size:clamp(18px,1.8vw,22px)!important; }
 .hyundai-badge i { font-size:9px!important; }
 .subaru-photo img,.hyundai-image img,.intro-story .slide-stage,.location .map-panel { box-shadow:0 12px 28px rgba(31,58,60,.1)!important; }
-.engine-sketch { position:relative;width:min(100%,390px);height:clamp(112px,14vw,168px);margin:12px auto 14px;overflow:hidden; }
-.engine-sketch::after { content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,#f0f2ef 0%,transparent 15%,transparent 85%,#f0f2ef 100%),linear-gradient(0deg,#f0f2ef 0%,transparent 18%,transparent 82%,#f0f2ef 100%);opacity:.78; }
-.engine-sketch img { display:block;width:100%;height:100%;object-fit:cover;object-position:center 53%;filter:grayscale(1) contrast(.84) brightness(1.45);mix-blend-mode:multiply; }
+.engine-sketch { display:grid;place-items:center;width:min(100%,390px);height:clamp(112px,14vw,168px);margin:12px auto 14px;overflow:visible;background:transparent; }
+.engine-sketch::after { display:none!important; }
+.engine-sketch img { display:block;width:100%;height:100%;object-fit:contain;object-position:center;filter:none;mix-blend-mode:normal; }
 .japan-heading h2 { position:relative;z-index:1; }
 
 /* A real, legible map with fixed bounds prevents the mobile layout from stretching. */
@@ -329,8 +329,8 @@ main#contenido>:not(.background-tile-hover) {position:relative;z-index:1}
 .location .arrival-photos { min-width:0!important;width:100%!important; }
 .light-copy-wash { position:relative!important;z-index:0!important;isolation:isolate; }
 .light-copy-wash::before { content:"";position:absolute;z-index:-1;inset:-20px -34px;pointer-events:none;background:radial-gradient(ellipse at center,rgba(245,247,245,.94) 0%,rgba(245,247,245,.76) 48%,rgba(245,247,245,0) 84%);filter:blur(11px); }
-.reviews-heading,.services-heading,.hyundai-copy,.location-top>div,.intro-feature-copy,.diagnostic-story-copy,.customer-gallery-heading>div { position:relative!important;z-index:0!important;isolation:isolate; }
-.reviews-heading::before,.services-heading::before,.hyundai-copy::before,.location-top>div::before,.intro-feature-copy::before,.diagnostic-story-copy::before,.customer-gallery-heading>div::before { content:"";position:absolute;z-index:-1;inset:-20px -34px;pointer-events:none;background:radial-gradient(ellipse at center,rgba(245,247,245,.94) 0%,rgba(245,247,245,.76) 48%,rgba(245,247,245,0) 84%);filter:blur(11px); }
+.reviews-heading,.services-heading,.hyundai-copy,.location-top>div,.intro-feature-copy,.customer-gallery-heading>div { position:relative!important;z-index:0!important;isolation:isolate; }
+.reviews-heading::before,.services-heading::before,.hyundai-copy::before,.location-top>div::before,.intro-feature-copy::before,.customer-gallery-heading>div::before { content:"";position:absolute;z-index:-1;inset:-20px -34px;pointer-events:none;background:radial-gradient(ellipse at center,rgba(245,247,245,.94) 0%,rgba(245,247,245,.76) 48%,rgba(245,247,245,0) 84%);filter:blur(11px); }
 @media(max-width:1050px) {
   .location .arrival-grid { grid-template-columns:minmax(0,1fr)!important;gap:18px!important; }
   .location .map-panel { height:clamp(290px,58vw,420px)!important;max-height:420px!important; }
