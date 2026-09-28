@@ -27,6 +27,18 @@
     svg.setAttribute('viewBox', '0 0 48 48'); svg.innerHTML = whyArt[i] || whyArt[0];
   });
 
+  const engineSketch = document.querySelector('.subaru-section .engine-sketch');
+  if (engineSketch && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    if ('IntersectionObserver' in window) {
+      const engineObserver = new IntersectionObserver(entries => {
+        engineSketch.classList.toggle('is-revving', entries[0].isIntersecting);
+      }, { threshold: .28 });
+      engineObserver.observe(engineSketch);
+    } else {
+      engineSketch.classList.add('is-revving');
+    }
+  }
+
   function rotateImages(rootSelector, imageSelector, interval, update) {
     const root = document.querySelector(rootSelector);
     if (!root) return;

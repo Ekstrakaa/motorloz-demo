@@ -137,3 +137,90 @@
   .films-grid .film-caption strong { white-space:normal!important;font-size:clamp(12px,3.7vw,15px)!important;line-height:1.2!important; }
   .films-grid .film-caption a { margin:0!important;font-size:8px!important;line-height:1.35!important;overflow-wrap:anywhere!important; }
 }
+
+/* Give the proof points a darker, more crafted finish with quiet technical detailing. */
+.intro-proof-row>article {
+  position:relative!important;isolation:isolate!important;overflow:hidden!important;
+  grid-template-columns:50px minmax(0,1fr)!important;min-height:94px!important;
+  border:1px solid rgba(81,198,209,.28)!important;border-radius:14px!important;
+  background:radial-gradient(135px 95px at 100% 100%,rgba(26,161,177,.18),transparent 74%),linear-gradient(120deg,#152b30 0%,#0d1b20 66%,#0a1519 100%)!important;
+  box-shadow:inset 0 1px rgba(255,255,255,.08),0 15px 36px rgba(7,20,23,.18)!important;
+}
+.intro-proof-row>article::before { content:"";position:absolute;z-index:-1;left:0;top:15px;bottom:15px;width:3px;border-radius:0 3px 3px 0;background:linear-gradient(#67e0e7,#118a9a);box-shadow:0 0 17px rgba(55,200,211,.4); }
+.intro-proof-row>article::after { content:"";position:absolute;z-index:-1;right:-38px;bottom:-55px;width:132px;height:132px;border:1px solid rgba(85,202,212,.16);border-radius:50%;box-shadow:0 0 0 12px rgba(65,176,188,.035),0 0 0 27px rgba(65,176,188,.025); }
+.intro-proof-row .proof-index { display:grid!important;place-items:center;width:42px;height:42px;border:1px solid rgba(93,211,222,.3);border-radius:12px;background:linear-gradient(145deg,rgba(50,157,168,.2),rgba(13,57,65,.65));color:#70dbe2!important;font-size:16px!important;letter-spacing:-.06em!important;box-shadow:inset 0 1px rgba(255,255,255,.1),0 8px 20px rgba(0,0,0,.16); }
+.intro-proof-row article b { position:relative;color:#f1f7f6!important;font-size:14px!important; }
+.intro-proof-row article small { position:relative;color:#adc1c2!important;font-size:11px!important; }
+
+/* Rev the boxer illustration with a visible rumble and rotating crank highlight. */
+.subaru-section .engine-sketch { position:relative!important;isolation:isolate!important;width:min(100%,520px)!important;height:clamp(190px,52vw,285px)!important;margin:12px auto 18px!important; }
+.subaru-section .engine-sketch img { position:relative;z-index:1;transform-origin:50% 68%;filter:drop-shadow(0 8px 6px rgba(7,23,27,.08));animation:none!important; }
+.subaru-section .engine-sketch::before { content:"";position:absolute;z-index:0;left:50%;top:67%;width:35%;height:28%;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(ellipse,rgba(28,178,191,.22),rgba(28,178,191,.08) 43%,transparent 72%);filter:blur(9px);opacity:0; }
+.subaru-section .engine-sketch::after { content:"";position:absolute;z-index:2;left:50%;top:69%;width:15%;aspect-ratio:1;transform:translate(-50%,-50%);border:2px solid rgba(67,205,216,.7);border-right-color:transparent;border-bottom-color:rgba(67,205,216,.2);border-radius:50%;box-shadow:0 0 0 5px rgba(47,178,190,.07),0 0 22px rgba(41,196,210,.48),inset 0 0 12px rgba(46,186,201,.23);opacity:0; }
+.subaru-section .engine-sketch.is-revving img { animation:boxer-rev-pulse 3.8s linear infinite!important; }
+.subaru-section .engine-sketch.is-revving::before { animation:boxer-aura 3.8s ease-in-out infinite; }
+.subaru-section .engine-sketch.is-revving::after { animation:crank-spin .68s linear infinite,crank-flash 3.8s ease-in-out infinite; }
+@keyframes boxer-rev-pulse {
+  0%,22%,100% { transform:translate(0,0) rotate(0) scale(1);filter:drop-shadow(0 4px 3px rgba(7,23,27,.06)); }
+  27% { transform:translate(0,-2px) rotate(-.25deg) scale(1.008); }
+  30% { transform:translate(2px,1px) rotate(.35deg) scale(1.016);filter:drop-shadow(0 12px 10px rgba(10,77,86,.22)); }
+  32% { transform:translate(-2px,-1px) rotate(-.35deg) scale(1.012); }
+  34% { transform:translate(2px,0) rotate(.25deg) scale(1.016); }
+  36% { transform:translate(-1px,1px) rotate(-.2deg) scale(1.01); }
+  43% { transform:translate(0,-1px) rotate(0) scale(1.006);filter:drop-shadow(0 10px 8px rgba(10,77,86,.16)); }
+  52%,64% { transform:translate(0,0) rotate(0) scale(1);filter:drop-shadow(0 4px 3px rgba(7,23,27,.06)); }
+  68% { transform:translate(1px,-1px) rotate(.22deg) scale(1.012); }
+  70% { transform:translate(-1px,1px) rotate(-.22deg) scale(1.009); }
+  76% { transform:translate(0,0) rotate(0) scale(1); }
+}
+@keyframes boxer-aura { 0%,22%,52%,100% {opacity:0} 30%,43%,68%,74% {opacity:.9} 36%,70% {opacity:.58} }
+@keyframes crank-spin { to { transform:translate(-50%,-50%) rotate(1turn); } }
+@keyframes crank-flash { 0%,22%,52%,100% {opacity:0} 30%,43%,68%,74% {opacity:.85} }
+@media(prefers-reduced-motion:reduce) {
+  .subaru-section .engine-sketch.is-revving img,.subaru-section .engine-sketch.is-revving::before,.subaru-section .engine-sketch.is-revving::after { animation:none!important; }
+  .subaru-section .engine-sketch::before,.subaru-section .engine-sketch::after { opacity:0!important; }
+}
+
+/* Use the whole mobile viewport for the supplied photos and map; preserve each original frame. */
+@media(max-width:760px) {
+  .subaru-section .subaru-photo-carousel,.diagnostic-mosaic,.people .team-story,.appointment-office,
+  .location .map-panel,.location .arrival-slide-figure {
+    width:100vw!important;max-width:none!important;margin-left:calc(50% - 50vw)!important;margin-right:calc(50% - 50vw)!important;
+  }
+  .subaru-section .subaru-photo-carousel,.diagnostic-feature-carousel,.people .team-story,.appointment-office,.location .arrival-slide-figure { border:0!important;border-radius:0!important;box-shadow:none!important;background:transparent!important; }
+  .subaru-carousel-stage { aspect-ratio:.95!important;background:transparent!important; }
+  .subaru-carousel-caption,.diagnostic-feature-caption,.people .team-story .slide-toolbar,.location .arrival-slide-figure>figcaption { padding-inline:20px!important; }
+  .diagnostic-mosaic { max-width:none!important; }
+  .diagnostic-feature-stage { aspect-ratio:.96!important;background:transparent!important; }
+  .people .team-story .slide-stage { width:100vw!important;height:auto!important;aspect-ratio:1.55!important;overflow:hidden!important;background:transparent!important; }
+  .people .team-story .slide-frame { background:transparent!important; }
+  .people .team-story .slide-frame img,.people .team-story .slide-frame.clean-photo img {
+    width:100%!important;height:100%!important;max-width:none!important;left:50%!important;top:50%!important;
+    transform:translate(-50%,-50%)!important;object-fit:contain!important;object-position:center!important;padding:0!important;background:transparent!important;
+  }
+  .appointment-office { margin-top:18px!important; }
+  .appointment-office img { display:block!important;width:100%!important;height:auto!important;max-height:none!important;aspect-ratio:1405/933!important;object-fit:contain!important;object-position:center!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important; }
+  .appointment-office figcaption { padding:9px 20px 0!important; }
+  .location .arrival-grid { display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:0!important; }
+  .location .map-panel { height:clamp(300px,84vw,390px)!important;min-height:0!important;max-height:none!important;border:0!important;border-radius:0!important;box-shadow:none!important; }
+  .location .map-panel iframe { opacity:1!important; }
+  .location .arrival-photos { width:100%!important;margin:0!important;padding:0!important; }
+  .location .arrival-slide-figure { margin-top:0!important; }
+  .location .arrival-story .slide-stage { width:100vw!important;height:auto!important;aspect-ratio:1.77!important;background:transparent!important; }
+  .location .arrival-story .slide-frame,.location .arrival-story .slide-frame.clean-photo { background:#111a1d!important; }
+  .location .arrival-story .slide-frame img,.location .arrival-story .slide-frame.clean-photo img {
+    width:100%!important;height:100%!important;max-width:none!important;left:50%!important;top:50%!important;
+    transform:translate(-50%,-50%)!important;object-fit:contain!important;object-position:center!important;padding:0!important;background:transparent!important;
+  }
+  .intro-proof-row>article { min-height:88px!important;padding:13px 17px!important; }
+}
+
+/* Center the customer gallery title and its supporting line on every screen. */
+.customer-gallery-heading {
+  display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;
+  gap:8px!important;margin:0 auto 22px!important;text-align:center!important;
+}
+.customer-gallery-heading>div { width:100%!important;text-align:center!important; }
+.customer-gallery-heading .eyebrow { margin-inline:auto!important;text-align:center!important; }
+.customer-gallery-heading h3 { width:100%!important;text-align:center!important;text-wrap:balance!important; }
+.customer-gallery-heading>p { max-width:38ch!important;margin:0 auto!important;text-align:center!important; }
