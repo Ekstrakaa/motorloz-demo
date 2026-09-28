@@ -28,6 +28,18 @@
   const esc = value => String(value).replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[character]));
   const getMessageCount = () => history.filter(item => item.role === 'user').length;
 
+  function speakReply(text) {
+    if (!('speechSynthesis' in window) || !window.SpeechSynthesisUtterance) return false;
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(String(text || '').replace(/[*_`#]/g, ' '));
+    utterance.lang = 'es-UY';
+    const voices = window.speechSynthesis.getVoices();
+    utterance.voice = voices.find(voice => /^es-(UY|AR|419)/i.test(voice.lang)) || voices.find(voice => /^es/i.test(voice.lang)) || null;
+    utterance.rate = 1.02;
+    window.speechSynthesis.speak(utterance);
+    return true;
+  }
+
   function bubble(text, role, extra = {}) {
     const row = document.createElement('div');
     row.className = `assistant-message assistant-message-${role}`;
@@ -37,6 +49,16 @@
       const copy = document.createElement('p');
       copy.textContent = text;
       row.append(copy);
+      if (role === 'assistant' && !extra.pending && 'speechSynthesis' in window) {
+        const speakButton = document.createElement('button');
+        speakButton.className = 'assistant-speak';
+        speakButton.type = 'button';
+        speakButton.setAttribute('aria-label', 'Escuchar respuesta');
+        speakButton.title = 'Escuchar respuesta';
+        speakButton.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5Z"></path><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"></path></svg>';
+        speakButton.addEventListener('click', () => speakReply(text));
+        row.append(speakButton);
+      }
     }
     if (extra.pending) row.classList.add('is-pending');
     messagesEl.append(row);
@@ -105,6 +127,7 @@
       if (!response.ok) throw new Error(result.message || 'No pude responder en este momento.');
       history.push({ role: 'assistant', content: result.reply });
       bubble(result.reply, 'assistant');
+      speakReply(result.reply);
       maybeShowBooking();
     } catch (error) {
       pending.remove();
@@ -196,6 +219,7 @@
       pending?.remove();
       history.push({ role: 'assistant', content: result.reply });
       bubble(result.reply, 'assistant');
+      speakReply(result.reply);
       maybeShowBooking();
     } catch (error) {
       messagesEl.querySelector('.assistant-message.is-pending:last-child')?.remove();
