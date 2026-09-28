@@ -290,7 +290,7 @@
   animation:none!important;
 }
 .reference-bridge-card:before,.reference-bridge-card:after{content:none!important;display:none!important}
-.reference-bridge-card>*{position:relative!important;z-index:1!important}
+.reference-bridge-card>*:not(.motorloz-aurora-canvas){position:relative!important;z-index:1!important}
 .reference-bridge-card .button.primary{
   min-height:50px!important;
   padding-inline:24px!important;
@@ -325,7 +325,7 @@
   background:#0b1112!important;color:#f2f7f6!important;
 }
 .contact-bridge:before{content:none!important;animation:none!important}
-.contact-bridge>*{position:relative!important;z-index:1!important}
+.contact-bridge>*:not(.motorloz-aurora-canvas){position:relative!important;z-index:1!important}
 .contact-bridge .eyebrow{color:#8bd7dc!important}
 .contact-bridge h2{color:#f2f7f6!important}
 .contact-bridge>p{color:#c4d1d0!important}
@@ -358,9 +358,8 @@
 }
 .customer-gallery-toggle:hover,.customer-gallery-toggle:focus-visible{border-color:#209ba6;background:rgba(37,166,177,.08);color:#116f79}
 .customer-gallery-lane{width:100%;overflow:hidden}
-.customer-gallery-lane+.customer-gallery-lane{margin-top:14px}
 .customer-gallery-track{display:flex;width:max-content;will-change:transform;animation:customer-gallery-forward 54s linear infinite}
-.customer-gallery-reverse .customer-gallery-track{animation-name:customer-gallery-reverse;animation-duration:61s}
+.customer-gallery-opposite .customer-gallery-track{animation-name:customer-gallery-reverse;animation-duration:76s}
 .customer-gallery-group{display:flex;flex:none;gap:16px;padding-right:16px}
 .customer-gallery-photo{
   flex:0 0 var(--gallery-card-size);width:var(--gallery-card-size);aspect-ratio:1;margin:0;
@@ -377,7 +376,6 @@
   .customer-gallery-heading h3{font-size:25px}
   .customer-gallery-heading>p{grid-column:1/-1;grid-row:2;margin:0;font-size:11px}
   .customer-gallery-toggle{grid-column:2;grid-row:1}
-  .customer-gallery-lane+.customer-gallery-lane{margin-top:10px}
   .customer-gallery-group{gap:10px;padding-right:10px}
   .customer-gallery-photo{border-radius:9px}
 }
@@ -387,4 +385,22 @@
   .customer-gallery-lane::-webkit-scrollbar{display:none}
   .customer-gallery-track{animation:none!important;will-change:auto}
   .customer-gallery-toggle{display:none}
+}
+
+/* El carrusel de autos va en sentido contrario al de reseñas, en una sola línea. */
+@media(max-width:760px){
+  .films-grid .film-card{
+    aspect-ratio:9/16!important;min-height:0!important;overflow:hidden!important;
+    border:0!important;border-radius:9px!important;background:transparent!important;box-shadow:none!important;
+  }
+  .films-grid .film-card>video{
+    position:absolute!important;inset:0!important;display:block!important;width:100%!important;height:100%!important;
+    object-fit:cover!important;object-position:center!important;background:transparent!important;
+  }
+  .films-grid .film-card:after{inset:0!important;background:linear-gradient(180deg,transparent 58%,rgba(4,13,15,.58) 100%)!important;opacity:1!important}
+  .films-grid .film-caption{
+    position:absolute!important;inset:auto 0 0!important;width:auto!important;max-width:none!important;
+    min-height:0!important;margin:0!important;padding:38px 12px 12px!important;gap:5px!important;
+    background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;
+  }
 }

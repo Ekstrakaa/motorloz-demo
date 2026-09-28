@@ -74,8 +74,7 @@
   }
 
   gallery.append(
-    buildLane(photos.slice(0, 5), 'customer-gallery-forward', 'Primera fila de fotos de autos'),
-    buildLane(photos.slice(5), 'customer-gallery-reverse', 'Segunda fila de fotos de autos')
+    buildLane(photos, 'customer-gallery-opposite', 'Carrusel de fotos de autos de clientes')
   );
   reviews.insertAdjacentElement('afterend', gallery);
 

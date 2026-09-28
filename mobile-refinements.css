@@ -417,8 +417,8 @@ main>.section.why-motorloz:after,main>.section.diagnostic-story:after,footer:aft
     linear-gradient(126deg,transparent 20%,rgba(45,190,202,.07) 38%,rgba(12,120,144,.12) 50%,transparent 66%,rgba(52,188,203,.075) 81%,transparent 93%);
   opacity:.68;mix-blend-mode:screen;animation:motorloz-aurora-wave-b 27s ease-in-out infinite alternate;will-change:transform;
 }
-main>.section.workshop>*,main>.section.people>*,main>.section.films-section>*,
-main>.section.why-motorloz>*,main>.section.diagnostic-story>*,footer>*{position:relative;z-index:1}
+main>.section.workshop>*:not(.motorloz-aurora-canvas),main>.section.people>*:not(.motorloz-aurora-canvas),main>.section.films-section>*:not(.motorloz-aurora-canvas),
+main>.section.why-motorloz>*:not(.motorloz-aurora-canvas),main>.section.diagnostic-story>*:not(.motorloz-aurora-canvas),footer>*:not(.motorloz-aurora-canvas){position:relative;z-index:1}
 /* La cita tiene una tarjeta oscura sobre una sección clara; conserva su marco y mueve el reflejo dentro. */
 .appointment:before{
   background-image:radial-gradient(ellipse at 16% 22%,rgba(28,155,170,.2),transparent 47%),
@@ -447,7 +447,7 @@ main>.section.why-motorloz>*,main>.section.diagnostic-story>*,footer>*{position:
     transition:opacity .35s ease;
   }
   .intro:hover:after,.services:hover:after,.reviews:hover:after,.location:hover:after,.subaru-section:hover:after,.hyundai-section:hover:after,.appointment:hover:after{opacity:1}
-  .intro>*,.services>*,.reviews>*,.location>*,.subaru-section>*,.hyundai-section>*,.appointment>*{position:relative;z-index:1}
+  .intro>*,.services>*,.reviews>*,.location>*,.subaru-section>*,.hyundai-section>*,.appointment>*:not(.motorloz-aurora-canvas){position:relative;z-index:1}
 }
 @media(max-width:760px){
   .intro,.services,.reviews,.location,.subaru-section,.hyundai-section,.appointment{background-size:38px 38px,38px 38px,152px 152px,152px 152px!important}
@@ -488,7 +488,7 @@ main>.section.why-motorloz>*,main>.section.diagnostic-story>*,footer>*{position:
   opacity:.72;mix-blend-mode:screen;animation:bridge-card-aurora 13s ease-in-out infinite alternate;will-change:transform;
 }
 .reference-bridge-card:after{z-index:2!important;border-color:rgba(164,223,225,.1)!important;transition:border-color .35s ease,box-shadow .35s ease}
-.reference-bridge-card>*{position:relative;z-index:1}
+.reference-bridge-card>*:not(.motorloz-aurora-canvas){position:relative;z-index:1}
 .reference-bridge-card:hover,.reference-bridge-card:focus-within{
   border-color:rgba(81,207,216,.62)!important;
   box-shadow:0 32px 78px rgba(8,16,20,.23),0 0 42px rgba(40,183,197,.2)!important;
@@ -597,11 +597,11 @@ main>.section.why-motorloz:after,main>.section.diagnostic-story:after,main>.sect
   width:100%!important;height:100%!important;pointer-events:none!important;opacity:.92!important;
   mix-blend-mode:screen!important;
 }
-main>.section.workshop>*,main>.section.people>*,main>.section.films-section>*,
-main>.section.why-motorloz>*,main>.section.diagnostic-story>*,main>.section.appointment>*,footer>*{position:relative;z-index:1}
+main>.section.workshop>*:not(.motorloz-aurora-canvas),main>.section.people>*:not(.motorloz-aurora-canvas),main>.section.films-section>*:not(.motorloz-aurora-canvas),
+main>.section.why-motorloz>*:not(.motorloz-aurora-canvas),main>.section.diagnostic-story>*:not(.motorloz-aurora-canvas),main>.section.appointment>*:not(.motorloz-aurora-canvas),footer>*:not(.motorloz-aurora-canvas){position:relative;z-index:1}
 .appointment:before,.reference-bridge-card{background-size:auto!important;animation:none!important}
 main>.section.appointment:before{content:none!important}
 .reference-bridge-card{position:relative!important;isolation:isolate;overflow:hidden!important}
 .reference-bridge-card:before{animation:none!important}
-.reference-bridge-card>*{position:relative;z-index:1}
+.reference-bridge-card>*:not(.motorloz-aurora-canvas){position:relative;z-index:1}
 @media(prefers-reduced-motion:reduce){.motorloz-aurora-canvas{opacity:.92!important}}
