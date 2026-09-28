@@ -5,7 +5,7 @@
   // líneas, bandas ni formas delimitadas.
   const auroraSurfaces = document.querySelectorAll(
     '.hero,main>.section.people,main>.section.films-section,main>.section.why-motorloz,' +
-    'main>.section.contact-bridge,main>.section.appointment,footer,.reference-bridge-card'
+    'main>.section.appointment,footer,.reference-bridge-card,.contact-bridge-card'
   );
   const auroraStates = [];
 
@@ -16,20 +16,20 @@
     const t = time * (reduced.matches ? .26 : 1);
     // Keep the glow large enough to feel like atmosphere, but localized enough
     // for its slow travel to register against each dark surface.
-    const span = Math.min(width, height) * .78;
+    const span = Math.min(width, height) * .58;
     const fields = [
-      { colors: [[10,51,58],[16,132,143]], alpha: .62, x: .2 + .3 * Math.sin(t * .34), y: .3 + .22 * Math.cos(t * .29), sx: 1.3, sy: .76, turn: .3 },
-      { colors: [[8,42,55],[31,111,129]], alpha: .55, x: .8 + .28 * Math.cos(t * .31 + 1.7), y: .68 + .26 * Math.sin(t * .33 + 1.7), sx: 1.16, sy: .72, turn: -.32 },
-      { colors: [[9,58,55],[30,119,98]], alpha: .53, x: .47 + .32 * Math.sin(t * .25 + 3.1), y: .48 + .24 * Math.cos(t * .3 + 2.4), sx: 1.24, sy: .7, turn: .24 },
-      { colors: [[7,39,46],[20,98,112]], alpha: .46, x: .34 + .3 * Math.cos(t * .29 + .8), y: .76 + .2 * Math.sin(t * .32 + .5), sx: 1.28, sy: .74, turn: -.28 }
+      { colors: [[8,55,59],[24,158,164]], alpha: .78, x: .2 + .34 * Math.sin(t * .52), y: .3 + .25 * Math.cos(t * .43), sx: 1.3, sy: .76, turn: .3 },
+      { colors: [[8,43,58],[36,127,150]], alpha: .72, x: .8 + .31 * Math.cos(t * .46 + 1.7), y: .68 + .29 * Math.sin(t * .5 + 1.7), sx: 1.16, sy: .72, turn: -.32 },
+      { colors: [[8,63,54],[30,142,113]], alpha: .7, x: .47 + .35 * Math.sin(t * .4 + 3.1), y: .48 + .27 * Math.cos(t * .47 + 2.4), sx: 1.24, sy: .7, turn: .24 },
+      { colors: [[7,42,49],[24,119,133]], alpha: .64, x: .34 + .33 * Math.cos(t * .47 + .8), y: .76 + .23 * Math.sin(t * .51 + .5), sx: 1.28, sy: .74, turn: -.28 }
     ];
     fields.forEach((field, index) => {
       const x = width * field.x;
       const y = height * field.y;
-      const pulse = .78 + .22 * Math.sin(t * .42 + index * 1.17);
+      const pulse = .78 + .22 * Math.sin(t * .56 + index * 1.17);
       const radius = span / field.sx * (.84 + .16 * pulse);
       const alpha = field.alpha * pulse * (reduced.matches ? .8 : 1);
-      const shift = .5 + .5 * Math.sin(t * .28 + index * 1.23);
+      const shift = .5 + .5 * Math.sin(t * .39 + index * 1.23);
       const color = field.colors[0].map((channel, channelIndex) =>
         Math.round(channel + (field.colors[1][channelIndex] - channel) * shift)
       ).join(',');
@@ -38,10 +38,10 @@
       ctx.rotate(field.turn * Math.sin(t * .2 + index));
       ctx.scale(field.sx, field.sy);
       const glow = ctx.createRadialGradient(0, 0, 0, 0, 0, radius);
-      glow.addColorStop(0, `rgba(${color},${alpha * .82})`);
-      glow.addColorStop(.2, `rgba(${color},${alpha * .66})`);
-      glow.addColorStop(.52, `rgba(${color},${alpha * .32})`);
-      glow.addColorStop(.8, `rgba(${color},${alpha * .07})`);
+      glow.addColorStop(0, `rgba(${color},${alpha * .9})`);
+      glow.addColorStop(.2, `rgba(${color},${alpha * .76})`);
+      glow.addColorStop(.52, `rgba(${color},${alpha * .39})`);
+      glow.addColorStop(.8, `rgba(${color},${alpha * .1})`);
       glow.addColorStop(1, `rgba(${color},0)`);
       ctx.fillStyle = glow;
       ctx.fillRect(-radius, -radius, radius * 2, radius * 2);

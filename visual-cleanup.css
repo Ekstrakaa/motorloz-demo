@@ -332,6 +332,73 @@
 .contact-bridge-actions>a:last-child{color:#c4d1d0!important}
 .hero>.motorloz-aurora-canvas{z-index:2!important;opacity:.58!important}
 
+/* Lo vemos juntos: tarjeta de consulta centrada sobre papel claro; turno oscuro debajo. */
+.contact-bridge{
+  display:block!important;position:relative!important;isolation:isolate!important;overflow:hidden!important;
+  max-width:none!important;padding:clamp(56px,8vw,104px) var(--pad)!important;
+  color:#152326!important;background-color:#f2f3f0!important;
+}
+.contact-bridge:before{content:none!important;display:none!important}
+.contact-bridge-card{
+  position:relative!important;isolation:isolate!important;overflow:hidden!important;
+  display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;
+  width:100%!important;max-width:1120px!important;min-height:0!important;height:auto!important;margin:0 auto!important;
+  padding:clamp(36px,5vw,62px) clamp(22px,5vw,64px)!important;transform:none!important;
+  border:1px solid rgba(104,167,173,.34)!important;border-radius:18px!important;
+  color:#f2f7f6!important;
+  background:radial-gradient(ellipse at 50% 0%,rgba(28,105,112,.22),transparent 68%),linear-gradient(145deg,#0d1a1c,#0a1113 78%)!important;
+  box-shadow:0 20px 48px rgba(9,20,22,.16)!important;
+}
+.contact-bridge-card:before,.contact-bridge-card:after{content:none!important;display:none!important}
+.contact-bridge-card>*:not(.motorloz-aurora-canvas){position:relative!important;z-index:1!important}
+.contact-bridge-card .eyebrow{margin:0 0 17px!important;color:#a9c5c7!important;text-align:center!important}
+.contact-bridge-card h2{max-width:18ch!important;margin:0!important;color:#f5f8f7!important;text-align:center!important;font-size:clamp(32px,4.5vw,52px)!important;line-height:1.04!important;letter-spacing:-.05em!important}
+.contact-bridge-card h2 em{color:#f5f8f7!important;font-style:normal!important}
+.contact-bridge-card>p:not(.eyebrow){max-width:66ch!important;margin:16px auto 22px!important;color:#c4d1d0!important;text-align:center!important;font-size:14px!important;line-height:1.65!important}
+.contact-bridge-card .contact-bridge-actions{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:12px!important;margin:0!important}
+.contact-bridge-card .contact-bridge-actions .button.primary{min-height:50px!important;padding-inline:24px!important;border:1px solid rgba(204,250,252,.42)!important;border-radius:999px!important;background:linear-gradient(135deg,#43c2cc,#28aeba)!important;color:#071719!important;box-shadow:0 8px 22px rgba(32,157,169,.23)!important}
+.contact-bridge-card .contact-bridge-actions>a:last-child{color:#d6e0df!important;font-size:12px!important}
+.contact-bridge-card .motorloz-aurora-canvas{z-index:0!important}
+.appointment{position:relative!important;isolation:isolate!important;background:#0b1112!important;color:#f2f7f6!important}
+.appointment:before{content:none!important;display:none!important}
+.appointment .motorloz-aurora-canvas{z-index:0!important}
+@media(max-width:760px){
+  .contact-bridge{padding:48px 16px!important}
+  .contact-bridge-card{padding:34px 20px!important;border-radius:15px!important}
+  .contact-bridge-card h2{font-size:clamp(30px,8vw,38px)!important}
+  .contact-bridge-card>p:not(.eyebrow){max-width:38ch!important;font-size:13px!important;margin:14px auto 20px!important}
+}
+
+/* Superficie clara editorial, sin retícula repetida: papel frío y luz muy tenue. */
+.intro,.services,.reviews,.location,.subaru-section,.hyundai-section,.reference-bridge,.contact-bridge{
+  background-color:#f2f3f0!important;
+  background-image:radial-gradient(ellipse at 8% 0%,rgba(72,167,172,.075),transparent 34%),radial-gradient(ellipse at 100% 100%,rgba(85,129,130,.055),transparent 31%),linear-gradient(145deg,#f5f6f3,#eef1ef 100%)!important;
+  background-size:cover!important;background-position:center!important;
+}
+
+/* El canvas de la aurora debe ser una capa real del fondo, nunca una pieza del layout. */
+.hero,.people,.films-section,.why-motorloz,.contact-bridge-card,.appointment,footer,.reference-bridge-card{position:relative!important;isolation:isolate!important}
+.motorloz-aurora-canvas{position:absolute!important;inset:0!important;z-index:0!important;display:block!important;width:100%!important;height:100%!important;pointer-events:none!important;opacity:.92!important;mix-blend-mode:screen!important}
+.hero>.motorloz-aurora-canvas{z-index:0!important;opacity:.78!important}
+.hero-copy,.hero-cinema,.hero-bottom,.people>*:not(.motorloz-aurora-canvas),.films-section>*:not(.motorloz-aurora-canvas),.why-motorloz>*:not(.motorloz-aurora-canvas),.contact-bridge-card>*:not(.motorloz-aurora-canvas),footer>*:not(.motorloz-aurora-canvas){position:relative;z-index:1}
+.reference-bridge-card>.motorloz-aurora-canvas,.contact-bridge-card>.motorloz-aurora-canvas{border-radius:inherit}
+
+/* Centrado consistente y marcas legibles en el cierre y el contacto directo. */
+.footer-brand .brand-art{width:clamp(190px,22vw,250px)!important;height:64px!important}
+.contact-brand img{width:min(290px,86%)!important;height:82px!important}
+.location-top{justify-items:center!important;text-align:center!important}
+.location-top h2{width:100%!important;text-align:center!important;margin-inline:auto!important}
+.location-top>div{justify-self:center!important;text-align:center!important}
+.location-top p{text-align:center!important}
+.map-directions-link{margin-inline:auto!important}
+@media(max-width:760px){
+  .footer-brand .brand-art{width:clamp(190px,58vw,230px)!important;height:62px!important}
+  .contact-brand img{width:min(270px,88%)!important;height:76px!important}
+  .location-top{display:grid!important;grid-template-columns:minmax(0,1fr)!important;justify-items:center!important;gap:18px!important}
+  .location-top>div{width:100%!important;justify-items:center!important;margin-inline:auto!important}
+  .location-top h2{max-width:100%!important}
+}
+
 /* Galería de clientes: dos carriles continuos, fotos parejas y movimiento en sentidos opuestos. */
 .customer-gallery{
   --gallery-card-size:clamp(172px,16vw,224px);
