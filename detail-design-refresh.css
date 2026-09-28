@@ -212,7 +212,7 @@
     width:100%!important;height:100%!important;max-width:none!important;left:50%!important;top:50%!important;
     transform:translate(-50%,-50%)!important;object-fit:contain!important;object-position:center!important;padding:0!important;background:transparent!important;
   }
-  .intro-proof-row>article { min-height:88px!important;padding:13px 17px!important; }
+.intro-proof-row>article { min-height:88px!important;padding:13px 17px!important; }
 }
 
 /* Center the customer gallery title and its supporting line on every screen. */
@@ -224,3 +224,77 @@
 .customer-gallery-heading .eyebrow { margin-inline:auto!important;text-align:center!important; }
 .customer-gallery-heading h3 { width:100%!important;text-align:center!important;text-wrap:balance!important; }
 .customer-gallery-heading>p { max-width:38ch!important;margin:0 auto!important;text-align:center!important; }
+
+/* One light, legible treatment across every proof point. */
+.intro-proof-row>article:nth-child(n) {
+  border:1px solid rgba(18,106,115,.18)!important;border-radius:15px!important;
+  background:linear-gradient(135deg,rgba(255,255,255,.99),rgba(237,244,242,.96))!important;
+  box-shadow:0 9px 24px rgba(11,34,38,.09),inset 0 1px 0 #fff!important;
+}
+.intro-proof-row>article:nth-child(n)::before { background:linear-gradient(#49c3d0,#158d9b)!important;box-shadow:0 0 13px rgba(55,180,193,.23)!important; }
+.intro-proof-row>article:nth-child(n)::after { border-color:rgba(40,151,160,.09)!important;box-shadow:0 0 0 12px rgba(40,151,160,.018),0 0 0 27px rgba(40,151,160,.012)!important; }
+.intro-proof-row>article:nth-child(n) .proof-index { background:linear-gradient(145deg,#0f5960,#17343a)!important;color:#ecffff!important;box-shadow:inset 0 1px rgba(255,255,255,.28),0 7px 16px rgba(9,48,53,.17)!important; }
+.intro-proof-row>article:nth-child(n)>div>b { color:#17282b!important; }
+.intro-proof-row>article:nth-child(n)>div>small { color:#52696c!important; }
+
+/* The Subaru headline uses the same cyan only for the requested word. */
+.subaru-section .japan-heading h2 { color:#152326!important;margin-top:17px!important; }
+.subaru-section .japan-heading h2 span { color:#2bb6c5!important; }
+
+/* More scale and air around the boxer illustration. */
+.subaru-section .engine-sketch { width:min(100%,560px)!important;height:clamp(220px,59vw,315px)!important;margin:14px auto 23px!important; }
+.subaru-section .engine-sketch figcaption { margin:8px 0 15px!important; }
+@media(max-width:760px) {
+  .subaru-section .engine-sketch { width:min(100%,440px)!important;height:clamp(215px,61vw,270px)!important;margin:12px auto 22px!important; }
+  .subaru-section .engine-sketch figcaption { margin:8px 0 14px!important; }
+  .subaru-section .subaru-photo-carousel { margin-top:18px!important; }
+}
+
+/* Blender-rendered service and workshop icons from one consistent atlas. */
+.service-icon,.why-icon {
+  background-image:url("assets/motorloz-icon-atlas.png")!important;background-repeat:no-repeat!important;background-size:400% 400%!important;
+}
+.service-icon { border-color:rgba(34,139,150,.17)!important;background-color:transparent!important;background-image:url("assets/motorloz-icon-atlas.png")!important;box-shadow:none!important; }
+.service-icon svg { display:none!important; }
+.why-card>.why-icon { display:block!important;width:46px!important;height:46px!important;padding:0!important;border:0!important;border-radius:0!important;background-color:transparent!important;box-shadow:none!important;filter:drop-shadow(0 7px 8px rgba(0,0,0,.18))!important; }
+.service-icon[data-icon-index="0"] { background-position:0% 0%!important; }
+.service-icon[data-icon-index="1"] { background-position:33.333% 0%!important; }
+.service-icon[data-icon-index="2"] { background-position:66.666% 0%!important; }
+.service-icon[data-icon-index="3"] { background-position:100% 0%!important; }
+.service-icon[data-icon-index="4"] { background-position:0% 33.333%!important; }
+.service-icon[data-icon-index="5"] { background-position:33.333% 33.333%!important; }
+.service-icon[data-icon-index="6"] { background-position:66.666% 33.333%!important; }
+.service-icon[data-icon-index="7"] { background-position:100% 33.333%!important; }
+.service-icon[data-icon-index="8"] { background-position:0% 66.666%!important; }
+.why-icon[data-icon-index="9"] { background-position:33.333% 66.666%!important; }
+.why-icon[data-icon-index="10"] { background-position:66.666% 66.666%!important; }
+.why-icon[data-icon-index="11"] { background-position:100% 66.666%!important; }
+.why-icon[data-icon-index="12"] { background-position:0% 100%!important; }
+.why-icon[data-icon-index="13"] { background-position:33.333% 100%!important; }
+.why-icon[data-icon-index="14"] { background-position:66.666% 100%!important; }
+
+/* A fine glass sheen and dimensional edge on every action control. */
+:is(a.button,button.button,.header-cta,.header-contact,.contact-open,.map-open-link,.text-link,.service-card-copy>a,[data-service],.slide-buttons button,.review-controls button,.services-controls button,.services-pagination button,.why-card,.floating-booking,.floating-whatsapp,#assistant-launcher,.assistant-header-actions button,.assistant-booking-head>button,.assistant-send-whatsapp,.assistant-mic,.assistant-submit) {
+  transition:transform .22s ease,box-shadow .22s ease,background .22s ease,border-color .22s ease,filter .22s ease!important;
+}
+:is(a.button,button.button,.header-cta,.header-contact,.contact-open,.map-open-link,.text-link,.service-card-copy>a,[data-service],.slide-buttons button,.review-controls button,.services-controls button,.services-pagination button,.floating-booking,.floating-whatsapp,#assistant-launcher,.assistant-header-actions button,.assistant-booking-head>button,.assistant-send-whatsapp,.assistant-mic,.assistant-submit) {
+  backdrop-filter:blur(14px) saturate(155%)!important;-webkit-backdrop-filter:blur(14px) saturate(155%)!important;
+  border:1px solid rgba(255,255,255,.48)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.48),inset 0 -1px 0 rgba(8,74,82,.13),0 8px 22px rgba(9,65,73,.17)!important;
+}
+:is(a.button,button.button,.header-cta,.header-contact,.contact-open,.map-open-link,.service-card-copy>a,[data-service],.floating-booking,.floating-whatsapp,#assistant-launcher,.assistant-header-actions button,.assistant-booking-head>button,.assistant-send-whatsapp,.assistant-mic,.assistant-submit) { position:relative;isolation:isolate;overflow:hidden; }
+:is(a.button,button.button,.header-cta,.header-contact,.contact-open,.map-open-link,.service-card-copy>a,[data-service],.floating-booking,.floating-whatsapp,#assistant-launcher,.assistant-header-actions button,.assistant-booking-head>button,.assistant-send-whatsapp,.assistant-submit)::after {
+  content:"";position:absolute;inset:1px 20% auto 1px;height:42%;pointer-events:none;border-radius:inherit;
+  background:linear-gradient(180deg,rgba(255,255,255,.34),rgba(255,255,255,0));opacity:.7;
+}
+:is(a.button,button.button,.header-cta,.header-contact,.contact-open,.map-open-link,.text-link,.service-card-copy>a,[data-service],.slide-buttons button,.review-controls button,.services-controls button,.floating-booking,.floating-whatsapp,#assistant-launcher,.assistant-send-whatsapp,.assistant-submit):hover {
+  transform:translateY(-2px)!important;filter:saturate(1.07)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.58),0 12px 27px rgba(9,65,73,.24)!important;
+}
+:is(a.button,button.button,.header-cta,.header-contact,.contact-open,.map-open-link,.text-link,.service-card-copy>a,[data-service],.slide-buttons button,.review-controls button,.services-controls button,.services-pagination button,.floating-booking,.floating-whatsapp,#assistant-launcher,.assistant-send-whatsapp,.assistant-submit):focus-visible,.why-card:focus-visible { outline:3px solid #9ceaf0!important;outline-offset:3px!important; }
+#appointment-form { border:1px solid rgba(142,216,221,.35)!important;border-radius:20px!important;background:linear-gradient(145deg,rgba(18,43,51,.91),rgba(8,24,30,.96))!important;box-shadow:0 24px 60px rgba(3,20,24,.24),inset 0 1px 0 rgba(255,255,255,.16)!important;backdrop-filter:blur(18px) saturate(145%)!important;-webkit-backdrop-filter:blur(18px) saturate(145%)!important; }
+#appointment-form .field-shell { border-radius:10px!important;background:rgba(228,251,252,.065)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.09)!important; }
+#appointment-form .priority-choice { border-radius:14px!important;background:rgba(228,251,252,.045)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.08)!important; }
+.service-card { position:relative!important;border:1px solid rgba(23,70,77,.12)!important;border-radius:17px!important;background:linear-gradient(145deg,#fff 0%,#f9fbf9 64%,#e8f0ed 100%)!important;box-shadow:0 16px 34px rgba(13,39,43,.13),0 3px 7px rgba(13,39,43,.07),inset 0 1px 0 rgba(255,255,255,.95)!important;transition:transform .28s ease,box-shadow .28s ease!important; }
+.service-card:hover { transform:translateY(-4px)!important;box-shadow:0 23px 42px rgba(13,39,43,.17),0 5px 12px rgba(13,39,43,.08),inset 0 1px 0 #fff!important; }
+.customer-gallery-heading h3 em { color:#2bb6c5!important;font-style:normal!important; }
+@media(prefers-reduced-motion:reduce) { :is(a.button,button.button,.header-cta,.contact-open,.map-open-link,.text-link,.service-card-copy>a,[data-service],.slide-buttons button,.review-controls button,.services-controls button,.services-pagination button,.why-card):hover { transform:none!important; } }

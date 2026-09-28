@@ -33,7 +33,7 @@
   eyebrow.textContent = 'CLIENTES · AUTOS REALES';
   const title = document.createElement('h3');
   title.id = 'customer-gallery-title';
-  title.textContent = 'Historias que llegan sobre ruedas.';
+  title.innerHTML = 'Historias que llegan sobre <em>ruedas.</em>';
   titleGroup.append(eyebrow, title);
   const description = document.createElement('p');
   description.textContent = 'Una muestra de los vehículos que pasan por MOTORLOZ.';

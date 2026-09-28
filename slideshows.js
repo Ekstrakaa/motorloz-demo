@@ -2,7 +2,7 @@
 (() => {
   const photo = (file, alt, clean=false, position='50% 50%') => ({src:`assets/${file.includes('.')?file:`${file}.png`}`,alt,clean,position});
   const pictures = {
-    subaruWide:photo('subaru-panoramica','Subaru, una pasión que se vive en el taller',true),
+    subaruWide:photo('subaru-panoramica-privacy','Subaru, una pasión que se vive en el taller',true),
     salon:photo('salon-panoramica','El taller, lleno de historias y vehículos',true),
     classics:photo('subaru-clasicos','Subaru: una historia que sigue en movimiento',true),
     workshopWide:photo('taller-panoramica','El taller, desde otra perspectiva',true),
