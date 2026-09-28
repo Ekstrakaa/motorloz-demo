@@ -1,4 +1,6 @@
 const MODEL = process.env.GEMINI_MODEL || 'gemini-3.8-flash';
+const SPEECH_MODEL = 'gemini-3.8-flash-tts';
+const SPEECH_VOICE = process.env.GEMINI_TTS_VOICE || 'Algieba';
 const SYSTEM_PROMPT = `Sos el asistente virtual de recepción de MOTORLOZ, taller multimarca en Montevideo. Respondé en español rioplatense, con calidez y naturalidad, como una persona que escucha de verdad. Entendé errores de escritura y mensajes de voz. La bienvenida ya pidió marca, modelo y kilometraje del auto, y qué notó; aprovechá lo que la persona diga y no vuelvas a pedir datos que ya aportó. En cada respuesta, reflejá brevemente lo que entendiste —sin mostrar una transcripción literal del audio— para que sepa que su explicación llegó. Mantené respuestas concretas, de 1 a 3 frases: nada de listas numeradas, pasos, biblias ni enumeraciones de causas. Podés explicar en una frase que los síntomas pueden tener más de una causa, sin asegurar piezas ni diagnósticos; hacé como máximo una pregunta breve y útil si falta un dato importante. Si no hay señales de peligro, respondé con calma y empatía. No des precios, presupuestos ni promesas. Orientá con naturalidad a una revisión presencial en MOTORLOZ, sin presionar ni inventar servicios, garantías o disponibilidad. Si hay humo abundante o continuo, olor fuerte a combustible, frenos que fallan, sobrecalentamiento, pérdida de dirección u otra señal peligrosa, priorizá la seguridad: indicá detenerse en un lugar seguro, apagar el motor cuando corresponda, no seguir conduciendo y pedir asistencia; nunca asustes con costos. No indiques abrir un sistema de refrigeración caliente. Nunca pidas nombre, teléfono, correo ni otros datos personales durante el chat; se solicitan únicamente después de que la persona toque “Hacer reserva ahora”. No alargues la charla para obtener datos que se completan en la reserva. Para otros temas, explicá amablemente que este chat es para consultas del vehículo y MOTORLOZ. Cuando el contexto esté claro, invitá a hacer una reserva para que el taller revise el vehículo.`;
 const rateLimits = new Map();
 
@@ -15,7 +17,7 @@ function allowed(req, action) {
   const bucket = `${action}:${ip}`;
   const now = Date.now();
   const windowMs = action === 'chat' ? 60_000 : 60 * 60_000;
-  const limit = action === 'chat' ? 12 : action === 'summary' ? 4 : 6;
+  const limit = action === 'chat' ? 12 : action === 'summary' ? 4 : action === 'speech' ? 24 : 6;
   const recent = (rateLimits.get(bucket) || []).filter(time => now - time < windowMs);
   if (recent.length >= limit) return false;
   recent.push(now);
@@ -36,26 +38,61 @@ function cleanHistory(messages) {
     .filter(item => item.parts[0].text);
 }
 
-async function callGemini(contents, { maxOutputTokens = 260, systemInstruction = SYSTEM_PROMPT } = {}) {
+async function callGemini(contents, { maxOutputTokens = 1536, systemInstruction = SYSTEM_PROMPT } = {}) {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw Object.assign(new Error('not_configured'), { status: 503 });
-  const upstream = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(MODEL)}:generateContent`, {
+  for (const tokenLimit of [maxOutputTokens, maxOutputTokens * 2]) {
+    const upstream = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(MODEL)}:generateContent`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
+      body: JSON.stringify({
+        systemInstruction: { parts: [{ text: systemInstruction }] },
+        contents,
+        generationConfig: {
+          maxOutputTokens: tokenLimit,
+          ...(MODEL.startsWith('gemini-3') ? { thinkingConfig: { thinkingLevel: 'low' } } : {})
+        }
+      })
+    });
+    const result = await upstream.json().catch(() => ({}));
+    if (!upstream.ok) {
+      const error = new Error('gemini_request_failed');
+      error.upstreamStatus = upstream.status;
+      error.upstreamCode = result.error?.status || result.error?.code || 'unknown';
+      throw error;
+    }
+    const candidate = result.candidates?.[0];
+    if (candidate?.finishReason === 'MAX_TOKENS') continue;
+    return (candidate?.content?.parts || []).filter(part => !part.thought).map(part => part.text || '').join('').trim();
+  }
+  throw new Error('gemini_output_truncated');
+}
+
+async function generateSpeech(text) {
+  const upstream = await fetch('https://generativelanguage.googleapis.com/v1beta/interactions', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
+    headers: { 'Content-Type': 'application/json', 'x-goog-api-key': process.env.GEMINI_API_KEY },
     body: JSON.stringify({
-      systemInstruction: { parts: [{ text: systemInstruction }] },
-      contents,
-      generationConfig: { maxOutputTokens, temperature: 0.7 }
+      model: SPEECH_MODEL,
+      input: [{ type: 'user_input', content: [{
+        type: 'text', text,
+        annotations: [{ type: 'speech_metadata', style: 'Español rioplatense de Montevideo. Voz cálida, natural y cercana, ritmo conversacional tranquilo; sin tono robótico ni locución publicitaria.' }]
+      }] }],
+      response_format: { type: 'audio' },
+      generation_config: { speech_config: [{ voice: SPEECH_VOICE }] }
     })
   });
   const result = await upstream.json().catch(() => ({}));
   if (!upstream.ok) {
-    const error = new Error('gemini_request_failed');
+    const error = new Error('gemini_speech_failed');
     error.upstreamStatus = upstream.status;
     error.upstreamCode = result.error?.status || result.error?.code || 'unknown';
     throw error;
   }
-  return (result.candidates?.[0]?.content?.parts || []).map(part => part.text || '').join('').trim();
+  const audio = (result.steps || []).flatMap(step => step.content || []).filter(part => part.type === 'audio' && part.data).at(-1);
+  const wav = audio && Buffer.from(audio.data, 'base64');
+  if (!wav || wav.subarray(0, 4).toString() !== 'RIFF') throw new Error('gemini_speech_empty');
+  return wav;
 }
 
 function userMessage(message) {
@@ -82,9 +119,24 @@ async function handle(req, res, action) {
 
   try {
     const body = req.body && typeof req.body === 'object' ? req.body : {};
+    if (action === 'speech') {
+      const text = typeof body.text === 'string' ? body.text.trim() : '';
+      if (!text || text.length > 700) {
+        json(res, 400, { error: 'texto_invalido', message: 'No pude leer ese mensaje.' });
+        return;
+      }
+      const wav = await generateSpeech(text);
+      res.statusCode = 200;
+      res.setHeader('Content-Type', 'audio/wav');
+      res.setHeader('Content-Length', wav.length);
+      res.setHeader('Cache-Control', 'no-store');
+      res.setHeader('X-Content-Type-Options', 'nosniff');
+      res.end(wav);
+      return;
+    }
     const history = cleanHistory(body.messages);
     let contents;
-    let maxOutputTokens = action === 'summary' ? 140 : 260;
+    let maxOutputTokens = action === 'summary' ? 768 : 1536;
 
     if (action === 'voice') {
       const audio = typeof body.audio === 'string' ? body.audio : '';

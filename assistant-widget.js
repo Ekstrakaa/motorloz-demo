@@ -15,6 +15,10 @@
   const reservationPrompt = document.querySelector('#assistant-reservation-prompt');
   const bookingForm = document.querySelector('#assistant-booking-form');
   const resetDialog = document.querySelector('#assistant-reset-confirm');
+  const voiceToggle = document.querySelector('#assistant-voice-toggle');
+  const voicePlayer = new Audio();
+  const speechCache = new Map();
+  const welcomeText = 'Hola, soy tu asistente MOTORLOZ. Estoy acá para escucharte. Mandame un audio corto con la marca, el modelo y el kilometraje del auto, y contame qué notaste. Así entiendo mejor la historia y te oriento con el próximo paso.';
   let history = [];
   let configured = false;
   let busy = false;
@@ -24,21 +28,75 @@
   let recordingTimer = null;
   let maxRecordTimer = null;
   let reservationDismissedAt = 0;
+  let voiceEnabled = true;
+  let voiceNeedsGesture = false;
+  let voiceRequest = 0;
+  let voiceUrl = '';
+  try { voiceEnabled = localStorage.getItem('motorloz-voice') !== 'off'; } catch {}
 
   const esc = value => String(value).replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[character]));
   const getMessageCount = () => history.filter(item => item.role === 'user').length;
 
-  function speakReply(text) {
-    if (!('speechSynthesis' in window) || !window.SpeechSynthesisUtterance) return false;
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(String(text || '').replace(/[*_`#]/g, ' '));
-    utterance.lang = 'es-UY';
-    const voices = window.speechSynthesis.getVoices();
-    utterance.voice = voices.find(voice => /^es-(UY|AR|419)/i.test(voice.lang)) || voices.find(voice => /^es/i.test(voice.lang)) || null;
-    utterance.rate = 1.02;
-    window.speechSynthesis.speak(utterance);
-    return true;
+  function updateVoiceToggle() {
+    voiceToggle.classList.toggle('is-active', voiceEnabled);
+    voiceToggle.classList.toggle('needs-gesture', voiceNeedsGesture);
+    voiceToggle.setAttribute('aria-pressed', String(voiceEnabled));
+    voiceToggle.setAttribute('aria-label', voiceNeedsGesture ? 'Tocá para activar la voz' : voiceEnabled ? 'Desactivar lectura automática' : 'Activar lectura automática');
+    voiceToggle.title = voiceNeedsGesture ? 'Tocá para escuchar' : voiceEnabled ? 'Voz automática activada' : 'Voz automática desactivada';
   }
+
+  function stopSpeech() {
+    voiceRequest += 1;
+    voicePlayer.pause();
+    voicePlayer.removeAttribute('src');
+    voicePlayer.load();
+    if (voiceUrl) URL.revokeObjectURL(voiceUrl);
+    voiceUrl = '';
+    panel.querySelectorAll('.assistant-speak.is-playing,.assistant-speak.is-loading').forEach(button => button.classList.remove('is-playing', 'is-loading'));
+  }
+
+  async function speakReply(text, button = null, automatic = false) {
+    if (!configured || (automatic && !voiceEnabled)) return;
+    stopSpeech();
+    const request = voiceRequest;
+    button?.classList.add('is-loading');
+    try {
+      let audio = speechCache.get(text);
+      if (!audio) {
+        const response = await fetch('/api/assistant/speech', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text })
+        });
+        if (!response.ok) throw new Error('speech_unavailable');
+        audio = await response.blob();
+        if (audio.type !== 'audio/wav' || audio.size < 44) throw new Error('speech_invalid');
+        speechCache.set(text, audio);
+        if (speechCache.size > 10) speechCache.delete(speechCache.keys().next().value);
+      }
+      if (request !== voiceRequest || panel.hidden) return;
+      voiceUrl = URL.createObjectURL(audio);
+      voicePlayer.src = voiceUrl;
+      voicePlayer.currentTime = 0;
+      await voicePlayer.play();
+      voiceNeedsGesture = false;
+      updateVoiceToggle();
+      button?.classList.add('is-playing');
+    } catch (error) {
+      if (request !== voiceRequest) return;
+      if (error.name === 'NotAllowedError') {
+        voiceNeedsGesture = true;
+        updateVoiceToggle();
+        button?.setAttribute('aria-label', 'Tocá para escuchar esta respuesta');
+      } else {
+        button?.setAttribute('aria-label', 'Voz no disponible por ahora');
+        voiceToggle.title = 'Voz no disponible por ahora';
+      }
+    } finally {
+      button?.classList.remove('is-loading');
+    }
+  }
+  voicePlayer.addEventListener('ended', () => panel.querySelectorAll('.assistant-speak.is-playing').forEach(button => button.classList.remove('is-playing')));
+  updateVoiceToggle();
 
   function bubble(text, role, extra = {}) {
     const row = document.createElement('div');
@@ -49,14 +107,14 @@
       const copy = document.createElement('p');
       copy.textContent = text;
       row.append(copy);
-      if (role === 'assistant' && !extra.pending && 'speechSynthesis' in window) {
+      if (role === 'assistant' && !extra.pending && configured) {
         const speakButton = document.createElement('button');
         speakButton.className = 'assistant-speak';
         speakButton.type = 'button';
         speakButton.setAttribute('aria-label', 'Escuchar respuesta');
         speakButton.title = 'Escuchar respuesta';
         speakButton.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5Z"></path><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"></path></svg>';
-        speakButton.addEventListener('click', () => speakReply(text));
+        speakButton.addEventListener('click', () => speakReply(text, speakButton));
         row.append(speakButton);
       }
     }
@@ -72,9 +130,10 @@
     reservationPrompt.hidden = true;
     history = [];
     reservationDismissedAt = 0;
-    bubble('Hola, soy tu asistente MOTORLOZ. Estoy acá para escucharte. Mandame un audio corto con la marca, el modelo y el kilometraje del auto, y contame qué notaste. Así entiendo mejor la historia y te oriento con el próximo paso.', 'assistant');
+    const greeting = bubble(welcomeText, 'assistant');
     if (!configured) bubble('La conexión con la inteligencia artificial todavía no está configurada. El formulario de consulta sigue disponible en la página.', 'assistant');
     messagesEl.scrollTop = 0;
+    return greeting;
   }
 
   async function checkStatus() {
@@ -88,7 +147,8 @@
       sendButton.disabled = !configured;
       micButton.disabled = !configured;
       if (!configured) hintEl.textContent = 'El asistente se activa al configurar la conexión privada.';
-      welcome();
+      const greeting = welcome();
+      if (configured && voiceEnabled && !panel.hidden) speakReply(welcomeText, greeting.querySelector('.assistant-speak'), true);
     } catch {
       statusEl.textContent = 'Conexión no disponible';
       configured = false;
@@ -126,8 +186,8 @@
       pending.remove();
       if (!response.ok) throw new Error(result.message || 'No pude responder en este momento.');
       history.push({ role: 'assistant', content: result.reply });
-      bubble(result.reply, 'assistant');
-      speakReply(result.reply);
+      const reply = bubble(result.reply, 'assistant');
+      speakReply(result.reply, reply.querySelector('.assistant-speak'), true);
       maybeShowBooking();
     } catch (error) {
       pending.remove();
@@ -218,8 +278,8 @@
       if (!response.ok) throw new Error(result.message || 'No pude escuchar ese audio. Probá grabarlo otra vez.');
       pending?.remove();
       history.push({ role: 'assistant', content: result.reply });
-      bubble(result.reply, 'assistant');
-      speakReply(result.reply);
+      const reply = bubble(result.reply, 'assistant');
+      speakReply(result.reply, reply.querySelector('.assistant-speak'), true);
       maybeShowBooking();
     } catch (error) {
       messagesEl.querySelector('.assistant-message.is-pending:last-child')?.remove();
@@ -269,6 +329,7 @@
   }
 
   function close() {
+    stopSpeech();
     if (mediaRecorder) {
       mediaRecorder.stream.getTracks().forEach(track => track.stop());
       if (mediaRecorder.state !== 'inactive') mediaRecorder.stop();
@@ -285,10 +346,20 @@
   }
 
   launcher.addEventListener('click', () => panel.hidden ? open() : close());
+  voiceToggle.addEventListener('click', async () => {
+    if (voiceNeedsGesture && voicePlayer.src) {
+      try { await voicePlayer.play(); voiceNeedsGesture = false; updateVoiceToggle(); return; } catch {}
+    }
+    voiceEnabled = !voiceEnabled;
+    voiceNeedsGesture = false;
+    if (!voiceEnabled) stopSpeech();
+    try { localStorage.setItem('motorloz-voice', voiceEnabled ? 'on' : 'off'); } catch {}
+    updateVoiceToggle();
+  });
   document.querySelector('#assistant-close').addEventListener('click', close);
   document.querySelector('#assistant-new').addEventListener('click', () => { resetDialog.hidden = false; });
   document.querySelector('#assistant-reset-no').addEventListener('click', () => { resetDialog.hidden = true; });
-  document.querySelector('#assistant-reset-yes').addEventListener('click', () => { resetDialog.hidden = true; welcome(); input.focus(); });
+  document.querySelector('#assistant-reset-yes').addEventListener('click', () => { resetDialog.hidden = true; stopSpeech(); const greeting = welcome(); if (configured && voiceEnabled) speakReply(welcomeText, greeting.querySelector('.assistant-speak'), true); input.focus(); });
   document.querySelector('#assistant-stop-recording').addEventListener('click', finishRecording);
   document.querySelector('#assistant-mic').addEventListener('click', () => mediaRecorder ? finishRecording() : startRecording());
   document.querySelector('#assistant-privacy-link').addEventListener('click', event => { event.preventDefault(); close(); document.querySelector('#turno').scrollIntoView({ behavior: 'smooth' }); });
