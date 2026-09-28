@@ -114,30 +114,61 @@
   const subaruPhotos = [...document.querySelectorAll('.subaru-photo')];
   const targets = [...principles, ...subaruPhotos];
 
-  // En superficies claras, los bloques siguen suavemente al cursor o al toque.
-  if (!reduced.matches) {
-    const lightSurfaces = document.querySelectorAll('.intro,.services,.reviews,.location,.subaru-section,.hyundai-section,.reference-bridge,.contact-bridge,.customer-gallery');
-    lightSurfaces.forEach(surface => {
-      let frame = 0;
-      surface.addEventListener('pointermove', event => {
-        if (frame) cancelAnimationFrame(frame);
-        frame = requestAnimationFrame(() => {
-          const rect = surface.getBoundingClientRect();
-          const x = event.clientX - rect.left;
-          const y = event.clientY - rect.top;
-          surface.style.setProperty('--surface-x', `${x}px`);
-          surface.style.setProperty('--surface-y', `${y}px`);
-          surface.style.setProperty('--tile-x', `${Math.round((.5 - x / rect.width) * 10)}px`);
-          surface.style.setProperty('--tile-y', `${Math.round((.5 - y / rect.height) * 10)}px`);
+  // Una sola capa de fondo y una sola pieza interactiva mantienen la trama alineada.
+  const paper = document.querySelector('main#contenido');
+  if (paper && matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    const tile = document.createElement('span');
+    tile.className = 'background-tile-hover';
+    tile.setAttribute('aria-hidden', 'true');
+    paper.prepend(tile);
+    const patternWidth = 590;
+    const patternHeight = 154;
+    const skew = Math.tan(8 * Math.PI / 180);
+    const rows = [
+      { y: 2, x: [4, 122, 240, 358, 476] },
+      { y: 78, x: [-55, 63, 181, 299, 417, 535] }
+    ];
+    let frame = 0;
+    const clearTile = () => {
+      tile.classList.remove('is-active');
+      paper.style.setProperty('--tile-x', '0px');
+    };
+    paper.addEventListener('pointermove', event => {
+      if (frame) cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        const lightSurface = event.target.closest('.intro,.services,.reviews,.location,.subaru-section,.hyundai-section,.reference-bridge,.contact-bridge,.customer-gallery');
+        if (!lightSurface) { tile.classList.remove('is-active'); frame = 0; return; }
+        const rect = paper.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+        const drift = Number.parseFloat(getComputedStyle(paper).getPropertyValue('--tile-drift')) || 0;
+        const shift = Math.round((.5 - x / Math.max(rect.width, 1)) * 12) + drift;
+        paper.style.setProperty('--tile-x', `${shift - drift}px`);
+        const rowY = ((y % patternHeight) + patternHeight) % patternHeight;
+        const row = rows.find(candidate => rowY >= candidate.y && rowY <= candidate.y + 68);
+        if (!row) {
+          tile.classList.remove('is-active');
           frame = 0;
-        });
-      }, { passive: true });
-      surface.addEventListener('pointerdown', () => surface.classList.add('is-surface-pressed'), { passive: true });
-      const release = () => surface.classList.remove('is-surface-pressed');
-      surface.addEventListener('pointerup', release, { passive: true });
-      surface.addEventListener('pointercancel', release, { passive: true });
-      surface.addEventListener('pointerleave', release, { passive: true });
-    });
+          return;
+        }
+        const visualX = x - shift + skew * rowY;
+        const cycle = Math.floor(visualX / patternWidth);
+        let match = null;
+        for (let repeat = cycle - 1; repeat <= cycle + 1 && !match; repeat++) {
+          for (const cellX of row.x) {
+            const left = repeat * patternWidth + cellX;
+            if (visualX >= left && visualX <= left + 108) { match = { left, repeat }; break; }
+          }
+        }
+        if (match) {
+          tile.style.left = `${match.left + shift - skew * row.y}px`;
+          tile.style.top = `${Math.floor(y / patternHeight) * patternHeight + row.y}px`;
+          tile.classList.add('is-active');
+        } else tile.classList.remove('is-active');
+        frame = 0;
+      });
+    }, { passive: true });
+    paper.addEventListener('pointerleave', clearTile, { passive: true });
   }
 
   if (!targets.length) return;

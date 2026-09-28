@@ -37,12 +37,7 @@
   titleGroup.append(eyebrow, title);
   const description = document.createElement('p');
   description.textContent = 'Una muestra de los vehículos que pasan por MOTORLOZ.';
-  const toggle = document.createElement('button');
-  toggle.className = 'customer-gallery-toggle';
-  toggle.type = 'button';
-  toggle.setAttribute('aria-pressed', 'false');
-  toggle.textContent = 'Pausar movimiento';
-  heading.append(titleGroup, description, toggle);
+  heading.append(titleGroup, description);
   gallery.append(heading);
 
   function buildLane(items, direction, label) {
@@ -84,9 +79,4 @@
   );
   reviews.closest('.reviews').insertAdjacentElement('afterend', gallery);
 
-  toggle.addEventListener('click', () => {
-    const paused = gallery.classList.toggle('is-paused');
-    toggle.setAttribute('aria-pressed', String(paused));
-    toggle.textContent = paused ? 'Reanudar movimiento' : 'Pausar movimiento';
-  });
 })();

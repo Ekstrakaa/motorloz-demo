@@ -142,29 +142,49 @@
   .arrival-directions, .hero .button.light { transition: transform .22s ease, background .22s ease, border-color .22s ease, color .22s ease; }
 }
 
-/* Round three: horizontal, staggered workshop tiles with open space behind copy. */
-.intro,.services,.reviews,.location,.subaru-section,.hyundai-section,.reference-bridge,.contact-bridge,.customer-gallery {
-  background-color:#f2f3f0!important;
-  background-image:
-    radial-gradient(ellipse 82% 64% at 50% 50%,rgba(244,246,243,.9) 0%,rgba(244,246,243,.68) 55%,rgba(244,246,243,.16) 85%,rgba(244,246,243,0) 100%),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='560' height='180' viewBox='0 0 560 180'%3E%3Cg transform='skewX(-8)' fill='%23dce5e2' fill-opacity='.2' stroke='%239baead' stroke-opacity='.22' stroke-width='1'%3E%3Crect x='17' y='7' width='104' height='68' rx='12'/%3E%3Crect x='134' y='7' width='108' height='68' rx='12'/%3E%3Crect x='255' y='7' width='103' height='68' rx='12'/%3E%3Crect x='371' y='7' width='107' height='68' rx='12'/%3E%3Crect x='491' y='7' width='104' height='68' rx='12'/%3E%3Crect x='-42' y='91' width='108' height='68' rx='12'/%3E%3Crect x='79' y='91' width='103' height='68' rx='12'/%3E%3Crect x='195' y='91' width='109' height='68' rx='12'/%3E%3Crect x='317' y='91' width='105' height='68' rx='12'/%3E%3Crect x='435' y='91' width='109' height='68' rx='12'/%3E%3Crect x='557' y='91' width='105' height='68' rx='12'/%3E%3C/g%3E%3Cg transform='skewX(-8)' fill='%23c6d4d0' fill-opacity='.28' stroke='%239baead' stroke-opacity='.26' stroke-width='1'%3E%3Crect x='134' y='7' width='108' height='68' rx='12'/%3E%3Crect x='317' y='91' width='105' height='68' rx='12'/%3E%3C/g%3E%3C/svg%3E"),
-    radial-gradient(ellipse at 8% 0%,rgba(72,167,172,.065),transparent 34%),
-    linear-gradient(145deg,#f5f6f3,#eef1ef 100%)!important;
-  background-size:cover,560px 180px,cover,cover!important;
-  background-position:center center,var(--tile-x,0px) 0px,center center,center center!important;
-  background-repeat:no-repeat,repeat,no-repeat,no-repeat!important;
-  animation:horizontal-tile-drift 36s ease-in-out infinite alternate!important;
-  transition:background-size .45s ease!important;
+/* A single continuous paper field keeps the horizontal tiles aligned across sections. */
+main#contenido {
+  --tile-drift:0px;
+  position:relative!important;
+  isolation:isolate;
+  background-color:#ecefec!important;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='590' height='154' viewBox='0 0 590 154'%3E%3Cg transform='skewX(-8)' fill='%23d7dfdc' fill-opacity='.12' stroke='%239baead' stroke-opacity='.17' stroke-width='1'%3E%3Crect x='4' y='2' width='108' height='68' rx='12'/%3E%3Crect x='122' y='2' width='108' height='68' rx='12'/%3E%3Crect x='240' y='2' width='108' height='68' rx='12'/%3E%3Crect x='358' y='2' width='108' height='68' rx='12'/%3E%3Crect x='476' y='2' width='108' height='68' rx='12'/%3E%3Crect x='-55' y='78' width='108' height='68' rx='12'/%3E%3Crect x='63' y='78' width='108' height='68' rx='12'/%3E%3Crect x='181' y='78' width='108' height='68' rx='12'/%3E%3Crect x='299' y='78' width='108' height='68' rx='12'/%3E%3Crect x='417' y='78' width='108' height='68' rx='12'/%3E%3Crect x='535' y='78' width='108' height='68' rx='12'/%3E%3C/g%3E%3C/svg%3E")!important;
+  background-size:590px 154px!important;
+  background-position:calc(var(--tile-x,0px) + var(--tile-drift,0px)) 0!important;
+  background-repeat:repeat!important;
+  animation:paper-tile-drift 42s ease-in-out infinite alternate;
 }
-.intro.is-surface-pressed,.services.is-surface-pressed,.reviews.is-surface-pressed,.location.is-surface-pressed,
-.subaru-section.is-surface-pressed,.hyundai-section.is-surface-pressed,.reference-bridge.is-surface-pressed,
-.contact-bridge.is-surface-pressed,.customer-gallery.is-surface-pressed { background-size:cover,572px 184px,cover,cover!important; }
-@keyframes horizontal-tile-drift {
-  from { background-position:center center,calc(var(--tile-x,0px) - 20px) 0px,center center,center center; }
-  to { background-position:center center,calc(var(--tile-x,0px) + 20px) 0px,center center,center center; }
+@property --tile-drift { syntax:'<length>';inherits:false;initial-value:0px; }
+@keyframes paper-tile-drift { from { --tile-drift:-10px; } to { --tile-drift:10px; } }
+main#contenido>.background-tile-hover {
+  position:absolute!important;z-index:0!important;pointer-events:none!important;
+  left:-200px;top:-200px;width:108px;height:68px;opacity:0;
+  border:1px solid rgba(40,79,81,.23);border-radius:12px;
+  background:rgba(34,77,79,.17);
+  box-shadow:0 4px 13px rgba(29,57,58,.12),inset 0 0 0 1px rgba(255,255,255,.4);
+  transform:skewX(-8deg);transform-origin:top left;
+  transition:opacity .16s ease,background-color .18s ease,box-shadow .18s ease;
+}
+main#contenido>.background-tile-hover.is-active {opacity:1}
+main#contenido>:not(.background-tile-hover) {position:relative;z-index:1}
+.intro,.services,.reviews,.location,.subaru-section,.hyundai-section,.reference-bridge,.contact-bridge,.customer-gallery {
+  background-color:transparent!important;background-image:none!important;
+}
+
+/* Tighten joins between the light sections so they read as one continuous sheet. */
+@media(min-width:761px) {
+  .intro.section,.subaru-section.section,.hyundai-section.section,.reference-bridge.section,
+  .reviews.section,.location.section {padding-block:clamp(50px,4.5vw,70px)!important;}
+  .intro.section {padding-bottom:clamp(26px,3vw,44px)!important;}
+  .hyundai-section.section {padding-block:clamp(42px,3.5vw,58px)!important;}
+  .reference-bridge.section {padding-block:clamp(28px,3.4vw,48px)!important;}
+  .reviews.section {padding-bottom:12px!important;}
+  .customer-gallery {margin-block:0!important;padding-block:12px clamp(34px,4vw,56px)!important;}
+  .location.section {padding-top:clamp(40px,4vw,60px)!important;}
 }
 @media(prefers-reduced-motion:reduce) {
-  .intro,.services,.reviews,.location,.subaru-section,.hyundai-section,.reference-bridge,.contact-bridge,.customer-gallery { animation:none!important; }
+  main#contenido {animation:none!important;--tile-drift:0px!important;}
+  main#contenido>.background-tile-hover {transition:none!important;}
 }
 
 /* The review rail keeps moving on its own; its thin divider and manual controls add clutter. */
@@ -213,4 +233,114 @@
 }
 @media(prefers-reduced-motion:reduce) {
   .location .map-panel iframe { transition:none!important; }
+}
+
+/* Mobile contact stays on one screen; the two-by-two links keep hours visible. */
+@media(max-width:760px) {
+  .contact-dialog[open] {
+    width:min(490px,calc(100% - 28px))!important;
+    max-height:calc(100svh - 24px)!important;
+    overflow:hidden!important;
+    padding:30px 18px 20px!important;
+  }
+  .contact-dialog>.eyebrow { margin:0 0 7px!important;font-size:9px!important; }
+  .contact-brand { margin:0 auto 5px!important; }
+  .contact-brand img { height:39px!important; }
+  #contact-explanation { font-size:12px!important;line-height:1.35!important; }
+  .contact-dialog-links { grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:7px!important;margin-top:12px!important; }
+  .contact-dialog-links>a { grid-template-columns:30px minmax(0,1fr)!important;gap:7px!important;min-height:53px;padding:7px 8px!important; }
+  .contact-icon { width:29px!important;height:29px!important;border-radius:8px!important; }
+  .contact-icon svg { width:17px!important;height:17px!important; }
+  .contact-icon img { width:19px!important;height:19px!important; }
+  .contact-item-copy { gap:2px!important; }
+  .contact-item-copy small { font-size:9px!important;line-height:1.2!important; }
+  .contact-item-copy strong { font-size:11px!important;line-height:1.2!important; }
+  .contact-hours { margin-top:11px!important;padding-top:9px!important;gap:2px!important;text-align:center!important; }
+  .contact-hours>span { font-size:8px!important; }
+  .contact-hours>strong,.contact-hours>p { font-size:11px!important;line-height:1.25!important; }
+  .contact-hours>small { font-size:9px!important;line-height:1.25!important; }
+}
+@media(max-width:760px) and (max-height:600px) {
+  .contact-dialog[open] { padding-top:20px!important;padding-bottom:14px!important; }
+  .contact-brand img { height:30px!important; }
+  #contact-explanation { display:none!important; }
+  .contact-dialog-links { margin-top:8px!important; }
+  .contact-hours { margin-top:8px!important;padding-top:7px!important; }
+}
+
+/* Keep the assistant bubble clear of the separate WhatsApp contact shortcut. */
+.floating-booking { display:flex!important;opacity:1!important;visibility:visible!important;z-index:101!important; }
+.floating-whatsapp { flex:none!important;width:56px!important;height:56px!important;border:2px solid rgba(255,255,255,.92)!important;box-shadow:0 7px 21px rgba(0,0,0,.3),0 0 0 4px rgba(35,182,75,.17)!important; }
+.floating-whatsapp svg { display:block!important;width:31px!important;height:31px!important;stroke-width:2!important; }
+@media(max-width:600px) {
+  .assistant-launcher { z-index:100!important;bottom:calc(100px + env(safe-area-inset-bottom,0px))!important;right:14px!important; }
+  .floating-booking { right:14px!important;bottom:calc(15px + env(safe-area-inset-bottom,0px))!important; }
+  .floating-help-label { display:none!important; }
+  .floating-whatsapp { width:52px!important;height:52px!important; }
+}
+@media(prefers-reduced-motion:reduce) { .customer-gallery-track { animation:none!important; } }
+
+/* Center and enlarge the desktop review introduction; keep its rating readable. */
+@media(min-width:761px) {
+  .reviews>.section-label>span:last-child { display:none!important; }
+  .reviews-intro { display:flex!important;justify-content:center!important;width:100%!important;margin-inline:auto!important; }
+  .reviews-heading { width:min(100%,920px)!important;margin-inline:auto!important;text-align:center!important; }
+  .reviews-heading>.eyebrow,.reviews-heading>p:last-child { margin-inline:auto!important; }
+  .reviews-heading h2 { margin-inline:auto!important;font-size:clamp(58px,6.2vw,84px)!important; }
+  .reviews-rating { display:grid!important;grid-template-columns:auto auto;justify-content:center!important;align-items:center!important;column-gap:13px!important;row-gap:5px!important;margin:14px auto 24px!important; }
+  .reviews-rating>strong { font-size:clamp(27px,2.6vw,36px)!important; }
+  .reviews-rating>.gold-stars { font-size:clamp(34px,3.2vw,44px)!important; }
+  .reviews-rating>small { grid-column:1/-1!important;text-align:center!important;font-size:13px!important; }
+}
+.customer-gallery-toggle { display:none!important; }
+
+/* The step number, service icon and label share a clean, centered baseline. */
+.why-card { grid-template-columns:58px 34px minmax(0,1fr) 20px!important;align-items:center!important; }
+.why-card .why-number { display:block!important;align-self:center!important;justify-self:center!important;min-width:0!important;width:100%!important;padding:0!important;text-align:center!important;line-height:1!important;font-size:clamp(30px,3vw,40px)!important; }
+.why-card>svg { align-self:center!important;justify-self:center!important;width:32px!important;height:32px!important;margin:0!important; }
+.service-title-row { min-height:48px!important;align-items:center!important;gap:12px!important; }
+.service-title-row h3 { flex:1 1 auto!important;align-self:center!important;line-height:1.22!important;text-align:left!important; }
+.service-icon { align-self:center!important; }
+@media(max-width:600px) {
+  .why-card { grid-template-columns:48px 30px minmax(0,1fr) 20px!important; }
+  .why-card .why-number { font-size:32px!important; }
+  .why-card>svg { width:26px!important;height:26px!important; }
+  .service-title-row { min-height:44px!important;gap:10px!important; }
+}
+
+.hyundai-badge { gap:13px!important;margin-block:17px 24px!important; }
+.hyundai-badge img { width:72px!important;height:48px!important; }
+.hyundai-badge span { font-size:clamp(18px,1.8vw,22px)!important; }
+.hyundai-badge i { font-size:9px!important; }
+.subaru-photo img,.hyundai-image img,.intro-story .slide-stage,.location .map-panel { box-shadow:0 12px 28px rgba(31,58,60,.1)!important; }
+.engine-sketch { position:relative;width:min(100%,390px);height:clamp(112px,14vw,168px);margin:12px auto 14px;overflow:hidden; }
+.engine-sketch::after { content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,#f0f2ef 0%,transparent 15%,transparent 85%,#f0f2ef 100%),linear-gradient(0deg,#f0f2ef 0%,transparent 18%,transparent 82%,#f0f2ef 100%);opacity:.78; }
+.engine-sketch img { display:block;width:100%;height:100%;object-fit:cover;object-position:center 53%;filter:grayscale(1) contrast(.84) brightness(1.45);mix-blend-mode:multiply; }
+.japan-heading h2 { position:relative;z-index:1; }
+
+/* A real, legible map with fixed bounds prevents the mobile layout from stretching. */
+.location .arrival-grid { min-width:0!important;align-items:start!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important; }
+.location .map-panel { position:relative!important;width:100%!important;min-width:0!important;min-height:0!important;height:clamp(320px,34vw,460px)!important;max-height:460px!important;overflow:hidden!important;border:1px solid rgba(41,77,78,.13)!important;border-radius:12px!important;box-shadow:0 12px 30px rgba(22,44,45,.1)!important; }
+.location .map-panel { background:#e8eeeb url('assets/map-streets.svg') center/cover no-repeat!important; }
+.location .map-panel iframe { position:absolute!important;inset:0!important;display:block!important;width:100%!important;height:100%!important;opacity:.18!important;filter:none!important;transition:opacity .28s ease!important; }
+.location .map-panel:hover iframe,.location .map-panel:focus-within iframe { opacity:1!important; }
+.location .map-panel::before,.location .map-focus { display:none!important; }
+.location .map-address { bottom:12px!important;left:12px!important;max-width:min(340px,calc(100% - 24px))!important; }
+.location .arrival-photos { min-width:0!important;width:100%!important; }
+.light-copy-wash { position:relative!important;z-index:0!important;isolation:isolate; }
+.light-copy-wash::before { content:"";position:absolute;z-index:-1;inset:-20px -34px;pointer-events:none;background:radial-gradient(ellipse at center,rgba(245,247,245,.94) 0%,rgba(245,247,245,.76) 48%,rgba(245,247,245,0) 84%);filter:blur(11px); }
+.reviews-heading,.services-heading,.hyundai-copy,.location-top>div,.intro-feature-copy,.diagnostic-story-copy,.customer-gallery-heading>div { position:relative!important;z-index:0!important;isolation:isolate; }
+.reviews-heading::before,.services-heading::before,.hyundai-copy::before,.location-top>div::before,.intro-feature-copy::before,.diagnostic-story-copy::before,.customer-gallery-heading>div::before { content:"";position:absolute;z-index:-1;inset:-20px -34px;pointer-events:none;background:radial-gradient(ellipse at center,rgba(245,247,245,.94) 0%,rgba(245,247,245,.76) 48%,rgba(245,247,245,0) 84%);filter:blur(11px); }
+@media(max-width:1050px) {
+  .location .arrival-grid { grid-template-columns:minmax(0,1fr)!important;gap:18px!important; }
+  .location .map-panel { height:clamp(290px,58vw,420px)!important;max-height:420px!important; }
+}
+@media(max-width:600px) {
+  .location .map-panel { height:clamp(270px,68vw,360px)!important;max-height:360px!important;border-radius:10px!important; }
+  .location .map-address { top:9px!important;bottom:auto!important;left:9px!important;padding:12px!important; }
+  .location .map-open-link { min-height:42px!important; }
+}
+@media(max-width:760px) {
+  .engine-sketch { width:min(100%,360px);height:clamp(104px,34vw,148px);margin:5px auto 12px; }
+  .hyundai-badge img { width:62px!important;height:42px!important; }
 }

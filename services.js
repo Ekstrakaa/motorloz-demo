@@ -12,7 +12,10 @@
     '<svg viewBox="0 0 24 24"><path d="M8 3v3m8-3v3M8 18v3m8-3v3M8 6c0 3 8 3 8 6s-8 3-8 6"/><path d="M6 6h12M6 18h12"/></svg>',
     '<svg viewBox="0 0 24 24"><path d="M13.5 2.8 5.8 13h5l-.5 8.2 7.9-10.5h-5.1l.4-7.9Z"/><path d="M4 5h3M17 19h3"/></svg>',
     '<svg viewBox="0 0 24 24"><path d="M9 3.5a8.5 8.5 0 1 0 0 17A8.5 8.5 0 0 0 9 3.5Z"/><circle cx="9" cy="12" r="3.2"/><path d="M16.3 6.4c1.6.8 2.7 2.4 2.7 4.3v2.6m-2.3 3.4 2.3 1.3 2.3-1.3"/></svg>',
-    '<svg viewBox="0 0 24 24"><path d="M12 3.5c2.2 3.1 5.4 6.7 5.4 10.2a5.4 5.4 0 1 1-10.8 0C6.6 10.2 9.8 6.6 12 3.5Z"/><path d="M9.5 14.5a2.6 2.6 0 0 0 2.6 2.6"/></svg>'
+    '<svg viewBox="0 0 24 24"><path d="M12 3.5c2.2 3.1 5.4 6.7 5.4 10.2a5.4 5.4 0 1 1-10.8 0C6.6 10.2 9.8 6.6 12 3.5Z"/><path d="M9.5 14.5a2.6 2.6 0 0 0 2.6 2.6"/></svg>',
+    '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="3.3"/><path d="M12 3.5v5.2m8 1.1-5 1.7m-4.3 9.1v-5.2m-8-1.2 5-1.6"/></svg>',
+    '<svg viewBox="0 0 24 24"><path d="M3 14h2l2-5h9l3 5h2v5h-2m-14 0H3v-5Z"/><circle cx="7" cy="18" r="1.5"/><circle cx="17" cy="18" r="1.5"/><path d="M9 9V6h5l2 3"/></svg>',
+    '<svg viewBox="0 0 24 24"><path d="M4 14.5 6.5 9h11l2.5 5.5v4h-2m-14 0h-1v-4Z"/><circle cx="7.5" cy="18" r="1.5"/><circle cx="16.5" cy="18" r="1.5"/><path d="m9 5 2 2 4-4"/></svg>'
   ];
   cards.forEach((card, index) => {
     const title = card.querySelector('.service-card-copy h3');
