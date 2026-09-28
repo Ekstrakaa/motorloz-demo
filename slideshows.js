@@ -18,7 +18,9 @@
     toyota:photo('toyota-frente','Toyota en MOTORLOZ'),
     corvette:photo('corvette-taller','Corvette en el taller',true),
     space:photo('instalaciones','Una mirada al interior del taller',true),
-    front:photo('fachada-vehiculos','Puertas abiertas a la pasión por los autos',true),
+    front:photo('local-frente-hires.webp','Exterior del taller MOTORLOZ con varios vehículos de clientes',true),
+    inside:photo('taller-interior-overview.webp','Vista amplia del interior del taller MOTORLOZ',true),
+    ferrariInShop:photo('ferrari-interior-cliente.webp','Ferrari negro atendido dentro del taller MOTORLOZ',true),
     engineRepair:photo('equipo-revision-multimarca','Mecánico revisando un vehículo multimarca en el taller',true),
     workbench:photo('equipo-planificacion','Mecánico trabajando en el banco de servicio',true),
     facadeSubaru:photo('fachada-subaru-frente','Fachada de MOTORLOZ con un Subaru al frente',true),
@@ -28,7 +30,7 @@
   };
   const groups = {
     hero:{items:[pictures.salon,pictures.workshopWide,pictures.subaruFront,pictures.panorama,pictures.space],interval:5900},
-    intro:{items:[pictures.subaruWide,pictures.front],interval:3000},
+    intro:{items:[pictures.subaruWide,pictures.front,pictures.inside,pictures.ferrariInShop],interval:3000},
     vehicles:{items:[pictures.ferrari,pictures.corvette],interval:3000},
     spaces:{items:[pictures.space,pictures.reception,pictures.subaruWide],interval:3000},
     arrival:{items:[pictures.localAereo,pictures.facadeSubaru],interval:3000},

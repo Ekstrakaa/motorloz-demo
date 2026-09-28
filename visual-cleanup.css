@@ -471,3 +471,48 @@
     background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;
   }
 }
+/* Videos: dos piezas simultáneas, con el metraje entero visible también en móvil. */
+.films-section{background-color:#0b1112!important;color:#f1f6f5!important}
+.films-section>.section-label{margin-bottom:24px!important;color:#aabbbb!important}
+.films-heading{max-width:1050px!important;margin:0 auto clamp(22px,3vw,34px)!important;align-items:end!important}
+.films-heading h2{font-size:clamp(34px,5vw,62px)!important;line-height:1!important;letter-spacing:-.055em!important}
+.films-heading>p{max-width:38ch!important;color:#bdc9c8!important;font-size:13px!important;line-height:1.6!important}
+.films-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;grid-auto-flow:row!important;grid-auto-columns:auto!important;gap:clamp(12px,2vw,22px)!important;width:min(100%,1050px)!important;max-width:1050px!important;margin-inline:auto!important;padding:0!important;overflow:visible!important;overflow-x:visible!important;scroll-snap-type:none!important}
+.films-grid .film-card{position:relative!important;display:flex!important;flex-direction:column!important;min-width:0!important;width:auto!important;height:auto!important;min-height:0!important;aspect-ratio:auto!important;overflow:hidden!important;scroll-snap-align:none!important;border:1px solid rgba(117,192,197,.2)!important;border-radius:12px!important;background:linear-gradient(150deg,rgba(20,39,41,.92),rgba(9,19,20,.98))!important;box-shadow:0 14px 34px rgba(0,0,0,.2)!important}
+.films-grid .film-card:after{display:none!important;content:none!important}
+.films-grid .film-card>video{position:relative!important;inset:auto!important;display:block!important;flex:none!important;width:100%!important;height:auto!important;aspect-ratio:9/16!important;object-fit:contain!important;object-position:center!important;background:#050a0b!important;border:0!important;border-radius:0!important}
+.films-grid .film-caption{position:relative!important;inset:auto!important;display:flex!important;flex:1!important;flex-direction:column!important;align-items:flex-start!important;width:auto!important;max-width:none!important;min-height:0!important;margin:0!important;padding:12px 13px 14px!important;gap:5px!important;background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;color:#eff6f5!important}
+.films-grid .film-caption small{color:#67ced5!important;font:600 8px/1.35 var(--mono)!important;letter-spacing:.13em!important;text-shadow:none!important}
+.films-grid .film-caption strong{color:#f1f6f5!important;font:650 clamp(14px,1.8vw,18px)/1.2 var(--body)!important;letter-spacing:-.025em!important;text-shadow:none!important}
+.films-grid .film-caption a{margin-top:2px!important;color:#b6c8c8!important;font-size:9px!important;line-height:1.45!important;text-shadow:none!important}
+.films-grid .film-caption a:hover{color:#70d9df!important}
+.films-social{width:min(100%,1050px)!important;margin:22px auto 0!important}
+@media(max-width:760px){
+  .films-section{padding:58px 15px 50px!important}
+  .films-section>.section-label{display:flex!important;gap:10px!important;margin-bottom:17px!important;font-size:7px!important;line-height:1.5!important}
+  .films-heading{display:block!important;margin:0 auto 20px!important;text-align:center!important}
+  .films-heading h2{font-size:clamp(31px,8.4vw,39px)!important;line-height:1.03!important}
+  .films-heading>p{max-width:34ch!important;margin:10px auto 0!important;font-size:11px!important;line-height:1.5!important}
+  .films-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;grid-auto-flow:row!important;grid-auto-columns:auto!important;width:100%!important;max-width:520px!important;margin-inline:auto!important;gap:9px!important;overflow:visible!important;overflow-x:visible!important;scroll-snap-type:none!important}
+  .films-grid .film-card{width:100%!important;aspect-ratio:auto!important;border-radius:9px!important}
+  .films-grid .film-card>video{position:relative!important;inset:auto!important;width:100%!important;height:auto!important;aspect-ratio:9/16!important;object-fit:contain!important;background:#050a0b!important;border-radius:0!important}
+  .films-grid .film-card .film-caption{position:relative!important;inset:auto!important;padding:9px 8px 10px!important;gap:4px!important}
+  .films-grid .film-card .film-caption small{font-size:7px!important;line-height:1.3!important}
+  .films-grid .film-card .film-caption strong{font-size:clamp(12px,3.6vw,15px)!important;line-height:1.15!important}
+  .films-grid .film-card .film-caption a{font-size:8px!important;line-height:1.35!important;overflow-wrap:anywhere!important}
+  .films-social{margin-top:14px!important;padding-top:13px!important;border-color:rgba(160,196,196,.2)!important}
+}
+@media(max-width:360px){.films-section{padding-inline:12px!important}.films-grid{gap:7px!important}.films-grid .film-card .film-caption{padding:8px 7px!important}.films-grid .film-card .film-caption strong{font-size:12px!important}}
+
+/* El carrusel principal usa un único marco, sin barras negras entre fotos. */
+.intro-story .slide-stage{position:relative!important;aspect-ratio:1.5!important;min-height:0!important;height:auto!important;overflow:hidden!important;border-radius:11px!important;background:#101719!important}
+.intro-story .slide-frame,.intro-story .slide-frame.is-current{position:absolute!important;inset:0!important;width:100%!important;height:100%!important}
+.intro-story .slide-frame img{position:absolute!important;inset:0!important;display:block!important;width:100%!important;height:100%!important;max-width:none!important;object-fit:cover!important;object-position:center!important;background:transparent!important}
+@media(max-width:760px){.intro-story .slide-stage{aspect-ratio:1.25!important;border-radius:9px!important}}
+
+/* Carruseles más ágiles y con más tarjetas a la vista. */
+.customer-gallery-track{animation-duration:38s!important}
+.customer-gallery-opposite .customer-gallery-track{animation-duration:46s!important}
+.google-review-card{flex-basis:clamp(235px,24vw,300px)!important;min-height:176px!important;padding:17px!important}
+.google-review-card blockquote{font-size:15px!important;line-height:1.38!important}
+@media(max-width:760px){.google-review-card{flex-basis:min(64vw,248px)!important;min-height:168px!important;padding:14px!important}.google-review-card blockquote{font-size:14px!important}.customer-gallery{--gallery-card-size:clamp(152px,43vw,168px)!important}}

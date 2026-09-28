@@ -88,7 +88,7 @@
     const elapsed = Math.min(now - lastFrame, 64);
     lastFrame = now;
     if (visible && !paused && !document.hidden && !nudging && loopWidth) {
-      const speed = innerWidth <= 760 ? 24 : 30;
+      const speed = innerWidth <= 760 ? 44 : 52;
       offset += elapsed * speed / 1000;
       normalize();
       paint();

@@ -12,7 +12,13 @@
     ['cliente-auto-06.webp', 'Subaru azul con el capó abierto para revisión'],
     ['cliente-auto-07.webp', 'BMW blanco dentro del taller MOTORLOZ'],
     ['cliente-auto-08.webp', 'Subaru clásico color plata en el taller'],
-    ['cliente-auto-09.webp', 'SUV blanco en el taller MOTORLOZ']
+    ['cliente-auto-09.webp', 'SUV blanco en el taller MOTORLOZ'],
+    ['cliente-auto-10.webp', 'Toyota Tacoma gris elevada en el taller MOTORLOZ'],
+    ['cliente-auto-11.webp', 'BMW Z3 negro fotografiado dentro del taller'],
+    ['cliente-auto-12.webp', 'Mercedes-Benz gris atendido por MOTORLOZ'],
+    ['cliente-auto-13.webp', 'Jeep Grand Cherokee rojo de un cliente'],
+    ['cliente-auto-14.webp', 'Porsche clásico negro dentro del taller'],
+    ['cliente-auto-15.webp', 'Subaru WRX azul plata en el taller MOTORLOZ']
   ];
 
   const gallery = document.createElement('section');
@@ -76,7 +82,7 @@
   gallery.append(
     buildLane(photos, 'customer-gallery-opposite', 'Carrusel de fotos de autos de clientes')
   );
-  reviews.insertAdjacentElement('afterend', gallery);
+  reviews.closest('.reviews').insertAdjacentElement('afterend', gallery);
 
   toggle.addEventListener('click', () => {
     const paused = gallery.classList.toggle('is-paused');
