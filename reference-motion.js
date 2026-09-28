@@ -4,7 +4,7 @@
   // Aurora difusa de taller: el color se transforma dentro del fondo, sin
   // líneas, bandas ni formas delimitadas.
   const auroraSurfaces = document.querySelectorAll(
-    '.hero,main>.section.people,main>.section.films-section,main>.section.why-motorloz,' +
+    '.hero,.people-why-aurora,main>.section.films-section,' +
     'main>.section.appointment,footer,.reference-bridge-card,.contact-bridge-card'
   );
   const auroraStates = [];

@@ -516,3 +516,9 @@
 .google-review-card{flex-basis:clamp(235px,24vw,300px)!important;min-height:176px!important;padding:17px!important}
 .google-review-card blockquote{font-size:15px!important;line-height:1.38!important}
 @media(max-width:760px){.google-review-card{flex-basis:min(64vw,248px)!important;min-height:168px!important;padding:14px!important}.google-review-card blockquote{font-size:14px!important}.customer-gallery{--gallery-card-size:clamp(152px,43vw,168px)!important}}
+
+/* El taller y su forma de trabajar comparten una sola superficie de aurora, sin corte entre secciones. */
+.people-why-aurora{position:relative!important;isolation:isolate!important;overflow:hidden!important;background:#0b1112!important;color:#f2f7f6!important}
+.people-why-aurora>.people,.people-why-aurora>.why-motorloz{position:relative!important;isolation:initial!important;overflow:visible!important;background:transparent!important;color:#f2f7f6!important}
+.people-why-aurora>.people:before,.people-why-aurora>.people:after,.people-why-aurora>.why-motorloz:before,.people-why-aurora>.why-motorloz:after{content:none!important;display:none!important;animation:none!important}
+.people-why-aurora>.people>*,.people-why-aurora>.why-motorloz>*{position:relative;z-index:1}
