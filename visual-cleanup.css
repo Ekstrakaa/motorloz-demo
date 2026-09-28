@@ -200,6 +200,30 @@
 }
 
 /* Clips verticales: una pieza protagonista por pantalla, con texto legible y sin marcos añadidos. */
+.films-social{
+  width:100%!important;
+  max-width:460px!important;
+  margin:27px auto 0!important;
+  padding:18px 0 0!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:7px!important;
+  text-align:center!important;
+}
+.films-social .instagram-mark{margin:0 auto 2px!important}
+.films-social>div{justify-items:center!important;gap:4px!important}
+.films-social b,.films-social small,.films-social>a{width:100%;text-align:center!important}
+.films-social>a{margin:3px auto 0!important}
+.why-number{
+  width:2.2ch!important;
+  color:rgba(126,190,194,.82)!important;
+  font:500 14px/1.1 var(--mono)!important;
+  letter-spacing:0!important;
+  text-align:left!important;
+  font-variant-numeric:tabular-nums;
+}
 @media(max-width:760px){
   .films-grid{
     display:grid!important;
@@ -230,33 +254,11 @@
   .films-grid .film-card .film-caption strong{font-size:clamp(18px,5vw,21px)!important;line-height:1.15!important}
   .films-grid .film-card .film-caption a{font-size:11px!important;line-height:1.45!important}
 
-  .films-social{
-    width:100%!important;
-    max-width:460px!important;
-    margin:20px auto 0!important;
-    padding:18px 0 0!important;
-    display:flex!important;
-    flex-direction:column!important;
-    align-items:center!important;
-    justify-content:center!important;
-    gap:7px!important;
-    text-align:center!important;
-  }
-  .films-social .instagram-mark{margin:0 auto 2px!important}
-  .films-social>div{justify-items:center!important;gap:4px!important}
-  .films-social b,.films-social small,.films-social>a{width:100%;text-align:center!important}
-  .films-social>a{margin:3px auto 0!important}
-
   .why-number{
-    width:2.2ch!important;
-    color:rgba(126,190,194,.82)!important;
-    font:500 17px/1 var(--mono)!important;
-    letter-spacing:-.04em!important;
-    text-align:left!important;
-    font-variant-numeric:tabular-nums;
+    font-size:14px!important;
   }
 }
 @media(max-width:390px){
   .films-grid{grid-auto-columns:min(80vw,320px)!important;gap:14px!important}
-  .why-number{font-size:16px!important}
+  .why-number{font-size:14px!important}
 }
