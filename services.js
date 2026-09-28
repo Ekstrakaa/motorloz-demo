@@ -7,15 +7,16 @@
   if (!viewport || !track) return;
   const cards = [...track.querySelectorAll('.service-card')];
   const serviceIcons = [
-    '<svg viewBox="0 0 24 24"><path d="M21 6.5a6 6 0 0 1-7.9 5.7L7 18.3a2.1 2.1 0 1 1-3-3l6.1-6.1A6 6 0 0 1 16 2l-3.1 3.1 3 3L19 5Z"/></svg>',
-    '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="3.2"/><path d="m12 3.5 1.5 5.4m7 1.3-5.3 1.8m-2.6 8.5-1.2-5.5m-7.6-2 5.2-1.5m5.4-4.7 1.3-1.2"/></svg>',
-    '<svg viewBox="0 0 24 24"><path d="M8 3v3m8-3v3M8 18v3m8-3v3M8 6c0 3 8 3 8 6s-8 3-8 6"/><path d="M6 6h12M6 18h12"/></svg>',
-    '<svg viewBox="0 0 24 24"><path d="M13.5 2.8 5.8 13h5l-.5 8.2 7.9-10.5h-5.1l.4-7.9Z"/><path d="M4 5h3M17 19h3"/></svg>',
-    '<svg viewBox="0 0 24 24"><path d="M9 3.5a8.5 8.5 0 1 0 0 17A8.5 8.5 0 0 0 9 3.5Z"/><circle cx="9" cy="12" r="3.2"/><path d="M16.3 6.4c1.6.8 2.7 2.4 2.7 4.3v2.6m-2.3 3.4 2.3 1.3 2.3-1.3"/></svg>',
-    '<svg viewBox="0 0 24 24"><path d="M12 3.5c2.2 3.1 5.4 6.7 5.4 10.2a5.4 5.4 0 1 1-10.8 0C6.6 10.2 9.8 6.6 12 3.5Z"/><path d="M9.5 14.5a2.6 2.6 0 0 0 2.6 2.6"/></svg>',
-    '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="3.3"/><path d="M12 3.5v5.2m8 1.1-5 1.7m-4.3 9.1v-5.2m-8-1.2 5-1.6"/></svg>',
-    '<svg viewBox="0 0 24 24"><path d="M3 14h2l2-5h9l3 5h2v5h-2m-14 0H3v-5Z"/><circle cx="7" cy="18" r="1.5"/><circle cx="17" cy="18" r="1.5"/><path d="M9 9V6h5l2 3"/></svg>',
-    '<svg viewBox="0 0 24 24"><path d="M4 14.5 6.5 9h11l2.5 5.5v4h-2m-14 0h-1v-4Z"/><circle cx="7.5" cy="18" r="1.5"/><circle cx="16.5" cy="18" r="1.5"/><path d="m9 5 2 2 4-4"/></svg>'
+    '<svg viewBox="0 0 48 48"><path d="M31 9a11 11 0 0 0-13 13L8 32a5 5 0 0 0 7 7l10-10a11 11 0 0 0 13-13l-7 7-7-7Z"/><path d="m13 32 3 3"/></svg>',
+    '<svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="17"/><circle cx="24" cy="24" r="10"/><circle cx="24" cy="24" r="3"/><path d="M24 7v5m17 12h-5M24 41v-5M7 24h5M12 12l4 4m20-4-4 4m0 16 4 4m-24 0 4-4"/></svg>',
+    '<svg viewBox="0 0 48 48"><path d="M16 6v7m16-7v7M16 35v7m16-7v7M13 13h22v22H13z"/><path d="m16 17 16 14m0-14L16 31"/><circle cx="24" cy="24" r="5"/></svg>',
+    '<svg viewBox="0 0 48 48"><rect x="8" y="12" width="32" height="25" rx="4"/><path d="M24 7v5m-9 0V9h18v3M12 20h4m-2-2v4"/><path d="m27 17-7 11h6l-2 8 9-13h-6l2-6Z"/></svg>',
+    '<svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="17"/><circle cx="24" cy="24" r="12"/><circle cx="24" cy="24" r="5"/><path d="M24 12v7m12 5h-7m-5 12v-7m-12-5h7m9-9-4 6m12 6-7-1m-5 12 1-7m-12-5 7-1m10-1-5-5m-5 10-5 5"/></svg>',
+    '<svg viewBox="0 0 48 48"><path d="M25 6c8 11 14 18 14 25a15 15 0 0 1-30 0C9 24 17 15 25 6Z"/><path d="M17 31a8 8 0 0 0 8 7"/><path d="M33 11h7v10"/></svg>',
+    '<svg viewBox="0 0 48 48"><path d="M7 21h6l4-6h13l4 5h7v15h-5v5H13v-5H7z"/><path d="M18 15V9h11v6m-8-3h5M11 21v-5m24 5v-5m-16 8h7m-7 5h7"/><circle cx="19" cy="29" r="3.5"/><circle cx="31" cy="29" r="3.5"/><path d="M4 25H7m34 0h3"/></svg>',
+    '<svg viewBox="0 0 48 48"><path d="M8 23h4l3-9h18l5 9h4v13H8z"/><path d="m15 14 4-6h11l5 6M16 27h16m-11-5v10m6-10v10"/><circle cx="14" cy="36" r="3"/><circle cx="34" cy="36" r="3"/></svg>',
+    '<svg viewBox="0 0 48 48"><circle cx="21" cy="24" r="15"/><circle cx="21" cy="24" r="10"/><circle cx="21" cy="24" r="2.5"/><path d="M36 14h6v20h-6l-4-4V18zM11 9 7 5m0 38 4-4"/><path d="M18 15v5m6-5v5m-6 8v5m6-5v5"/></svg>',
+    '<svg viewBox="0 0 48 48"><path d="M5 29 9 18c1-3 4-5 7-5h14c4 0 7 2 9 6l4 10v7H5z"/><path d="m11 20 3-5h18l5 6M13 29h22m-16-8v5m10-5v5"/><circle cx="13" cy="36" r="4"/><circle cx="35" cy="36" r="4"/></svg>'
   ];
   cards.forEach((card, index) => {
     const title = card.querySelector('.service-card-copy h3');
