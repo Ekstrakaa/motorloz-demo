@@ -56,3 +56,25 @@ test('serves the fixed Gemini voice as WAV audio', async () => {
     global.fetch = previousFetch;
   }
 });
+
+test('uses the backup Gemini model when the primary service is unavailable', async () => {
+  process.env.GEMINI_API_KEY = 'test-key';
+  const previousFetch = global.fetch;
+  const urls = [];
+  global.fetch = async (url) => {
+    urls.push(url);
+    return urls.length === 1
+      ? { ok: false, status: 503, json: async () => ({ error: { status: 'UNAVAILABLE' } }) }
+      : { ok: true, json: async () => ({ candidates: [{ finishReason: 'STOP', content: { parts: [{ text: 'Podemos revisar ese ruido en el taller.' }] } }] }) };
+  };
+  try {
+    const res = response();
+    await handle({ method: 'POST', body: { messages: [{ role: 'user', content: 'Ruido al frenar' }] }, headers: {}, socket: {} }, res, 'chat');
+    assert.equal(res.statusCode, 200);
+    assert.equal(JSON.parse(res.body).reply, 'Podemos revisar ese ruido en el taller.');
+    assert.match(urls[0], /gemini-3\.8-flash/);
+    assert.match(urls[1], /gemini-3\.7-flash/);
+  } finally {
+    global.fetch = previousFetch;
+  }
+});

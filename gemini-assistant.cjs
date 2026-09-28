@@ -41,31 +41,51 @@ function cleanHistory(messages) {
 async function callGemini(contents, { maxOutputTokens = 1536, systemInstruction = SYSTEM_PROMPT } = {}) {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw Object.assign(new Error('not_configured'), { status: 503 });
-  for (const tokenLimit of [maxOutputTokens, maxOutputTokens * 2]) {
-    const upstream = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(MODEL)}:generateContent`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
-      body: JSON.stringify({
-        systemInstruction: { parts: [{ text: systemInstruction }] },
-        contents,
-        generationConfig: {
-          maxOutputTokens: tokenLimit,
-          ...(MODEL.startsWith('gemini-3') ? { thinkingConfig: { thinkingLevel: 'low' } } : {})
+  const models = [...new Set([MODEL, 'gemini-3.7-flash', 'gemini-3.6-flash'])];
+  let lastError = new Error('gemini_output_truncated');
+  for (const model of models) {
+    for (const tokenLimit of [maxOutputTokens, maxOutputTokens * 2]) {
+      let upstream;
+      try {
+        upstream = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
+          body: JSON.stringify({
+            systemInstruction: { parts: [{ text: systemInstruction }] },
+            contents,
+            generationConfig: {
+              maxOutputTokens: tokenLimit,
+              ...(model.startsWith('gemini-3') ? { thinkingConfig: { thinkingLevel: 'low' } } : {})
+            }
+          })
+        });
+      } catch (error) {
+        lastError = error;
+        break;
+      }
+      const result = await upstream.json().catch(() => ({}));
+      if (!upstream.ok) {
+        const error = new Error('gemini_request_failed');
+        error.upstreamStatus = upstream.status;
+        error.upstreamCode = result.error?.status || result.error?.code || 'unknown';
+        if ([404, 500, 502, 503, 504].includes(upstream.status) || error.upstreamCode === 'UNAVAILABLE') {
+          lastError = error;
+          break;
         }
-      })
-    });
-    const result = await upstream.json().catch(() => ({}));
-    if (!upstream.ok) {
-      const error = new Error('gemini_request_failed');
-      error.upstreamStatus = upstream.status;
-      error.upstreamCode = result.error?.status || result.error?.code || 'unknown';
-      throw error;
+        throw error;
+      }
+      const candidate = result.candidates?.[0];
+      if (candidate?.finishReason === 'MAX_TOKENS') {
+        lastError = new Error('gemini_output_truncated');
+        continue;
+      }
+      const reply = (candidate?.content?.parts || []).filter(part => !part.thought).map(part => part.text || '').join('').trim();
+      if (reply) return reply;
+      lastError = new Error('gemini_empty_reply');
+      break;
     }
-    const candidate = result.candidates?.[0];
-    if (candidate?.finishReason === 'MAX_TOKENS') continue;
-    return (candidate?.content?.parts || []).filter(part => !part.thought).map(part => part.text || '').join('').trim();
   }
-  throw new Error('gemini_output_truncated');
+  throw lastError;
 }
 
 async function generateSpeech(text) {
