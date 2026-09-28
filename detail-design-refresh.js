@@ -6,6 +6,30 @@
     icon.setAttribute('aria-hidden', 'true'); svg.replaceWith(icon);
   });
 
+  const ratingStars = document.querySelector('.reviews-rating .gold-stars');
+  if (ratingStars) {
+    ratingStars.innerHTML = [...ratingStars.textContent.trim()].map((star, index) =>
+      `<span style="--star-delay:${index * 95}ms">${star}</span>`
+    ).join('');
+  }
+
+  const entranceTargets = [...document.querySelectorAll(
+    '.service-icon,.why-icon,.service-title-row h3,.why-card-copy,.brand-wordmark,.reviews-rating'
+  )];
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!reduceMotion && 'IntersectionObserver' in window) {
+    entranceTargets.forEach((target, index) => {
+      target.classList.add('scroll-entry');
+      target.style.setProperty('--entry-delay', `${(index % 5) * 65}ms`);
+    });
+    const entranceObserver = new IntersectionObserver(entries => entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      entry.target.classList.add('is-scroll-visible');
+      entranceObserver.unobserve(entry.target);
+    }), { threshold: .16, rootMargin: '0px 0px -5% 0px' });
+    entranceTargets.forEach(target => entranceObserver.observe(target));
+  }
+
   const engineSketch = document.querySelector('.subaru-section .engine-sketch');
   if (engineSketch && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
     if ('IntersectionObserver' in window) {

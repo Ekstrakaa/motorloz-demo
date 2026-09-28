@@ -152,33 +152,36 @@
 .intro-proof-row article b { position:relative;color:#f1f7f6!important;font-size:14px!important; }
 .intro-proof-row article small { position:relative;color:#adc1c2!important;font-size:11px!important; }
 
-/* Rev the boxer illustration with a visible rumble and rotating crank highlight. */
+/* Continuous high-rev rumble, with a grounded shadow under the boxer drawing. */
 .subaru-section .engine-sketch { position:relative!important;isolation:isolate!important;width:min(100%,520px)!important;height:clamp(190px,52vw,285px)!important;margin:12px auto 18px!important; }
-.subaru-section .engine-sketch img { position:relative;z-index:1;transform-origin:50% 68%;filter:drop-shadow(0 8px 6px rgba(7,23,27,.08));animation:none!important; }
-.subaru-section .engine-sketch::before { content:"";position:absolute;z-index:0;left:50%;top:67%;width:35%;height:28%;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(ellipse,rgba(28,178,191,.22),rgba(28,178,191,.08) 43%,transparent 72%);filter:blur(9px);opacity:0; }
-.subaru-section .engine-sketch::after { content:"";position:absolute;z-index:2;left:50%;top:69%;width:15%;aspect-ratio:1;transform:translate(-50%,-50%);border:2px solid rgba(67,205,216,.7);border-right-color:transparent;border-bottom-color:rgba(67,205,216,.2);border-radius:50%;box-shadow:0 0 0 5px rgba(47,178,190,.07),0 0 22px rgba(41,196,210,.48),inset 0 0 12px rgba(46,186,201,.23);opacity:0; }
-.subaru-section .engine-sketch.is-revving img { animation:boxer-rev-pulse 3.8s linear infinite!important; }
-.subaru-section .engine-sketch.is-revving::before { animation:boxer-aura 3.8s ease-in-out infinite; }
-.subaru-section .engine-sketch.is-revving::after { animation:crank-spin .68s linear infinite,crank-flash 3.8s ease-in-out infinite; }
+.subaru-section .engine-sketch img { position:relative;z-index:1;transform-origin:50% 68%;filter:drop-shadow(0 18px 13px rgba(7,31,37,.29)) drop-shadow(0 3px 2px rgba(5,31,36,.18))!important;animation:none!important;will-change:transform; }
+.subaru-section .engine-sketch::before { content:"";position:absolute;z-index:0;left:50%;top:77%;width:72%;height:19%;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(ellipse,rgba(7,33,39,.31),rgba(7,33,39,.12) 45%,transparent 76%);filter:blur(10px);opacity:.75; }
+.subaru-section .engine-sketch::after { content:"";position:absolute;z-index:2;left:50%;top:69%;width:14%;aspect-ratio:1;transform:translate(-50%,-50%);border:2px solid rgba(38,152,168,.48);border-right-color:transparent;border-bottom-color:rgba(38,152,168,.12);border-radius:50%;box-shadow:0 0 0 3px rgba(47,178,190,.04),0 0 13px rgba(29,151,165,.17);opacity:0; }
+.subaru-section .engine-sketch.is-revving img { animation:boxer-rev-pulse 1.7s linear infinite!important; }
+.subaru-section .engine-sketch.is-revving::before { animation:boxer-shadow-shift 1.7s linear infinite; }
+.subaru-section .engine-sketch.is-revving::after { opacity:.58;animation:crank-spin .58s linear infinite; }
 @keyframes boxer-rev-pulse {
-  0%,22%,100% { transform:translate(0,0) rotate(0) scale(1);filter:drop-shadow(0 4px 3px rgba(7,23,27,.06)); }
-  27% { transform:translate(0,-2px) rotate(-.25deg) scale(1.008); }
-  30% { transform:translate(2px,1px) rotate(.35deg) scale(1.016);filter:drop-shadow(0 12px 10px rgba(10,77,86,.22)); }
-  32% { transform:translate(-2px,-1px) rotate(-.35deg) scale(1.012); }
-  34% { transform:translate(2px,0) rotate(.25deg) scale(1.016); }
-  36% { transform:translate(-1px,1px) rotate(-.2deg) scale(1.01); }
-  43% { transform:translate(0,-1px) rotate(0) scale(1.006);filter:drop-shadow(0 10px 8px rgba(10,77,86,.16)); }
-  52%,64% { transform:translate(0,0) rotate(0) scale(1);filter:drop-shadow(0 4px 3px rgba(7,23,27,.06)); }
-  68% { transform:translate(1px,-1px) rotate(.22deg) scale(1.012); }
-  70% { transform:translate(-1px,1px) rotate(-.22deg) scale(1.009); }
-  76% { transform:translate(0,0) rotate(0) scale(1); }
+  0%,100% { transform:translate(0,-1px) rotate(-.2deg) scale(1.08); }
+  8% { transform:translate(2px,0) rotate(.24deg) scale(1.086); }
+  16% { transform:translate(-2px,1px) rotate(-.28deg) scale(1.079); }
+  24% { transform:translate(3px,-2px) rotate(.3deg) scale(1.09); }
+  32% { transform:translate(-2px,0) rotate(-.25deg) scale(1.083); }
+  40% { transform:translate(3px,-1px) rotate(.34deg) scale(1.096); }
+  48% { transform:translate(-3px,1px) rotate(-.31deg) scale(1.087); }
+  56% { transform:translate(2px,-2px) rotate(.27deg) scale(1.093); }
+  64% { transform:translate(-2px,0) rotate(-.26deg) scale(1.083); }
+  72% { transform:translate(3px,-1px) rotate(.32deg) scale(1.097); }
+  80% { transform:translate(-3px,1px) rotate(-.3deg) scale(1.086); }
+  88% { transform:translate(2px,-2px) rotate(.27deg) scale(1.091); }
+  96% { transform:translate(-1px,0) rotate(-.22deg) scale(1.082); }
 }
-@keyframes boxer-aura { 0%,22%,52%,100% {opacity:0} 30%,43%,68%,74% {opacity:.9} 36%,70% {opacity:.58} }
+@keyframes boxer-shadow-shift { 0%,100% {transform:translate(-50%,-50%) scaleX(1);opacity:.75} 24%,72% {transform:translate(-49%,-50%) scaleX(1.07);opacity:.58} 48%,88% {transform:translate(-51%,-50%) scaleX(.96);opacity:.85} }
 @keyframes crank-spin { to { transform:translate(-50%,-50%) rotate(1turn); } }
-@keyframes crank-flash { 0%,22%,52%,100% {opacity:0} 30%,43%,68%,74% {opacity:.85} }
 @media(prefers-reduced-motion:reduce) {
   .subaru-section .engine-sketch.is-revving img,.subaru-section .engine-sketch.is-revving::before,.subaru-section .engine-sketch.is-revving::after { animation:none!important; }
-  .subaru-section .engine-sketch::before,.subaru-section .engine-sketch::after { opacity:0!important; }
+  .subaru-section .engine-sketch img { transform:scale(1.08)!important; }
+  .subaru-section .engine-sketch::before { opacity:.75!important; }
+  .subaru-section .engine-sketch::after { opacity:0!important; }
 }
 
 /* Use the whole mobile viewport for the supplied photos and map; preserve each original frame. */
@@ -300,3 +303,110 @@
 @media(prefers-reduced-motion:reduce) { :is(a.button,button.button,.header-cta,.contact-open,.map-open-link,.text-link,.service-card-copy>a,[data-service],.slide-buttons button,.review-controls button,.services-controls button,.services-pagination button,.why-card):hover { transform:none!important; } }
 
 #subaru-title .subaru-cyan-word { color:#26b7c6!important;-webkit-text-fill-color:#26b7c6!important; }
+
+/* Let the automotive symbol stand on its own, with enough scale to read at a glance. */
+.service-title-row { min-height:88px!important;gap:12px!important;margin:9px 0 12px!important; }
+.service-title-row .service-icon {
+  box-sizing:border-box!important;flex:0 0 82px!important;width:82px!important;height:82px!important;
+  border:0!important;border-radius:0!important;background-color:transparent!important;box-shadow:none!important;
+  filter:drop-shadow(0 7px 8px rgba(8,38,42,.15))!important;
+}
+.service-title-row h3 {
+  min-width:0!important;font-size:clamp(17px,1.55vw,20px)!important;line-height:1.05!important;
+  letter-spacing:-.04em!important;white-space:nowrap!important;
+}
+@media(max-width:760px) {
+  .service-title-row { min-height:80px!important;gap:9px!important; }
+  .service-title-row .service-icon { flex-basis:74px!important;width:74px!important;height:74px!important; }
+  .service-title-row h3 { font-size:clamp(16px,4.5vw,18px)!important; }
+}
+@media(max-width:370px) {
+  .service-title-row { min-height:70px!important;gap:8px!important; }
+  .service-title-row .service-icon { flex-basis:64px!important;width:64px!important;height:64px!important; }
+  .service-title-row h3 { font-size:16px!important; }
+}
+
+/* The six workshop principles lead with their rendered automotive symbol. */
+.why-grid .why-card {
+  position:relative!important;grid-template-columns:88px minmax(0,1fr) 18px!important;
+  align-items:center!important;column-gap:15px!important;min-height:124px!important;padding:15px 12px!important;
+}
+.why-grid .why-card>.why-number {
+  position:absolute!important;top:10px!important;right:39px!important;z-index:1!important;
+  display:block!important;width:auto!important;min-width:0!important;padding:0!important;
+  color:rgba(109,205,212,.7)!important;font:600 10px/1 var(--mono)!important;letter-spacing:.12em!important;
+}
+.why-grid .why-card>.why-icon {
+  grid-column:1!important;grid-row:1!important;align-self:center!important;justify-self:center!important;
+  width:88px!important;height:88px!important;filter:drop-shadow(0 8px 10px rgba(0,0,0,.22))!important;
+}
+.why-grid .why-card>.why-card-copy { grid-column:2!important;grid-row:1!important;min-width:0!important;padding-top:9px!important; }
+.why-grid .why-card>.why-arrow { grid-column:3!important;grid-row:1!important;align-self:center!important;justify-self:center!important; }
+.why-grid .why-card-copy strong { font-size:17px!important;line-height:1.2!important; }
+.why-grid .why-card-copy small { font-size:13px!important;line-height:1.45!important; }
+@media(max-width:760px) {
+  .why-grid .why-card { grid-template-columns:82px minmax(0,1fr) 16px!important;column-gap:12px!important;min-height:116px!important;padding:13px 9px!important; }
+  .why-grid .why-card>.why-icon { width:82px!important;height:82px!important; }
+  .why-grid .why-card>.why-number { top:8px!important;right:32px!important;font-size:9px!important; }
+  .why-grid .why-card-copy strong { font-size:16px!important; }
+  .why-grid .why-card-copy small { font-size:12px!important; }
+}
+@media(max-width:370px) {
+  .why-grid .why-card { grid-template-columns:70px minmax(0,1fr) 15px!important;column-gap:9px!important;min-height:108px!important;padding-inline:6px!important; }
+  .why-grid .why-card>.why-icon { width:70px!important;height:70px!important; }
+  .why-grid .why-card>.why-number { right:27px!important; }
+}
+
+/* Scroll entrances give the symbols and copy a short, one-time arrival. */
+.scroll-entry { opacity:0;transform:translateY(13px);transition:opacity .58s ease,transform .68s cubic-bezier(.2,.75,.25,1);transition-delay:var(--entry-delay,0ms); }
+.service-icon.scroll-entry,.why-icon.scroll-entry { transform:translateY(13px) scale(.68) rotate(-7deg); }
+.scroll-entry.is-scroll-visible { opacity:1;transform:none; }
+.reviews-rating {
+  display:grid!important;grid-template-columns:auto auto!important;justify-content:start!important;align-items:center!important;
+  column-gap:14px!important;row-gap:7px!important;margin:17px 0 27px!important;
+}
+.reviews-rating>strong { font-size:clamp(35px,3.8vw,46px)!important;line-height:.95!important;font-weight:800!important;letter-spacing:-.055em!important; }
+.reviews-rating>.gold-stars { display:flex!important;align-items:center!important;gap:.025em!important;margin:0!important;font-size:clamp(31px,3.2vw,40px)!important;line-height:1!important;letter-spacing:0!important; }
+.reviews-rating>.gold-stars>span { display:inline-block!important;transform-origin:50% 70%; }
+.reviews-rating>small { grid-column:1/-1!important;font-size:14px!important;line-height:1.3!important; }
+.reviews-rating.is-scroll-visible .gold-stars>span { animation:rating-star-arrive .72s cubic-bezier(.2,.8,.2,1) var(--star-delay,0ms) both; }
+@keyframes rating-star-arrive {
+  0% { opacity:0;transform:translateY(13px) scale(.42) rotate(-18deg);filter:drop-shadow(0 0 0 rgba(218,164,29,0)); }
+  68% { opacity:1;transform:translateY(-4px) scale(1.2) rotate(5deg);filter:drop-shadow(0 0 8px rgba(218,164,29,.6)); }
+  100% { opacity:1;transform:none;filter:none; }
+}
+@media(max-width:760px) {
+  .reviews-rating { justify-content:center!important;margin:14px auto 25px!important; }
+  .reviews-rating>strong { font-size:38px!important; }
+  .reviews-rating>.gold-stars { font-size:35px!important; }
+  .reviews-rating>small { text-align:center!important;font-size:14px!important; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .scroll-entry,.scroll-entry.is-scroll-visible { opacity:1!important;transform:none!important;transition:none!important; }
+  .reviews-rating.is-scroll-visible .gold-stars>span { animation:none!important; }
+}
+
+/* Clear, enlarged contact mark inside a brighter glass dialog that fits mobile. */
+.contact-dialog[open] {
+  width:min(480px,calc(100% - 24px))!important;max-height:calc(100svh - 28px)!important;overflow:hidden!important;
+  padding:27px 21px 22px!important;border:1px solid rgba(190,239,241,.55)!important;border-radius:22px!important;
+  background:linear-gradient(145deg,rgba(151,211,216,.31),rgba(70,137,146,.22) 43%,rgba(14,43,51,.58))!important;
+  box-shadow:0 25px 90px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.38),inset 0 0 40px rgba(190,245,246,.055)!important;
+  backdrop-filter:blur(26px) saturate(165%)!important;-webkit-backdrop-filter:blur(26px) saturate(165%)!important;
+}
+.contact-brand { width:100%!important;margin:0 auto 12px!important; }
+.contact-brand img { display:block!important;width:min(100%,360px)!important;height:auto!important;max-height:none!important;object-fit:contain!important; }
+#contact-explanation { display:none!important; }
+.contact-dialog-links { margin-top:12px!important; }
+.contact-dialog-links .contact-icon.whatsapp-icon img { width:34px!important;height:34px!important;filter:none!important; }
+@media(max-width:760px) {
+  .contact-dialog[open] { padding:25px 18px 20px!important; }
+  .contact-brand { margin-bottom:10px!important; }
+  .contact-dialog-links { margin-top:10px!important; }
+}
+@media(max-height:600px) {
+  .contact-dialog[open] { padding-block:18px 14px!important; }
+  .contact-brand img { width:min(100%,300px)!important; }
+  .contact-dialog-links>a { min-height:45px!important;padding-block:6px!important; }
+  .contact-hours { margin-top:10px!important;padding-top:9px!important; }
+}
