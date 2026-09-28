@@ -1,0 +1,139 @@
+/* Clean finish for the latest mobile review. Keep the established brand palette. */
+
+/* Contact dialog: give the MOTORLOZ mark more presence while preserving its compact layout. */
+.contact-brand { margin:0 auto 8px!important; }
+.contact-brand img { display:block!important;width:min(310px,90%)!important;height:60px!important;object-fit:contain!important; }
+.header-cta>span[aria-hidden="true"] { display:none!important; }
+.floating-whatsapp img,.contact-icon.whatsapp-icon img { display:block!important;width:25px!important;height:25px!important;object-fit:contain!important;filter:brightness(0) invert(1)!important; }
+
+/* Correct the mark scale across the complete, now-expanded make lineup. */
+.brand-lineup-track { animation-duration:58s!important; }
+.brand-wordmark[aria-label="Toyota"] img { width:auto!important;max-width:138px!important;height:54px!important; }
+.brand-wordmark[aria-label="Alfa Romeo"] img,.brand-wordmark[aria-label="Citroën"] img,.brand-wordmark[aria-label="Peugeot"] img { width:auto!important;max-width:56px!important;height:54px!important; }
+.brand-wordmark[aria-label="Renault"] img { width:auto!important;max-width:68px!important;height:54px!important; }
+.brand-wordmark[aria-label="Dodge"] img,.brand-wordmark[aria-label="Jeep"] img { width:auto!important;max-width:124px!important;height:36px!important; }
+.brand-wordmark[aria-label="Ford"] img { width:auto!important;max-width:112px!important;height:43px!important; }
+.brand-wordmark[aria-label="Fiat"] img { width:auto!important;max-width:56px!important;height:54px!important; }
+.brand-wordmark[aria-label="Volvo"] img { width:auto!important;max-width:124px!important;height:37px!important; }
+@media(max-width:760px) {
+  .brand-lineup-track { animation-duration:36s!important; }
+  .brand-wordmark[aria-label="Toyota"] img { max-width:108px!important;height:43px!important; }
+  .brand-wordmark[aria-label="Alfa Romeo"] img,.brand-wordmark[aria-label="Citroën"] img,.brand-wordmark[aria-label="Peugeot"] img { max-width:48px!important;height:46px!important; }
+  .brand-wordmark[aria-label="Renault"] img { max-width:58px!important;height:46px!important; }
+  .brand-wordmark[aria-label="Dodge"] img,.brand-wordmark[aria-label="Jeep"] img { max-width:104px!important;height:32px!important; }
+  .brand-wordmark[aria-label="Ford"] img { max-width:98px!important;height:37px!important; }
+  .brand-wordmark[aria-label="Fiat"] img { max-width:48px!important;height:46px!important; }
+  .brand-wordmark[aria-label="Volvo"] img { max-width:105px!important;height:31px!important; }
+}
+@media(max-width:760px) {
+  .contact-dialog[open] { max-height:calc(100svh - 24px)!important;overflow:hidden!important; }
+  .contact-brand img { width:min(310px,92%)!important;height:56px!important; }
+}
+
+/* Hyundai partnership: centered presentation, no repeated address eyebrow, and a clearer mark. */
+.hyundai-copy { max-width:680px!important;margin-inline:auto!important;text-align:center!important; }
+.hyundai-copy>.eyebrow { display:none!important; }
+.hyundai-badge { justify-content:center!important;margin-inline:auto!important; }
+.hyundai-badge img { width:116px!important;height:76px!important;object-fit:contain!important; }
+.hyundai-badge span { font-size:clamp(23px,5vw,27px)!important; }
+.hyundai-copy h2,.hyundai-copy>p,.hyundai-copy>a,.hyundai-source { text-align:center!important;margin-inline:auto!important; }
+.hyundai-copy>a.text-link { justify-content:center!important; }
+@media(max-width:760px) {
+  .hyundai-copy { text-align:center!important; }
+  .hyundai-copy>.eyebrow { display:none!important; }
+  .hyundai-badge { display:flex!important;justify-content:center!important;margin-inline:auto!important; }
+  .hyundai-badge img { width:122px!important;height:80px!important; }
+  .hyundai-copy h2,.hyundai-copy>p,.hyundai-copy>a,.hyundai-source { text-align:center!important;margin-inline:auto!important; }
+  .hyundai-copy h2 { max-width:16ch!important;font-size:clamp(36px,9.5vw,44px)!important;line-height:1.04!important; }
+  .hyundai-copy>p:not(.eyebrow) { max-width:43ch!important; }
+  .hyundai-copy>a.text-link { justify-content:center!important; }
+  .hyundai-source { display:block!important; }
+}
+
+/* The mobile home keeps the cinematic frame untouched and gives the copy a clear hierarchy. */
+@media(max-width:760px) {
+  .hero-copy { justify-content:flex-end!important;padding:0 20px clamp(104px,13svh,126px)!important; }
+  .hero .eyebrow,.hero-signal,.hero-bottom,.hero-side { display:none!important; }
+  .hero h1 { max-width:8.2ch!important;margin:0 0 16px!important;font-family:"Bahnschrift","Arial Narrow",Arial,sans-serif!important;font-size:clamp(53px,13.2vw,68px)!important;font-weight:650!important;line-height:.96!important;letter-spacing:-.055em!important;text-wrap:balance!important; }
+  .hero h1 em { color:#50c3d0!important; }
+  .hero-description { max-width:31ch!important;margin:0 0 22px!important;font-size:14px!important;line-height:1.58!important; }
+  .hero-copy .button.light { min-width:190px!important;min-height:50px!important;justify-content:center!important;padding:0 22px!important;border:1px solid rgba(255,255,255,.56)!important;border-radius:999px!important;background:#f2f5f3!important;color:#111d20!important;box-shadow:0 10px 30px rgba(0,0,0,.2)!important;font-size:12px!important;font-weight:700!important; }
+  .hero-copy .button.light>span,.header-cta>span[aria-hidden="true"] { display:none!important; }
+  .hero-copy .button.light { gap:0!important; }
+  .intro>.section-label,.intro-story .slide-toolbar { display:none!important; }
+}
+@media(max-width:760px) and (max-height:600px) {
+  .contact-brand img { height:36px!important; }
+}
+
+/* Three proof points: editorial index rows instead of generic centered cards. */
+.intro-proof-row { gap:10px!important; }
+.intro-proof-row>article {
+  display:grid!important;grid-template-columns:46px minmax(0,1fr)!important;align-items:center!important;
+  gap:13px!important;min-height:86px!important;padding:15px 17px!important;text-align:left!important;
+  border:1px solid rgba(38,119,126,.2)!important;border-radius:12px!important;
+  background:linear-gradient(145deg,rgba(255,255,255,.96),rgba(235,243,241,.92))!important;
+  box-shadow:0 8px 24px rgba(28,56,58,.07),inset 0 1px 0 rgba(255,255,255,.8)!important;
+}
+.intro-proof-row .proof-index { align-self:center!important;color:#1697a5!important;font:600 23px/1 var(--mono)!important;letter-spacing:-.08em!important; }
+.intro-proof-row article>div { display:grid!important;gap:4px!important; }
+.intro-proof-row article b { color:#17282b!important;font-size:14px!important;letter-spacing:-.025em!important; }
+.intro-proof-row article small { color:#5c7071!important;font-size:11px!important;line-height:1.4!important; }
+@media(max-width:760px) {
+  .intro-proof-row { display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:8px!important; }
+  .intro-proof-row>article { min-height:74px!important;padding:12px 16px!important; }
+}
+
+/* The engine drawing has a restrained boxer pulse, with reduced-motion support. */
+.subaru-section .engine-sketch img { transform-origin:50% 58%;animation:boxer-rev-pulse 3.4s ease-in-out infinite!important; }
+@keyframes boxer-rev-pulse {
+  0%,100% { transform:translateY(0) scale(1);filter:drop-shadow(0 3px 1px rgba(12,45,50,.04)); }
+  8% { transform:translateY(-1px) scale(1.006); }
+  13% { transform:translate(1px,-2px) scale(1.008); }
+  18% { transform:translate(-1px,0) scale(1.005); }
+  24% { transform:translateY(-1px) scale(1.003);filter:drop-shadow(0 7px 5px rgba(12,45,50,.1)); }
+  33% { transform:translateY(0) scale(1); }
+}
+@media(prefers-reduced-motion:reduce) { .subaru-section .engine-sketch img { animation:none!important; } }
+
+/* One full-width Subaru frame alternates photos without the old two-tile gallery. */
+.subaru-section .japan-gallery { grid-template-columns:minmax(0,1fr)!important; }
+.subaru-section .japan-heading { grid-column:1/-1!important; }
+.subaru-section .subaru-photo-carousel { grid-column:1/-1!important;width:100%!important;max-width:none!important;margin:0!important; }
+.subaru-carousel-stage { position:relative!important;width:100%!important;aspect-ratio:1.35!important;overflow:hidden!important;background:#e2e9e7!important; }
+.subaru-carousel-stage img { position:absolute!important;inset:0!important;display:block!important;width:100%!important;height:100%!important;max-height:72svh!important;object-fit:contain!important;opacity:0!important;transition:opacity .65s ease!important; }
+.subaru-carousel-stage img.is-active { opacity:1!important; }
+.subaru-carousel-caption { display:flex!important;justify-content:space-between!important;gap:12px!important;margin-top:9px!important;color:#53676a!important;font:9px/1.4 var(--mono)!important;letter-spacing:.1em!important; }
+@media(prefers-reduced-motion:reduce) { .subaru-carousel-stage img { transition:none!important; } }
+@media(max-width:760px) { .subaru-carousel-stage { aspect-ratio:1.03!important; } }
+
+/* Let the Hyundai photo reach the viewport edges on mobile; copy remains inset. */
+@media(max-width:760px) {
+  .hyundai-section.section { padding:30px 0 42px!important; }
+  .hyundai-inner { display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:21px!important;width:100%!important; }
+  .hyundai-image { width:100vw!important;max-width:none!important;margin-inline:calc(50% - 50vw)!important;aspect-ratio:1.18!important; }
+  .hyundai-image img { width:100%!important;height:100%!important;aspect-ratio:auto!important;object-fit:cover!important;object-position:center 45%!important;clip-path:none!important; }
+  .hyundai-copy { width:auto!important;margin-inline:20px!important; }
+}
+
+/* A single diagnostic carousel keeps every photo complete in a wide, uninterrupted frame. */
+.diagnostic-mosaic { display:block!important;width:100%!important;max-width:1080px!important;margin-inline:auto!important; }
+.diagnostic-feature-carousel { width:100%!important;margin:0!important; }
+.diagnostic-feature-stage { position:relative!important;width:100%!important;aspect-ratio:1.15!important;overflow:hidden!important;background:#071011!important; }
+.diagnostic-feature-stage img { position:absolute!important;inset:0!important;display:block!important;width:100%!important;height:100%!important;max-height:74svh!important;object-fit:contain!important;opacity:0!important;transition:opacity .55s ease!important; }
+.diagnostic-feature-stage img.is-active { opacity:1!important; }
+.diagnostic-feature-caption { display:flex!important;justify-content:space-between!important;gap:12px!important;padding:10px 2px 0!important;color:#bed0cf!important;font:9px/1.4 var(--mono)!important;letter-spacing:.1em!important; }
+@media(prefers-reduced-motion:reduce) { .diagnostic-feature-stage img { transition:none!important; } }
+@media(max-width:760px) { .diagnostic-feature-stage { aspect-ratio:1.03!important; } }
+
+/* Video captions sit under the actual footage and never cover it. */
+@media(max-width:760px) {
+  .films-grid { align-items:start!important; }
+  .films-grid .film-card { display:flex!important;flex-direction:column!important;height:auto!important;min-height:0!important;aspect-ratio:auto!important;overflow:visible!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important; }
+  .films-grid .film-card:after { display:none!important; }
+  .films-grid .film-card>video { position:relative!important;inset:auto!important;display:block!important;width:100%!important;height:auto!important;aspect-ratio:auto!important;object-fit:contain!important;background:#050a0b!important; }
+  .films-grid .film-caption { position:relative!important;inset:auto!important;display:flex!important;flex-direction:column!important;align-items:flex-start!important;min-height:0!important;margin:0!important;padding:8px 1px 0!important;gap:4px!important;background:transparent!important; }
+  .films-grid .film-caption small { font-size:7px!important; }
+  .films-grid .film-caption strong { white-space:normal!important;font-size:clamp(12px,3.7vw,15px)!important;line-height:1.2!important; }
+  .films-grid .film-caption a { margin:0!important;font-size:8px!important;line-height:1.35!important;overflow-wrap:anywhere!important; }
+}
