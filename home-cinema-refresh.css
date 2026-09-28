@@ -2,7 +2,7 @@
 .hero-copy { animation:none!important; }
 .hero .eyebrow { display:flex!important;align-items:center!important;gap:10px!important;margin:0 0 18px!important;color:rgba(222,246,245,.86)!important;font:700 9px/1.3 var(--mono)!important;letter-spacing:.14em!important;text-shadow:0 2px 12px rgba(0,0,0,.7);animation:home-copy-in .7s .1s both; }
 .hero .eyebrow .dash { display:block!important;width:23px!important;height:1px!important;background:#59ccd3!important; }
-.hero h1 { width:max-content!important;max-width:calc(100vw - 40px)!important;margin:0!important;font-family:"Segoe UI Variable Display","Segoe UI",Arial,sans-serif!important;font-size:clamp(72px,8.3vw,124px)!important;font-weight:760!important;line-height:.94!important;letter-spacing:-.067em!important;text-wrap:initial!important; }
+.hero h1 { width:100%!important;max-width:850px!important;margin:0!important;font-family:"Segoe UI Variable Display","Segoe UI",Arial,sans-serif!important;font-size:clamp(72px,8.3vw,124px)!important;font-weight:760!important;line-height:.94!important;letter-spacing:-.067em!important;text-wrap:initial!important; }
 .hero-title-static { display:block;white-space:nowrap;animation:home-title-in .85s .18s both; }
 .hero-phrase-stage { position:relative;display:block;height:1.88em; }
 .hero-phrase { position:absolute;inset:0;display:block;visibility:hidden;opacity:0;transform:translateY(13px);filter:blur(6px);transition:opacity .45s ease,transform .65s cubic-bezier(.2,.75,.25,1),filter .65s ease,visibility 0s linear .65s; }

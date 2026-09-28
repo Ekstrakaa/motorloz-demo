@@ -179,7 +179,7 @@ async function handle(req, res, action) {
       json(res, 429, { error: 'cuota_gemini_alcanzada', message: 'El asistente alcanzó su límite gratuito por ahora. Probá de nuevo más tarde.' });
     } else {
       console.error('Gemini assistant error:', error.upstreamStatus || 'unknown', error.upstreamCode || error.message || 'unknown');
-      json(res, 502, { error: 'respuesta_no_disponible', message: 'No pude responder ahora. Intentá de nuevo o usá el formulario del taller.' });
+      json(res, 502, { error: 'respuesta_no_disponible', message: 'No pude responder ahora. Intentá de nuevo o usá el formulario del taller.', reason: error.upstreamCode || error.message || 'unknown' });
     }
   }
 }
