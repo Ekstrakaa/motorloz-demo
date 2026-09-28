@@ -522,3 +522,10 @@
 .people-why-aurora>.people,.people-why-aurora>.why-motorloz{position:relative!important;isolation:initial!important;overflow:visible!important;background:transparent!important;color:#f2f7f6!important}
 .people-why-aurora>.people:before,.people-why-aurora>.people:after,.people-why-aurora>.why-motorloz:before,.people-why-aurora>.why-motorloz:after{content:none!important;display:none!important;animation:none!important}
 .people-why-aurora>.people>*,.people-why-aurora>.why-motorloz>*{position:relative;z-index:1}
+
+
+/* El diagnóstico y los clips del taller comparten una sola aurora continua. */
+.diagnostic-films-aurora{position:relative!important;isolation:isolate!important;overflow:hidden!important;background:#0b1112!important;color:#f2f7f6!important}
+.diagnostic-films-aurora>.diagnostic-story,.diagnostic-films-aurora>.films-section{position:relative!important;isolation:initial!important;overflow:visible!important;background:transparent!important;color:#f2f7f6!important;border-top:0!important}
+.diagnostic-films-aurora>.diagnostic-story:before,.diagnostic-films-aurora>.diagnostic-story:after,.diagnostic-films-aurora>.films-section:before,.diagnostic-films-aurora>.films-section:after{content:none!important;display:none!important;animation:none!important}
+.diagnostic-films-aurora>.diagnostic-story>*,.diagnostic-films-aurora>.films-section>*{position:relative;z-index:1}
