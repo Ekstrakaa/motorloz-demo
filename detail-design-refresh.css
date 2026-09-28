@@ -305,7 +305,7 @@
 #subaru-title .subaru-cyan-word { color:#26b7c6!important;-webkit-text-fill-color:#26b7c6!important; }
 
 /* Let the automotive symbol stand on its own, with enough scale to read at a glance. */
-.service-title-row { min-height:88px!important;gap:12px!important;margin:9px 0 12px!important; }
+.service-title-row { grid-column:1/-1!important;min-height:88px!important;gap:12px!important;margin:9px 0 12px!important; }
 .service-title-row .service-icon {
   box-sizing:border-box!important;flex:0 0 82px!important;width:82px!important;height:82px!important;
   border:0!important;border-radius:0!important;background-color:transparent!important;box-shadow:none!important;
