@@ -20,7 +20,7 @@
     space:photo('instalaciones','Una mirada al interior del taller',true),
     front:photo('fachada-vehiculos','Puertas abiertas a la pasión por los autos',true),
     engineRepair:photo('equipo-revision-multimarca','Mecánico revisando un vehículo multimarca en el taller',true),
-    workbench:photo('equipo-trabajo-detalle','Mecánico trabajando en el banco de servicio',true),
+    workbench:photo('equipo-planificacion','Mecánico trabajando en el banco de servicio',true),
     facadeSubaru:photo('fachada-subaru-frente','Fachada de MOTORLOZ con un Subaru al frente',true),
     diagnostic:photo('equipo-diagnostico','Tecnología y atención al detalle',false,'56% 45%'),
     tools:photo('herramientas-taller','Herramientas listas para cada diagnóstico',true),
