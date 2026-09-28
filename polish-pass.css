@@ -1,0 +1,143 @@
+/* Focused desktop art direction and finishing details from the latest review. */
+@media (min-width: 901px) {
+  .appointment-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(430px, 1.08fr) !important;
+    grid-template-rows: auto auto;
+    align-items: stretch !important;
+    column-gap: clamp(34px, 5vw, 76px) !important;
+    row-gap: 22px !important;
+  }
+  .appointment-intro { grid-column: 1; grid-row: 1; align-self: end; max-width: 580px; }
+  .appointment-office { grid-column: 1; grid-row: 2; width: min(100%, 520px); align-self: start; }
+  .appointment-office img { aspect-ratio: 1.72 !important; object-position: center 55% !important; }
+  .appointment #appointment-form { grid-column: 2; grid-row: 1 / span 2; align-self: center; }
+  .location-top {
+    grid-template-columns: minmax(0, 1.2fr) minmax(280px, .8fr) !important;
+    align-items: center !important;
+    justify-items: stretch !important;
+    gap: clamp(35px, 8vw, 120px) !important;
+    max-width: 1260px;
+    margin: 0 auto 48px;
+    text-align: left !important;
+  }
+  .location-top h2 { max-width: 680px; text-align: left !important; margin: 0 !important; }
+  .location-top>div { justify-self: end !important; width: min(100%, 350px); text-align: left !important; }
+  .location-top p { text-align: left !important; }
+  .hyundai-section {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(0, .9fr) !important;
+    align-items: center !important;
+    gap: clamp(40px, 7vw, 112px) !important;
+    min-height: 0 !important;
+    padding-block: clamp(72px, 8vw, 118px) !important;
+  }
+  .hyundai-image { height: clamp(440px, 42vw, 610px) !important; min-height: 0 !important; overflow: hidden; }
+  .hyundai-image img { width: 100%; height: 100% !important; object-fit: cover; object-position: center; }
+  .hyundai-copy { max-width: 600px; }
+  .subaru-section .japan-gallery { grid-template-columns: minmax(0, 1.02fr) repeat(2, minmax(0, .94fr)) !important; max-width: 1380px !important; }
+  .subaru-photo img { width: 100%; aspect-ratio: .94 !important; object-fit: cover; }
+  .intro-feature { grid-template-columns: minmax(0, 1.12fr) minmax(370px, .88fr) !important; gap: clamp(42px, 7vw, 110px) !important; }
+  .intro-feature-image .slide-stage { aspect-ratio: 1.55 !important; }
+}
+
+.instagram-stories {
+  display: grid !important;
+  grid-template-columns: 56px minmax(0, 1fr) !important;
+  align-items: center !important;
+  gap: 18px !important;
+  width: 100%;
+  min-height: 116px;
+  margin: 27px 0 20px !important;
+  padding: 21px 23px !important;
+  border: 1px solid rgba(99, 204, 213, .31) !important;
+  border-radius: 15px !important;
+  background: linear-gradient(115deg, rgba(43, 183, 194, .12), rgba(14, 28, 31, .8) 58%), #111a1c !important;
+  box-shadow: 0 12px 32px rgba(4, 14, 16, .16), inset 0 1px rgba(255,255,255,.05) !important;
+}
+.instagram-stories .instagram-mark { display: grid; place-items: center; width: 48px; height: 48px; border: 1px solid rgba(113, 223, 225, .55); border-radius: 14px; background: #19292b; }
+.instagram-stories .instagram-mark img { width: 24px; height: 24px; }
+.instagram-stories strong { display: block; color: #f3f7f6; font-size: 14px; letter-spacing: -.01em; }
+.instagram-stories p { margin: 5px 0 9px !important; color: #afc0c2 !important; font-size: 11px !important; line-height: 1.55 !important; }
+.instagram-stories a { color: #76d2d7 !important; font-size: 10px !important; font-weight: 650; text-decoration: none; }
+.instagram-stories a:hover { color: #fff !important; }
+
+.why-card .why-number { align-self: start; min-width: 52px; color: #52c4cf !important; font-size: clamp(34px, 3.4vw, 48px) !important; line-height: .95 !important; font-weight: 650 !important; letter-spacing: -.075em; }
+.why-card { min-height: 156px; }
+.service-title-row { display: flex; align-items: center; gap: 13px; margin: 9px 0 8px; }
+.service-title-row h3 { margin: 0 !important; }
+.service-icon { display: grid; flex: 0 0 42px; place-items: center; width: 42px; height: 42px; border: 1px solid rgba(35, 176, 191, .28); border-radius: 13px; background: linear-gradient(145deg, #edfafa, #f7f9f7); color: #189cac; box-shadow: 0 5px 14px rgba(22, 120, 133, .08); }
+.service-icon svg { width: 23px; height: 23px; fill: none; stroke: currentColor; stroke-width: 1.65; stroke-linecap: round; stroke-linejoin: round; }
+.service-card-copy .service-title-row h3 { margin-block: 0 !important; }
+
+#appointment-form {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(130, 185, 188, .24) !important;
+  border-radius: 22px !important;
+  background: radial-gradient(ellipse at 100% 0%, rgba(42, 180, 191, .15), transparent 38%), linear-gradient(145deg, #172426, #101719 72%) !important;
+  box-shadow: 0 24px 64px rgba(0,0,0,.24), inset 0 1px rgba(255,255,255,.04) !important;
+}
+#appointment-form::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: linear-gradient(90deg, transparent, #38bdc9 22%, #83e0dc 53%, transparent); opacity: .86; }
+#appointment-form .field-shell input, #appointment-form .field-shell textarea { transition: border-color .2s, background .2s, box-shadow .2s; }
+#appointment-form .field-shell:focus-within input, #appointment-form .field-shell:focus-within textarea { border-color: #47c4ce !important; background: rgba(44, 190, 200, .045) !important; box-shadow: 0 0 0 3px rgba(48, 190, 201, .09); }
+#appointment-form .priority-choice label>span { border-radius: 11px !important; transition: border-color .2s, background .2s, transform .2s; }
+#appointment-form .priority-choice input:checked+span { border-color: rgba(63, 193, 202, .72) !important; background: rgba(39, 167, 180, .13) !important; }
+#appointment-form .button.primary { min-height: 58px; border-radius: 999px !important; box-shadow: 0 12px 26px rgba(24, 170, 184, .22); }
+
+.arrival-directions { min-height: 56px !important; padding: 15px 19px !important; border: 1px solid #172629 !important; border-radius: 12px !important; background: #142124 !important; color: #f2f8f7 !important; box-shadow: 0 8px 20px rgba(8, 28, 31, .13); }
+.arrival-directions span { color: #55cad2 !important; }
+.arrival-directions>span { position: relative; display: inline-block; width: 14px; height: 14px; overflow: hidden; font-size: 0 !important; }
+.arrival-directions>span::before,.film-caption a::after { content: ""; display: inline-block; width: 7px; height: 7px; border-top: 1.5px solid currentColor; border-right: 1.5px solid currentColor; }
+.arrival-directions>span::after { content: ""; position: absolute; left: 2px; bottom: 3px; width: 10px; height: 1.5px; background: currentColor; transform: rotate(-45deg); transform-origin: left center; }
+.arrival-directions:hover { background: #1c3336 !important; border-color: #36b9c5 !important; color: #fff !important; transform: translateY(-2px); }
+.footer-brand .brand-art { width: clamp(250px, 25vw, 320px) !important; height: 78px !important; }
+
+.assistant-launcher { position: fixed !important; display: grid !important; place-items: center !important; width: 72px !important; height: 72px !important; min-width: 72px !important; padding: 9px !important; border-radius: 50% !important; background: linear-gradient(145deg, rgba(17,40,43,.98), rgba(8,20,23,.98)) !important; border: 1px solid rgba(91,211,216,.6) !important; box-shadow: 0 12px 32px rgba(0,0,0,.34), 0 0 0 5px rgba(67,194,203,.08), inset 0 1px rgba(255,255,255,.12) !important; backdrop-filter: blur(14px); }
+.assistant-launcher:hover { transform: translateY(-3px) scale(1.025); box-shadow: 0 16px 38px rgba(0,0,0,.4), 0 0 0 6px rgba(67,194,203,.1), inset 0 1px rgba(255,255,255,.15) !important; }
+.assistant-launcher-avatar { width: 48px !important; height: 48px !important; border-radius: 50% !important; }
+.assistant-launcher-copy,.assistant-launcher-arrow { display: none !important; }
+.assistant-launcher::before { content: "Asistente MOTORLOZ"; position: absolute; right: calc(100% + 12px); top: 50%; transform: translate(5px,-50%); width: max-content; padding: 10px 13px; border: 1px solid rgba(91,211,216,.25); border-radius: 10px; background: rgba(12,25,28,.96); color: #f2f8f7; font-size: 11px; font-weight: 650; letter-spacing: .01em; opacity: 0; pointer-events: none; box-shadow: 0 8px 24px rgba(0,0,0,.22); transition: opacity .18s ease, transform .18s ease; }
+.assistant-launcher:hover::before,.assistant-launcher:focus-visible::before { opacity: 1; transform: translate(0,-50%); }
+
+.hero h1 { max-width: 7.4ch; font-size: clamp(82px, 9.4vw, 142px) !important; line-height: .91 !important; letter-spacing: -.075em !important; text-wrap: balance; }
+.hero h1 em { color: #46bdca !important; font-style: normal; }
+.hero-copy .eyebrow { letter-spacing: .16em; }
+.hero-description { max-width: 34ch; color: rgba(235,244,243,.82); }
+.hero .button.light { border: 1px solid rgba(255,255,255,.38); border-radius: 999px; background: rgba(248,251,249,.95); color: #132024; box-shadow: 0 12px 32px rgba(0,0,0,.16); }
+.hero .button.light:hover { background: #fff; transform: translateY(-2px); }
+.intro-feature-copy h2 em, .location-top h2 em { color: #152023 !important; font-style: normal; }
+#diagnostic-story-title em, #reference-bridge-title em { color: #39b9c8 !important; font-style: normal; }
+.diagnostic-story-copy .button.outline { background: #35b8c7 !important; border-color: #35b8c7 !important; color: #08272d !important; box-shadow: 0 9px 22px rgba(18,166,180,.19); }
+.diagnostic-story-copy .button.outline:hover { background: #54c9d4 !important; border-color: #54c9d4 !important; }
+.films-grid .film-card { overflow: hidden; border: 1px solid rgba(131, 190, 192, .19); border-radius: 17px; background: linear-gradient(145deg,#132124,#0d1416); box-shadow: 0 18px 42px rgba(0,0,0,.2); }
+.films-grid .film-card .film-caption { gap: 7px !important; padding: 18px 20px 20px !important; }
+.films-grid .film-card .film-caption small { display: flex; align-items: center; gap: 9px; }
+.films-grid .film-card .film-caption small::before { content: ""; width: 16px; height: 1px; background: #45c4cd; }
+.films-grid .film-card .film-caption strong { font-size: clamp(19px, 2.2vw, 27px) !important; letter-spacing: -.035em; }
+.films-grid .film-card .film-caption a { color: #d4e7e7 !important; }
+.films-grid .film-card .film-caption a::after { position: relative; margin: 0 0 2px 7px; transform: translateY(1px); }
+.films-grid .film-card .film-caption a:hover { color: #72d5db !important; }
+
+@media (max-width: 760px) {
+  .why-card .why-number { min-width: 38px; font-size: 30px !important; }
+  .why-card { min-height: 112px; }
+  .service-title-row { gap: 10px; }
+  .service-icon { flex-basis: 37px; width: 37px; height: 37px; border-radius: 11px; }
+  .service-icon svg { width: 21px; height: 21px; }
+  .footer-brand .brand-art { width: clamp(220px, 64vw, 270px) !important; height: 70px !important; }
+  .instagram-stories { grid-template-columns: 42px minmax(0,1fr) !important; min-height: 0; gap: 13px !important; padding: 16px !important; }
+  .instagram-stories .instagram-mark { width: 40px; height: 40px; border-radius: 12px; }
+  .instagram-stories strong { font-size: 12px; }
+  .instagram-stories p { font-size: 10px !important; }
+}
+
+@media (max-width: 600px) {
+  .assistant-launcher { width: 62px !important; height: 62px !important; min-width: 62px !important; right: 13px !important; bottom: calc(15px + env(safe-area-inset-bottom,0px) + 60px) !important; }
+  .assistant-launcher-avatar { width: 42px !important; height: 42px !important; }
+  .films-grid .film-card { border-radius: 13px; }
+  .films-grid .film-card .film-caption { padding: 13px 14px 15px !important; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .arrival-directions, .hero .button.light { transition: transform .22s ease, background .22s ease, border-color .22s ease, color .22s ease; }
+}
