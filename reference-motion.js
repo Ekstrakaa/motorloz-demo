@@ -133,7 +133,7 @@
       trace.removeTimer = setTimeout(() => {
         trace.element.remove();
         traces.delete(key);
-      }, 520);
+      }, 1050);
     }
 
     const clearTraces = () => {
@@ -184,7 +184,7 @@
           trace.element.style.left = `${left}px`;
           trace.element.style.top = `${rowTop}px`;
           trace.element.classList.add('is-active');
-          trace.releaseTimer = setTimeout(() => fadeTrace(key, trace), 180);
+          trace.releaseTimer = setTimeout(() => fadeTrace(key, trace), 420);
         }
         frame = 0;
       });
