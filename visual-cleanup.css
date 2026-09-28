@@ -269,6 +269,13 @@
   padding-bottom:clamp(54px,7vw,88px)!important;
 }
 .reference-bridge-card{
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  height:auto!important;
+  block-size:auto!important;
+  width:100%!important;
   transform:none!important;
   margin:0 auto!important;
   min-height:0!important;
@@ -310,4 +317,74 @@
 }
 @media(prefers-reduced-motion:reduce){
   .reference-bridge-card,.reference-bridge-card .button.primary{animation:none!important;transition:none!important}
+}
+
+/* Aurora viva también en los otros planos oscuros; el contenido queda por encima del canvas. */
+.contact-bridge{
+  position:relative!important;isolation:isolate;overflow:hidden!important;
+  background:#0b1112!important;color:#f2f7f6!important;
+}
+.contact-bridge:before{content:none!important;animation:none!important}
+.contact-bridge>*{position:relative!important;z-index:1!important}
+.contact-bridge .eyebrow{color:#8bd7dc!important}
+.contact-bridge h2{color:#f2f7f6!important}
+.contact-bridge>p{color:#c4d1d0!important}
+.contact-bridge-actions>a:last-child{color:#c4d1d0!important}
+.hero>.motorloz-aurora-canvas{z-index:2!important;opacity:.58!important}
+
+/* Galería de clientes: dos carriles continuos, fotos parejas y movimiento en sentidos opuestos. */
+.customer-gallery{
+  --gallery-card-size:clamp(172px,16vw,224px);
+  margin-top:clamp(40px,5.5vw,72px);
+  padding-top:clamp(24px,3vw,36px);
+  border-top:1px solid rgba(28,53,56,.16);
+  overflow:hidden;
+}
+.customer-gallery-heading{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(180px,.7fr) auto;
+  align-items:end;
+  gap:24px;
+  max-width:1100px;
+  margin:0 auto 22px;
+}
+.customer-gallery-heading .eyebrow{margin:0 0 8px;color:#138a97;font:650 9px var(--mono);letter-spacing:.13em}
+.customer-gallery-heading h3{margin:0;color:#152326;font:700 clamp(25px,3vw,39px)/1.08 var(--body);letter-spacing:-.045em}
+.customer-gallery-heading>p{max-width:34ch;margin:0 0 2px;color:#627174;font-size:12px;line-height:1.6}
+.customer-gallery-toggle{
+  min-height:34px;padding:0 12px;border:1px solid rgba(21,55,59,.22);border-radius:999px;
+  background:transparent;color:#345356;font:600 9px var(--body);cursor:pointer;
+  transition:background .2s,color .2s,border-color .2s;
+}
+.customer-gallery-toggle:hover,.customer-gallery-toggle:focus-visible{border-color:#209ba6;background:rgba(37,166,177,.08);color:#116f79}
+.customer-gallery-lane{width:100%;overflow:hidden}
+.customer-gallery-lane+.customer-gallery-lane{margin-top:14px}
+.customer-gallery-track{display:flex;width:max-content;will-change:transform;animation:customer-gallery-forward 54s linear infinite}
+.customer-gallery-reverse .customer-gallery-track{animation-name:customer-gallery-reverse;animation-duration:61s}
+.customer-gallery-group{display:flex;flex:none;gap:16px;padding-right:16px}
+.customer-gallery-photo{
+  flex:0 0 var(--gallery-card-size);width:var(--gallery-card-size);aspect-ratio:1;margin:0;
+  overflow:hidden;border-radius:11px;background:#dce3e0;
+}
+.customer-gallery-photo img{display:block;width:100%;height:100%;object-fit:cover;object-position:center}
+.customer-gallery.is-paused .customer-gallery-track,.customer-gallery:hover .customer-gallery-track,
+.customer-gallery:focus-within .customer-gallery-track{animation-play-state:paused}
+@keyframes customer-gallery-forward{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes customer-gallery-reverse{from{transform:translateX(-50%)}to{transform:translateX(0)}}
+@media(max-width:760px){
+  .customer-gallery{--gallery-card-size:168px;margin-top:32px;padding-top:22px}
+  .customer-gallery-heading{grid-template-columns:minmax(0,1fr) auto;gap:12px;margin-bottom:16px}
+  .customer-gallery-heading h3{font-size:25px}
+  .customer-gallery-heading>p{grid-column:1/-1;grid-row:2;margin:0;font-size:11px}
+  .customer-gallery-toggle{grid-column:2;grid-row:1}
+  .customer-gallery-lane+.customer-gallery-lane{margin-top:10px}
+  .customer-gallery-group{gap:10px;padding-right:10px}
+  .customer-gallery-photo{border-radius:9px}
+}
+@media(max-width:380px){.customer-gallery{--gallery-card-size:150px}.customer-gallery-toggle{padding-inline:9px;font-size:8px}}
+@media(prefers-reduced-motion:reduce){
+  .customer-gallery-lane{overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .customer-gallery-lane::-webkit-scrollbar{display:none}
+  .customer-gallery-track{animation:none!important;will-change:auto}
+  .customer-gallery-toggle{display:none}
 }
