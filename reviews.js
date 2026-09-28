@@ -15,14 +15,12 @@
   const root = document.querySelector('#review-carousel');
   const track = document.querySelector('#review-track');
   const windowElement = root.querySelector('.review-window');
-  const pauseButton = document.querySelector('#review-pause');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   let paused = reduced.matches;
   let visible = false;
   let offset = 0;
   let loopWidth = 0;
   let lastFrame = performance.now();
-  let nudging = false;
 
   function card(review, duplicate = false) {
     const article = document.createElement('article');
@@ -93,7 +91,7 @@
   function tick(now) {
     const elapsed = Math.min(now - lastFrame, 64);
     lastFrame = now;
-    if (visible && !paused && !document.hidden && !nudging && loopWidth) {
+    if (visible && !paused && !document.hidden && loopWidth) {
       const speed = innerWidth <= 760 ? 44 : 52;
       offset += elapsed * speed / 1000;
       normalize();
@@ -102,49 +100,15 @@
     requestAnimationFrame(tick);
   }
 
-  function nudge(direction) {
-    if (nudging) return;
-    const first = track.children[0];
-    const gap = parseFloat(getComputedStyle(track).columnGap || getComputedStyle(track).gap) || 16;
-    const step = first.getBoundingClientRect().width + gap;
-    if (direction < 0 && offset < step) offset += loopWidth;
-    const start = offset;
-    const target = start + direction * step;
-    const began = performance.now();
-    nudging = true;
-    function animate(now) {
-      const progress = Math.min((now - began) / 520, 1);
-      const eased = 1 - Math.pow(1 - progress, 3);
-      offset = start + (target - start) * eased;
-      paint();
-      if (progress < 1) requestAnimationFrame(animate);
-      else {
-        normalize();
-        paint();
-        nudging = false;
-      }
-    }
-    requestAnimationFrame(animate);
-  }
-
-  function updatePauseLabel() {
-    pauseButton.textContent = paused ? 'Reanudar' : 'Pausar';
-    pauseButton.setAttribute('aria-pressed', String(paused));
-  }
-
-  pauseButton.addEventListener('click', () => {
-    paused = !paused;
-    updatePauseLabel();
+  root.addEventListener('focusin', () => { paused = true; });
+  root.addEventListener('focusout', event => {
+    if (!root.contains(event.relatedTarget)) paused = reduced.matches;
   });
-  document.querySelector('#review-next').addEventListener('click', () => nudge(1));
-  document.querySelector('#review-prev').addEventListener('click', () => nudge(-1));
+  root.addEventListener('mouseenter', () => { paused = true; });
+  root.addEventListener('mouseleave', () => { paused = reduced.matches; });
   new ResizeObserver(measure).observe(windowElement);
   new IntersectionObserver(entries => { visible = entries[0].isIntersecting; }, { threshold: .15 }).observe(root);
-  reduced.addEventListener('change', () => {
-    paused = reduced.matches;
-    updatePauseLabel();
-  });
-  updatePauseLabel();
+  reduced.addEventListener('change', () => { paused = reduced.matches; });
   measure();
   requestAnimationFrame(tick);
 })();

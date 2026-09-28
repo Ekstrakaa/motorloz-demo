@@ -141,3 +141,68 @@
 @media (prefers-reduced-motion: no-preference) {
   .arrival-directions, .hero .button.light { transition: transform .22s ease, background .22s ease, border-color .22s ease, color .22s ease; }
 }
+
+/* Round two: a quieter horizontal workshop texture that clears behind copy. */
+.intro,.services,.reviews,.location,.subaru-section,.hyundai-section,.reference-bridge,.contact-bridge,.customer-gallery {
+  background-color:#f2f3f0!important;
+  background-image:
+    radial-gradient(ellipse 76% 66% at 50% 45%,rgba(244,246,243,.94) 0%,rgba(244,246,243,.78) 48%,rgba(244,246,243,.16) 100%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='360' height='92' viewBox='0 0 360 92'%3E%3Cg fill='%23ffffff' fill-opacity='.025' stroke='%239baead' stroke-opacity='.075' stroke-width='1'%3E%3Crect x='4' y='5' width='170' height='35' rx='10'/%3E%3Crect x='184' y='5' width='172' height='35' rx='10'/%3E%3Crect x='-86' y='51' width='170' height='35' rx='10'/%3E%3Crect x='94' y='51' width='172' height='35' rx='10'/%3E%3Crect x='274' y='51' width='172' height='35' rx='10'/%3E%3C/g%3E%3C/svg%3E"),
+    radial-gradient(ellipse at 8% 0%,rgba(72,167,172,.045),transparent 34%),
+    linear-gradient(145deg,#f5f6f3,#eef1ef 100%)!important;
+  background-size:cover,360px 92px,cover,cover!important;
+  background-position:center center,var(--tile-x,0px) 0px,center center,center center!important;
+  background-repeat:no-repeat,repeat,no-repeat,no-repeat!important;
+  transition:background-position .45s ease,background-size .45s ease!important;
+}
+.intro.is-surface-pressed,.services.is-surface-pressed,.reviews.is-surface-pressed,.location.is-surface-pressed,
+.subaru-section.is-surface-pressed,.hyundai-section.is-surface-pressed,.reference-bridge.is-surface-pressed,
+.contact-bridge.is-surface-pressed,.customer-gallery.is-surface-pressed { background-size:cover,372px 96px,cover,cover!important; }
+
+/* The review rail keeps moving on its own; its thin divider and manual controls add clutter. */
+.google-review-bar { border-bottom:0!important; }
+.review-controls { display:none!important; }
+
+/* Restore the brand colors and give the map column a finished, even surface. */
+.location-top h2 em,.contact-bridge-card h2 em { color:#36b9c8!important; font-style:normal!important; }
+.location .arrival-grid { align-items:stretch!important; }
+.location .map-panel {
+  min-height:clamp(360px,33vw,460px)!important;
+  background-color:#dbe5e1!important;
+  background-image:
+    linear-gradient(32deg,transparent 44%,rgba(255,255,255,.8) 44.5%,rgba(255,255,255,.8) 47%,transparent 47.5%),
+    linear-gradient(118deg,transparent 65%,rgba(255,255,255,.72) 65.5%,rgba(255,255,255,.72) 68%,transparent 68.5%),
+    linear-gradient(86deg,transparent 20%,rgba(255,255,255,.58) 20.5%,rgba(255,255,255,.58) 22%,transparent 22.5%),
+    radial-gradient(ellipse at 18% 85%,rgba(75,162,137,.2),transparent 22%),
+    linear-gradient(145deg,#e8eeea,#cfded9)!important;
+}
+.location .map-panel iframe { opacity:.16!important; transition:opacity .28s ease; }
+.location .map-panel:hover iframe,.location .map-panel:focus-within iframe { opacity:.94!important; }
+.location .map-panel::before { content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(90deg,transparent 49.8%,rgba(71,145,133,.55) 50%,transparent 50.3%),linear-gradient(0deg,transparent 55%,rgba(71,145,133,.4) 55.3%,transparent 55.7%);opacity:.62; }
+.location .map-address,.location .map-focus { z-index:2!important; }
+.location .map-address { bottom:14px!important; }
+.location .arrival-photos { align-self:stretch; }
+.location .arrival-slide-figure { margin:0; }
+.location .arrival-story .slide-stage { aspect-ratio:1.28!important; }
+.location .arrival-directions { margin-top:12px; }
+.location .arrival-grid,.location .map-footer { width:min(100%,1440px);margin-inline:auto; }
+.hyundai-section { display:block!important;min-height:0!important;padding-block:clamp(64px,7vw,112px)!important; }
+.hyundai-inner { display:grid;grid-template-columns:minmax(0,1.04fr) minmax(0,.96fr);align-items:center;gap:clamp(36px,6vw,92px);width:min(100%,1380px);margin-inline:auto; }
+.hyundai-image { width:100%;height:auto!important;min-height:0!important;aspect-ratio:1.26;overflow:hidden;border:0!important;outline:0!important;box-shadow:none!important;background:transparent!important; }
+.hyundai-image img { display:block;width:100%;height:100%!important;min-height:0!important;aspect-ratio:1.26;object-fit:cover;object-position:center 48%;border:0!important;outline:0!important;box-shadow:none!important;clip-path:inset(2px 4px 2px 0)!important;transform:none!important; }
+.hyundai-copy { max-width:590px; }
+
+@media(max-width:760px) {
+  .location .map-panel { min-height:340px!important; }
+  .location .arrival-story .slide-stage { aspect-ratio:1.25!important; }
+}
+@media(max-width:900px) {
+  .hyundai-section { padding-block:42px!important; }
+  .hyundai-inner { grid-template-columns:minmax(0,1fr);gap:24px;width:100%; }
+  .hyundai-image { aspect-ratio:1.45;width:100%; }
+  .hyundai-image img { aspect-ratio:1.45;object-position:center 44%; }
+  .hyundai-copy { max-width:680px; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .location .map-panel iframe { transition:none!important; }
+}
