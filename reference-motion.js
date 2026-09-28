@@ -14,30 +14,27 @@
     if (!width || !height) return;
     ctx.clearRect(0, 0, width, height);
     const t = time * (reduced.matches ? .52 : 1);
-    const span = Math.max(width, height) * 1.34;
+    const span = Math.max(width, height) * .72;
     const fields = [
-      { color: '15,91,104', alpha: .3, x: .25 + .3 * Math.sin(t * .19), y: .37 + .28 * Math.cos(t * .16), sx: 1.8, sy: .8, turn: .18 },
-      { color: '22,139,151', alpha: .25, x: .72 + .3 * Math.cos(t * .17 + 1.7), y: .54 + .27 * Math.sin(t * .2 + 1.7), sx: 1.62, sy: .94, turn: -.23 },
-      { color: '13,72,88', alpha: .31, x: .46 + .28 * Math.sin(t * .13 + 3.1), y: .74 + .23 * Math.cos(t * .19 + 2.4), sx: 1.95, sy: .72, turn: .12 },
-      { color: '37,163,171', alpha: .2, x: .53 + .3 * Math.cos(t * .16 + 4.2), y: .28 + .22 * Math.sin(t * .18 + 3.8), sx: 1.48, sy: .82, turn: -.16 },
-      { color: '9,105,119', alpha: .22, x: .12 + .25 * Math.sin(t * .22 + 1.4), y: .62 + .23 * Math.cos(t * .14 + .6), sx: 1.72, sy: .88, turn: .28 },
-      { color: '26,119,133', alpha: .24, x: .9 + .24 * Math.cos(t * .18 + 2.7), y: .33 + .26 * Math.sin(t * .15 + 2.9), sx: 1.7, sy: .78, turn: -.2 }
+      { color: '15,79,86', alpha: .14, x: .23 + .24 * Math.sin(t * .18), y: .31 + .2 * Math.cos(t * .15), sx: 1.25, sy: .72, turn: .18 },
+      { color: '20,105,112', alpha: .12, x: .77 + .24 * Math.cos(t * .16 + 1.7), y: .64 + .22 * Math.sin(t * .18 + 1.7), sx: 1.34, sy: .82, turn: -.2 },
+      { color: '13,59,72', alpha: .1, x: .48 + .23 * Math.sin(t * .14 + 3.1), y: .48 + .2 * Math.cos(t * .16 + 2.4), sx: 1.18, sy: .66, turn: .14 }
     ];
     fields.forEach((field, index) => {
       const x = width * field.x;
       const y = height * field.y;
-      const pulse = .76 + .24 * Math.sin(t * .28 + index * 1.17);
-      const radius = span / field.sx * (.9 + .13 * pulse);
+      const pulse = .84 + .16 * Math.sin(t * .32 + index * 1.17);
+      const radius = span / field.sx * (.96 + .06 * pulse);
       const alpha = field.alpha * pulse * (reduced.matches ? .62 : 1);
       ctx.save();
       ctx.translate(x, y);
       ctx.rotate(field.turn * Math.sin(t * .12 + index));
       ctx.scale(field.sx, field.sy);
       const glow = ctx.createRadialGradient(0, 0, 0, 0, 0, radius);
-      glow.addColorStop(0, `rgba(${field.color},${alpha})`);
-      glow.addColorStop(.24, `rgba(${field.color},${alpha * .88})`);
-      glow.addColorStop(.58, `rgba(${field.color},${alpha * .42})`);
-      glow.addColorStop(.82, `rgba(${field.color},${alpha * .1})`);
+      glow.addColorStop(0, `rgba(${field.color},${alpha * .72})`);
+      glow.addColorStop(.24, `rgba(${field.color},${alpha * .54})`);
+      glow.addColorStop(.58, `rgba(${field.color},${alpha * .22})`);
+      glow.addColorStop(.82, `rgba(${field.color},${alpha * .04})`);
       glow.addColorStop(1, `rgba(${field.color},0)`);
       ctx.fillStyle = glow;
       ctx.fillRect(-radius, -radius, radius * 2, radius * 2);

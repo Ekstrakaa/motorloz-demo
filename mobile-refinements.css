@@ -594,7 +594,7 @@ main>.section.why-motorloz:after,main>.section.diagnostic-story:after,main>.sect
 }
 .motorloz-aurora-canvas{
   position:absolute!important;z-index:0!important;inset:0!important;display:block!important;
-  width:100%!important;height:100%!important;pointer-events:none!important;opacity:.94!important;
+  width:100%!important;height:100%!important;pointer-events:none!important;opacity:.62!important;
   mix-blend-mode:screen!important;
 }
 main>.section.workshop>*,main>.section.people>*,main>.section.films-section>*,
@@ -604,4 +604,4 @@ main>.section.appointment:before{content:none!important}
 .reference-bridge-card{position:relative!important;isolation:isolate;overflow:hidden!important}
 .reference-bridge-card:before{animation:none!important}
 .reference-bridge-card>*{position:relative;z-index:1}
-@media(prefers-reduced-motion:reduce){.motorloz-aurora-canvas{opacity:.72!important}}
+@media(prefers-reduced-motion:reduce){.motorloz-aurora-canvas{opacity:.5!important}}

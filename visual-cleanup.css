@@ -198,3 +198,65 @@
   .films-grid .film-card>video{animation:none!important}
   .google-place-card,.google-place-card:hover{transition:none!important}
 }
+
+/* Clips verticales: una pieza protagonista por pantalla, con texto legible y sin marcos añadidos. */
+@media(max-width:760px){
+  .films-grid{
+    display:grid!important;
+    grid-auto-flow:column!important;
+    grid-auto-columns:min(78vw,340px)!important;
+    grid-template-columns:none!important;
+    justify-content:start!important;
+    gap:18px!important;
+    width:calc(100% + var(--pad))!important;
+    max-width:none!important;
+    margin:0 calc(var(--pad) * -1) 0 0!important;
+    padding:0 var(--pad) 8px 0!important;
+    overflow-x:auto!important;
+    overscroll-behavior-inline:contain;
+    scroll-snap-type:x mandatory;
+    scrollbar-width:none;
+    -webkit-overflow-scrolling:touch;
+  }
+  .films-grid::-webkit-scrollbar{display:none}
+  .films-grid .film-card{width:100%!important;scroll-snap-align:start;scroll-snap-stop:always}
+  .films-grid .film-card>video,.films-grid .film-card>img{
+    aspect-ratio:9/16!important;
+    border-radius:12px!important;
+    object-position:center!important;
+  }
+  .films-grid .film-card .film-caption{padding:12px 2px 0!important;gap:6px!important}
+  .films-grid .film-card .film-caption small{font-size:9px!important;letter-spacing:.13em!important}
+  .films-grid .film-card .film-caption strong{font-size:clamp(18px,5vw,21px)!important;line-height:1.15!important}
+  .films-grid .film-card .film-caption a{font-size:11px!important;line-height:1.45!important}
+
+  .films-social{
+    width:100%!important;
+    max-width:460px!important;
+    margin:20px auto 0!important;
+    padding:18px 0 0!important;
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:7px!important;
+    text-align:center!important;
+  }
+  .films-social .instagram-mark{margin:0 auto 2px!important}
+  .films-social>div{justify-items:center!important;gap:4px!important}
+  .films-social b,.films-social small,.films-social>a{width:100%;text-align:center!important}
+  .films-social>a{margin:3px auto 0!important}
+
+  .why-number{
+    width:2.2ch!important;
+    color:rgba(126,190,194,.82)!important;
+    font:500 17px/1 var(--mono)!important;
+    letter-spacing:-.04em!important;
+    text-align:left!important;
+    font-variant-numeric:tabular-nums;
+  }
+}
+@media(max-width:390px){
+  .films-grid{grid-auto-columns:min(80vw,320px)!important;gap:14px!important}
+  .why-number{font-size:16px!important}
+}
