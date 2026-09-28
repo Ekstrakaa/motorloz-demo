@@ -114,20 +114,29 @@
   const subaruPhotos = [...document.querySelectorAll('.subaru-photo')];
   const targets = [...principles, ...subaruPhotos];
 
-  // En superficies claras, una luz tenue sigue el cursor para dar profundidad a la cuadrícula.
-  if (matchMedia('(hover: hover) and (pointer: fine)').matches && !reduced.matches) {
-    const lightSurfaces = document.querySelectorAll('.intro,.services,.reviews,.location,.subaru-section,.hyundai-section,.appointment');
+  // En superficies claras, los bloques siguen suavemente al cursor o al toque.
+  if (!reduced.matches) {
+    const lightSurfaces = document.querySelectorAll('.intro,.services,.reviews,.location,.subaru-section,.hyundai-section,.reference-bridge,.contact-bridge,.customer-gallery');
     lightSurfaces.forEach(surface => {
       let frame = 0;
       surface.addEventListener('pointermove', event => {
         if (frame) cancelAnimationFrame(frame);
         frame = requestAnimationFrame(() => {
           const rect = surface.getBoundingClientRect();
-          surface.style.setProperty('--surface-x', `${event.clientX - rect.left}px`);
-          surface.style.setProperty('--surface-y', `${event.clientY - rect.top}px`);
+          const x = event.clientX - rect.left;
+          const y = event.clientY - rect.top;
+          surface.style.setProperty('--surface-x', `${x}px`);
+          surface.style.setProperty('--surface-y', `${y}px`);
+          surface.style.setProperty('--tile-x', `${Math.round((.5 - x / rect.width) * 10)}px`);
+          surface.style.setProperty('--tile-y', `${Math.round((.5 - y / rect.height) * 10)}px`);
           frame = 0;
         });
       }, { passive: true });
+      surface.addEventListener('pointerdown', () => surface.classList.add('is-surface-pressed'), { passive: true });
+      const release = () => surface.classList.remove('is-surface-pressed');
+      surface.addEventListener('pointerup', release, { passive: true });
+      surface.addEventListener('pointercancel', release, { passive: true });
+      surface.addEventListener('pointerleave', release, { passive: true });
     });
   }
 

@@ -1,9 +1,15 @@
 'use strict';
 (() => {
+  const seenNames = new Set();
   const reviews = window.MOTORLOZ.reviews.filter(review =>
     review.name && review.text && review.rating === 5 &&
     /^https:\/\/(www\.)?(google\.com|maps\.app\.goo\.gl)\//.test(review.url)
-  );
+  ).filter(review => {
+    const key = review.name.trim().toLocaleLowerCase('es');
+    if (seenNames.has(key)) return false;
+    seenNames.add(key);
+    return true;
+  });
   if (!reviews.length) return;
 
   const root = document.querySelector('#review-carousel');

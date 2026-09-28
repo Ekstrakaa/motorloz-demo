@@ -529,3 +529,61 @@
 .diagnostic-films-aurora>.diagnostic-story,.diagnostic-films-aurora>.films-section{position:relative!important;isolation:initial!important;overflow:visible!important;background:transparent!important;color:#f2f7f6!important;border-top:0!important}
 .diagnostic-films-aurora>.diagnostic-story:before,.diagnostic-films-aurora>.diagnostic-story:after,.diagnostic-films-aurora>.films-section:before,.diagnostic-films-aurora>.films-section:after{content:none!important;display:none!important;animation:none!important}
 .diagnostic-films-aurora>.diagnostic-story>*,.diagnostic-films-aurora>.films-section>*{position:relative;z-index:1}
+
+/* Reseñas a todo el ancho, con una transición compacta hacia la galería. */
+.reviews.section{padding-bottom:clamp(24px,3vw,42px)!important}
+#review-carousel{position:relative!important;left:50%!important;width:100vw!important;max-width:100vw!important;margin:clamp(28px,4vw,48px) 0 0 -50vw!important}
+.google-review-bar{padding:20px 4.5vw!important;margin:0 0 16px!important;border-bottom:1px solid rgba(28,53,56,.16)!important}
+.google-review-bar>div:first-child{gap:14px!important}
+.google-review-bar .review-section-title{display:grid!important;gap:7px!important}
+.review-section-title>span{color:#607174!important;font:650 9px var(--mono)!important;letter-spacing:.14em!important}
+.review-section-title>strong{color:#152326!important;font-size:clamp(17px,1.5vw,21px)!important}
+.review-controls{display:flex!important;gap:8px!important}
+.review-controls button{min-width:38px!important;min-height:38px!important;border-radius:50%!important}
+.review-window{padding:3px 4.5vw 14px!important;overflow:hidden!important}
+.review-window #review-track{gap:14px!important}
+.google-review-card{flex-basis:clamp(245px,13.5vw,390px)!important;min-height:176px!important;padding:16px!important;border-radius:12px!important;box-shadow:0 8px 24px rgba(25,49,53,.07)!important}
+.google-review-card .gold-stars{margin:17px 0 11px!important}
+.google-review-card blockquote{font-size:14px!important;line-height:1.45!important;margin-bottom:18px!important}
+.customer-gallery{margin-top:0!important;padding-top:clamp(14px,1.8vw,22px)!important;border-top:0!important}
+@media(max-width:760px){
+  #review-carousel{margin-top:22px!important}
+  .google-review-bar{padding:15px 16px!important;margin-bottom:10px!important;gap:10px!important}
+  .google-review-bar .review-controls{width:auto!important;margin:0 0 0 auto!important}
+  .review-controls button{min-width:34px!important;min-height:34px!important}
+  .review-window{padding:3px 16px 12px!important}
+  .review-window #review-track{gap:10px!important}
+  .google-review-card{flex-basis:min(72vw,270px)!important;min-height:168px!important;padding:14px!important}
+  .google-review-card blockquote{font-size:13px!important}
+  .reviews.section{padding-bottom:20px!important}
+  .customer-gallery{padding-top:12px!important}
+}
+
+/* Motivo de bloques en relieve para las superficies claras; el fondo oscuro queda intacto. */
+.intro,.services,.reviews,.location,.subaru-section,.hyundai-section,.reference-bridge,.contact-bridge,.customer-gallery{
+  --surface-x:50%;--surface-y:50%;--tile-x:0px;--tile-y:0px;
+  background-image:
+    radial-gradient(340px circle at var(--surface-x) var(--surface-y),rgba(37,174,187,.10),transparent 72%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='360' height='280' viewBox='0 0 360 280'%3E%3Cg fill='%23dce5e2' fill-opacity='.12' stroke='%239baead' stroke-opacity='.14' stroke-width='1'%3E%3Crect x='8' y='8' width='76' height='116' rx='13'/%3E%3Crect x='96' y='8' width='82' height='116' rx='13'/%3E%3Crect x='190' y='8' width='78' height='116' rx='13'/%3E%3Crect x='280' y='8' width='72' height='116' rx='13'/%3E%3Crect x='-34' y='156' width='62' height='116' rx='13'/%3E%3Crect x='40' y='156' width='80' height='116' rx='13'/%3E%3Crect x='132' y='156' width='76' height='116' rx='13'/%3E%3Crect x='220' y='156' width='84' height='116' rx='13'/%3E%3Crect x='316' y='156' width='76' height='116' rx='13'/%3E%3C/g%3E%3C/svg%3E"),
+    radial-gradient(ellipse at 8% 0%,rgba(72,167,172,.075),transparent 34%),
+    radial-gradient(ellipse at 100% 100%,rgba(85,129,130,.055),transparent 31%),
+    linear-gradient(145deg,#f5f6f3,#eef1ef 100%)!important;
+  background-size:340px 340px,360px 280px,cover,cover,cover!important;
+  background-position:center,var(--tile-x) var(--tile-y),center,center,center!important;
+  background-repeat:no-repeat,repeat,no-repeat,no-repeat,no-repeat!important;
+  transition:background-position .35s ease,background-size .35s ease;
+}
+.intro.is-surface-pressed,.services.is-surface-pressed,.reviews.is-surface-pressed,.location.is-surface-pressed,
+.subaru-section.is-surface-pressed,.hyundai-section.is-surface-pressed,.reference-bridge.is-surface-pressed,
+.contact-bridge.is-surface-pressed,.customer-gallery.is-surface-pressed{background-size:420px 420px,366px 286px,cover,cover,cover!important}
+.services .service-card,.reviews .google-review-card,.customer-gallery-photo,.location .google-place-card,.intro-story .slide-stage{
+  transition:transform .28s cubic-bezier(.2,.75,.25,1),box-shadow .28s ease!important
+}
+.services .service-card:hover,.reviews .google-review-card:hover,.customer-gallery-photo:hover,.location .google-place-card:hover,.intro-story .slide-stage:hover{
+  transform:translateY(-4px)!important;box-shadow:0 16px 32px rgba(18,46,51,.13)!important
+}
+.services .service-card:active,.reviews .google-review-card:active,.customer-gallery-photo:active,.location .google-place-card:active,.intro-story .slide-stage:active{transform:scale(.985)!important}
+@media(prefers-reduced-motion:reduce){
+  .intro,.services,.reviews,.location,.subaru-section,.hyundai-section,.reference-bridge,.contact-bridge,.customer-gallery,
+  .services .service-card,.reviews .google-review-card,.customer-gallery-photo,.location .google-place-card,.intro-story .slide-stage{transition:none!important}
+}
