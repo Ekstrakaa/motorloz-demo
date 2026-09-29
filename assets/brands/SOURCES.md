@@ -24,7 +24,7 @@ Imágenes originales de las marcas o copias fieles de ellas. Se guardan localmen
 | Alfa Romeo | https://fr.wikipedia.org/wiki/Fichier:Logo_Alfa_Romeo_(2015).svg |
 | Renault | https://commons.wikimedia.org/wiki/Special:FilePath/Renault_2021_Text.svg |
 | Citroën | https://www.citroen.com/content/dam/citroen/master/b2c/home/logo/logo858x558.PNG |
-| Dodge | https://www.dodge.com/content/dam/fca-brands/na/dodge/en_us/global/header/logo-dodge.png |
+| Dodge | https://commons.wikimedia.org/wiki/File:Dodge_black_logo.svg (original de Dodge según sus guías de marca) |
 | Ford | https://commons.wikimedia.org/wiki/Special:FilePath/Ford_logo.svg |
 | Jeep | https://commons.wikimedia.org/wiki/Special:FilePath/Jeepnewlogo.svg |
 | Fiat | https://commons.wikimedia.org/wiki/Special:FilePath/FIAT_logo_%282020%29.svg |

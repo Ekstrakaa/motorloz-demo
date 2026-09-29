@@ -18,7 +18,7 @@
 /* These are the actual supplied brand marks, including both copies of the moving row. */
 .brand-wordmark img[src$="/alfa-romeo-2015.png"] { width:auto!important;max-width:62px!important;height:62px!important; }
 .brand-wordmark img[src$="/citroen-official.png"] { width:auto!important;max-width:94px!important;height:62px!important; }
-.brand-wordmark img[src$="/dodge-official.png"] { width:auto!important;max-width:132px!important;height:40px!important; }
+.brand-wordmark img[src$="/dodge-black.png"] { width:auto!important;max-width:132px!important;height:40px!important; }
 .brand-wordmark img[src$="/ferrari-emblem.png"] { width:auto!important;max-width:52px!important;height:68px!important; }
 .brand-wordmark img[src$="/porsche-official.png"] { width:auto!important;max-width:58px!important;height:68px!important; }
 @media(max-width:760px) {
@@ -32,7 +32,7 @@
   .brand-wordmark[aria-label="Volvo"] img { max-width:105px!important;height:31px!important; }
   .brand-wordmark img[src$="/alfa-romeo-2015.png"] { max-width:52px!important;height:52px!important; }
   .brand-wordmark img[src$="/citroen-official.png"] { max-width:82px!important;height:54px!important; }
-  .brand-wordmark img[src$="/dodge-official.png"] { max-width:108px!important;height:35px!important; }
+  .brand-wordmark img[src$="/dodge-black.png"] { max-width:108px!important;height:35px!important; }
   .brand-wordmark img[src$="/ferrari-emblem.png"],.brand-wordmark img[src$="/porsche-official.png"] { max-width:45px!important;height:58px!important; }
 }
 @media(max-width:760px) {
