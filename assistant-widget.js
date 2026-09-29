@@ -15,7 +15,7 @@
   const reservationPrompt = document.querySelector('#assistant-reservation-prompt');
   const bookingForm = document.querySelector('#assistant-booking-form');
   const resetDialog = document.querySelector('#assistant-reset-confirm');
-  const voiceToggle = document.querySelector('#assistant-voice-toggle');
+  const recordingState = document.querySelector('#assistant-recording-state');
   const voicePlayer = new Audio();
   const AudioContextClass = window.AudioContext || window.webkitAudioContext;
   const speechCache = new Map();
@@ -35,9 +35,10 @@
   let recordingTimer = null;
   let maxRecordTimer = null;
   let finishTimer = null;
+  let recognitionRestartTimer = null;
+  let rapidRecognitionStops = 0;
+  let recognitionStartedAt = 0;
   let reservationDismissedAt = 0;
-  let voiceEnabled = true;
-  let voiceNeedsGesture = false;
   let voiceRequest = 0;
   let voiceUrl = '';
   let speechAbort = null;
@@ -46,19 +47,10 @@
   let audioSources = new Set();
   let nextAudioTime = 0;
   let streamFinished = false;
-  try { voiceEnabled = localStorage.getItem('motorloz-voice') !== 'off'; } catch {}
   const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   micButton.title = Recognition ? 'Dictar y enviar como texto' : 'Dictado no disponible en este navegador';
   hintEl.textContent = Recognition ? 'Dictá y tocá Terminar · se envía como texto' : 'Escribí o usá el dictado del teclado';
   const getMessageCount = () => history.filter(item => item.role === 'user').length;
-
-  function updateVoiceToggle() {
-    voiceToggle.classList.toggle('is-active', voiceEnabled);
-    voiceToggle.classList.toggle('needs-gesture', voiceNeedsGesture);
-    voiceToggle.setAttribute('aria-pressed', String(voiceEnabled));
-    voiceToggle.setAttribute('aria-label', voiceNeedsGesture ? 'Tocá para activar la voz' : voiceEnabled ? 'Desactivar lectura automática' : 'Activar lectura automática');
-    voiceToggle.title = voiceNeedsGesture ? 'Tocá para escuchar' : voiceEnabled ? 'Voz automática activada' : 'Voz automática desactivada';
-  }
 
   function stopSpeech() {
     voiceRequest += 1;
@@ -81,7 +73,14 @@
     if (!AudioContextClass) return;
     try {
       audioContext ||= new AudioContextClass();
-      if (audioContext.state === 'suspended') audioContext.resume().catch(() => {});
+      if (audioContext.state === 'suspended') {
+        audioContext.resume().catch(() => {});
+        const silent = audioContext.createBuffer(1, 1, 24000);
+        const source = audioContext.createBufferSource();
+        source.buffer = silent;
+        source.connect(audioContext.destination);
+        source.start(0);
+      }
     } catch { audioContext = null; }
   }
 
@@ -92,7 +91,7 @@
     let received = false;
     let oddByte = null;
     let pending = '';
-    const firstAudioTimeout = setTimeout(() => { if (!received) controller.abort(); }, 3200);
+    const firstAudioTimeout = setTimeout(() => { if (!received) controller.abort(); }, 9000);
     const handleBlock = block => {
       const data = block.split(/\r?\n/).filter(line => line.startsWith('data:')).map(line => line.slice(5).trimStart()).join('\n');
       if (!data || data === '[DONE]') return;
@@ -200,14 +199,12 @@
     voicePlayer.src = voiceUrl;
     voicePlayer.currentTime = 0;
     await voicePlayer.play();
-    voiceNeedsGesture = false;
-    updateVoiceToggle();
     button?.classList.remove('is-loading');
     button?.classList.add('is-playing');
   }
 
-  async function speakReply(text, button = null, automatic = false) {
-    if (!configured || (automatic && !voiceEnabled)) return;
+  async function speakReply(text, button = null) {
+    if (!configured) return;
     stopSpeech();
     unlockAudio();
     const request = voiceRequest;
@@ -217,7 +214,7 @@
         try {
           if (audioContext.state === 'suspended') await Promise.race([
             audioContext.resume().catch(() => {}),
-            new Promise(resolve => setTimeout(resolve, 500))
+            new Promise(resolve => setTimeout(resolve, 1800))
           ]);
           await streamSpeech(text, button, request);
           return;
@@ -233,12 +230,9 @@
     } catch (error) {
       if (request !== voiceRequest) return;
       if (error.name === 'NotAllowedError') {
-        voiceNeedsGesture = true;
-        updateVoiceToggle();
         button?.setAttribute('aria-label', 'Tocá para escuchar esta respuesta');
       } else {
         button?.setAttribute('aria-label', 'Voz no disponible por ahora');
-        voiceToggle.title = 'Voz no disponible por ahora';
       }
     } finally {
       button?.classList.remove('is-loading');
@@ -254,8 +248,6 @@
     try { await playSpeechPart(next, button, voiceRequest); }
     catch { button?.classList.remove('is-playing'); }
   });
-  updateVoiceToggle();
-
   function bubble(text, role, extra = {}) {
     const row = document.createElement('div');
     row.className = `assistant-message assistant-message-${role}`;
@@ -302,7 +294,7 @@
       micButton.disabled = !configured;
       if (!configured) hintEl.textContent = 'El asistente se activa al configurar la conexión privada.';
       const greeting = welcome();
-      if (configured && voiceEnabled && !panel.hidden) speakReply(welcomeText, greeting.querySelector('.assistant-speak'), true);
+      if (configured && !panel.hidden) speakReply(welcomeText, greeting.querySelector('.assistant-speak'));
     } catch {
       statusEl.textContent = 'Conexión no disponible';
       configured = false;
@@ -343,7 +335,7 @@
       if (!response.ok) throw new Error(result.message || 'No pude responder en este momento.');
       history.push({ role: 'assistant', content: result.reply });
       const reply = bubble(result.reply, 'assistant');
-      speakReply(result.reply, reply.querySelector('.assistant-speak'), true);
+      speakReply(result.reply, reply.querySelector('.assistant-speak'));
       maybeShowBooking();
     } catch (error) {
       pending.remove();
@@ -381,10 +373,23 @@
     clearInterval(recordingTimer);
     clearTimeout(maxRecordTimer);
     clearTimeout(finishTimer);
+    clearTimeout(recognitionRestartTimer);
+    recognitionRestartTimer = null;
     document.querySelector('#assistant-recording').hidden = true;
     micButton.classList.remove('is-recording');
     hintEl.hidden = false;
     input.placeholder = 'Contame qué notaste…';
+    recordingState.textContent = 'Escuchando';
+  }
+
+  function failDictation(message) {
+    dictationSession += 1;
+    dictating = false;
+    finishingDictation = false;
+    speechRecognition = null;
+    clearDictationUi();
+    showDictatedText();
+    hintEl.textContent = message;
   }
 
   function completeDictation(session) {
@@ -404,12 +409,78 @@
 
   function finishDictation() {
     if (!dictating || finishingDictation) return;
+    unlockAudio();
     finishingDictation = true;
     const session = dictationSession;
     clearInterval(recordingTimer);
     clearTimeout(maxRecordTimer);
+    clearTimeout(recognitionRestartTimer);
+    if (!speechRecognition) { completeDictation(session); return; }
     try { speechRecognition?.stop(); } catch { completeDictation(session); return; }
     finishTimer = setTimeout(() => completeDictation(session), 1800);
+  }
+
+  function beginRecognition(session) {
+    if (session !== dictationSession || !dictating || finishingDictation) return;
+    const recognizer = new Recognition();
+    recognizer.lang = 'es-UY';
+    // Short recognition sessions work more reliably on mobile; each end starts a fresh one.
+    recognizer.continuous = false;
+    recognizer.interimResults = true;
+    recognizer.maxAlternatives = 1;
+    let endFallbackTimer = null;
+    let transientFailure = false;
+    speechRecognition = recognizer;
+    recognitionStartedAt = Date.now();
+    recognizer.addEventListener('start', () => {
+      if (session === dictationSession) recordingState.textContent = 'Escuchando';
+    });
+    recognizer.addEventListener('result', event => {
+      if (session !== dictationSession || speechRecognition !== recognizer) return;
+      const final = [];
+      const interim = [];
+      for (const result of Array.from(event.results)) {
+        const phrase = result[0]?.transcript?.trim();
+        if (phrase) (result.isFinal ? final : interim).push(phrase);
+      }
+      recognitionFinal = final.join(' ');
+      recognitionInterim = interim.join(' ');
+      showDictatedText();
+    });
+    const onEnd = () => {
+      clearTimeout(endFallbackTimer);
+      if (session !== dictationSession || speechRecognition !== recognizer) return;
+      speechRecognition = null;
+      const hadWords = Boolean(recognitionFinal || recognitionInterim);
+      dictationSegments.push(...[recognitionFinal, recognitionInterim].filter(Boolean));
+      recognitionFinal = '';
+      recognitionInterim = '';
+      if (finishingDictation) { completeDictation(session); return; }
+      if (!dictating) return;
+      rapidRecognitionStops = hadWords || (!transientFailure && Date.now() - recognitionStartedAt > 1200) ? 0 : rapidRecognitionStops + 1;
+      if (rapidRecognitionStops >= 4) {
+        failDictation('El navegador cortó el micrófono. Revisá su permiso o usá el dictado del teclado.');
+        return;
+      }
+      recordingState.textContent = 'Reconectando…';
+      recognitionRestartTimer = setTimeout(() => beginRecognition(session), 240 + rapidRecognitionStops * 180);
+    };
+    recognizer.addEventListener('error', event => {
+      if (session !== dictationSession || speechRecognition !== recognizer) return;
+      if (['no-speech', 'aborted', 'network'].includes(event.error)) {
+        transientFailure = event.error === 'network';
+        endFallbackTimer = setTimeout(onEnd, 800);
+        return;
+      }
+      failDictation(['not-allowed', 'service-not-allowed'].includes(event.error)
+        ? 'Permití el micrófono para dictar, o usá el del teclado.'
+        : event.error === 'audio-capture'
+          ? 'No encontré el micrófono. Revisá el permiso del navegador o usá el del teclado.'
+          : 'Se cortó el dictado. El texto visible queda listo para enviar.');
+    });
+    recognizer.addEventListener('end', onEnd);
+    try { recognizer.start(); }
+    catch { failDictation('No pude iniciar el dictado. Revisá el permiso o usá el micrófono del teclado.'); }
   }
 
   function startDictation() {
@@ -424,58 +495,11 @@
     const session = ++dictationSession;
     dictating = true;
     finishingDictation = false;
+    rapidRecognitionStops = 0;
     recordingDraft = input.value.trim();
     dictationSegments = [];
     recognitionFinal = '';
     recognitionInterim = '';
-    const recognizer = new Recognition();
-    recognizer.lang = 'es-UY';
-    recognizer.continuous = true;
-    recognizer.interimResults = true;
-    recognizer.maxAlternatives = 1;
-    recognizer.addEventListener('result', event => {
-      if (session !== dictationSession) return;
-      const final = [];
-      const interim = [];
-      for (const result of Array.from(event.results)) {
-        const phrase = result[0]?.transcript?.trim();
-        if (phrase) (result.isFinal ? final : interim).push(phrase);
-      }
-      recognitionFinal = final.join(' ');
-      recognitionInterim = interim.join(' ');
-      showDictatedText();
-    });
-    recognizer.addEventListener('error', event => {
-      if (session !== dictationSession || ['no-speech', 'aborted'].includes(event.error)) return;
-      dictationSession += 1;
-      dictating = false;
-      finishingDictation = false;
-      speechRecognition = null;
-      clearDictationUi();
-      showDictatedText();
-      hintEl.textContent = event.error === 'not-allowed' ? 'Permití el micrófono para dictar, o escribí tu consulta.' : 'No pude seguir el dictado. El texto visible queda listo para enviar.';
-    });
-    recognizer.addEventListener('end', () => {
-      if (session !== dictationSession) return;
-      if (finishingDictation) { completeDictation(session); return; }
-      if (!dictating) return;
-      dictationSegments.push(...[recognitionFinal, recognitionInterim].filter(Boolean));
-      recognitionFinal = '';
-      recognitionInterim = '';
-      setTimeout(() => {
-        if (session !== dictationSession || !dictating || finishingDictation) return;
-        try { recognizer.start(); }
-        catch { finishDictation(); }
-      }, 150);
-    });
-    try { recognizer.start(); }
-    catch {
-      dictationSession += 1;
-      dictating = false;
-      hintEl.textContent = 'No pude iniciar el dictado. Probá el micrófono del teclado o escribí.';
-      return;
-    }
-    speechRecognition = recognizer;
     recordingStart = Date.now();
     micButton.classList.add('is-recording');
     document.querySelector('#assistant-recording').hidden = false;
@@ -486,6 +510,7 @@
       document.querySelector('#assistant-recording-time').textContent = `00:${String(seconds).padStart(2, '0')}`;
     }, 250);
     maxRecordTimer = setTimeout(finishDictation, 60_000);
+    beginRecognition(session);
   }
 
   function cancelDictation() {
@@ -519,21 +544,10 @@
   }
 
   launcher.addEventListener('click', () => panel.hidden ? open() : close());
-  voiceToggle.addEventListener('click', async () => {
-    unlockAudio();
-    if (voiceNeedsGesture && voicePlayer.src) {
-      try { await voicePlayer.play(); voiceNeedsGesture = false; updateVoiceToggle(); return; } catch {}
-    }
-    voiceEnabled = !voiceEnabled;
-    voiceNeedsGesture = false;
-    if (!voiceEnabled) stopSpeech();
-    try { localStorage.setItem('motorloz-voice', voiceEnabled ? 'on' : 'off'); } catch {}
-    updateVoiceToggle();
-  });
   document.querySelector('#assistant-close').addEventListener('click', close);
   document.querySelector('#assistant-new').addEventListener('click', () => { resetDialog.hidden = false; });
   document.querySelector('#assistant-reset-no').addEventListener('click', () => { resetDialog.hidden = true; });
-  document.querySelector('#assistant-reset-yes').addEventListener('click', () => { resetDialog.hidden = true; stopSpeech(); cancelDictation(); const greeting = welcome(); if (configured && voiceEnabled) speakReply(welcomeText, greeting.querySelector('.assistant-speak'), true); input.focus(); });
+  document.querySelector('#assistant-reset-yes').addEventListener('click', () => { resetDialog.hidden = true; stopSpeech(); cancelDictation(); const greeting = welcome(); if (configured) speakReply(welcomeText, greeting.querySelector('.assistant-speak')); input.focus(); });
   document.querySelector('#assistant-stop-recording').addEventListener('click', finishDictation);
   document.querySelector('#assistant-mic').addEventListener('click', () => dictating ? finishDictation() : startDictation());
   document.querySelector('#assistant-privacy-link').addEventListener('click', event => { event.preventDefault(); close(); document.querySelector('#turno').scrollIntoView({ behavior: 'smooth' }); });

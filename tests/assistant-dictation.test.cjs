@@ -26,10 +26,10 @@ test('dictation displays words while speaking and sends only text after stopping
     return nodes.get(selector);
   };
   const requests = [];
-  let recognizer;
+  const recognizers = [];
   let audioPlays = 0;
   class Recognition {
-    constructor(){ recognizer=this;this.listeners={}; }
+    constructor(){ recognizers.push(this);this.listeners={}; }
     addEventListener(name,handler){ this.listeners[name]=handler; }
     start(){ this.starts=(this.starts||0)+1; }
     stop(){ this.listeners.end?.(); }
@@ -45,7 +45,7 @@ test('dictation displays words while speaking and sends only text after stopping
   };
   const context = {
     document, window:{ SpeechRecognition:Recognition, setTimeout }, Audio,
-    localStorage:{ getItem:()=> 'off' }, location:{ search:'' }, URLSearchParams,
+    location:{ search:'' }, URLSearchParams,
     fetch:async (url,options) => {
       requests.push({url,body:options?.body});
       return url.endsWith('/speech')
@@ -59,12 +59,13 @@ test('dictation displays words while speaking and sends only text after stopping
   get('#assistant-launcher').listeners.click();
   await new Promise(resolve=>setImmediate(resolve));
   get('#assistant-mic').listeners.click();
-  recognizer.emit('result',{results:[{0:{transcript:'Mi auto hace ruido al frenar'},isFinal:true}]});
+  assert.equal(recognizers[0].continuous,false);
+  recognizers[0].emit('result',{results:[{0:{transcript:'Mi auto hace ruido al frenar'},isFinal:true}]});
   assert.equal(get('#assistant-input').value,'Mi auto hace ruido al frenar');
-  recognizer.emit('end');
-  await new Promise(resolve=>setTimeout(resolve,170));
-  assert.equal(recognizer.starts,2);
-  recognizer.emit('result',{results:[{0:{transcript:'y vibra en la ruta'},isFinal:true}]});
+  recognizers[0].emit('end');
+  await new Promise(resolve=>setTimeout(resolve,270));
+  assert.equal(recognizers.length,2);
+  recognizers[1].emit('result',{results:[{0:{transcript:'y vibra en la ruta'},isFinal:true}]});
   assert.equal(get('#assistant-input').value,'Mi auto hace ruido al frenar y vibra en la ruta');
   get('#assistant-stop-recording').listeners.click();
   await new Promise(resolve=>setImmediate(resolve));
@@ -73,10 +74,27 @@ test('dictation displays words while speaking and sends only text after stopping
   assert.equal(JSON.parse(chats[0].body).messages[0].content,'Mi auto hace ruido al frenar y vibra en la ruta');
   assert.ok(requests.every(request=>!request.url.includes('/voice')&&!request.url.includes('/transcribe')));
   assert.equal(get('#assistant-input').value,'');
-  get('#assistant-voice-toggle').listeners.click();
+  const spokenBeforeNextMessage = audioPlays;
   get('#assistant-input').value='¿Podés revisarlo?';
   get('#assistant-composer').listeners.submit({preventDefault(){}});
   await new Promise(resolve=>setImmediate(resolve));
   assert.ok(requests.some(request=>request.url.endsWith('/speech')));
-  assert.equal(audioPlays,1);
+  assert.ok(audioPlays > spokenBeforeNextMessage);
+
+  const recognizersBeforeSilentStop = recognizers.length;
+  get('#assistant-mic').listeners.click();
+  recognizers[recognizersBeforeSilentStop].emit('end');
+  await new Promise(resolve=>setTimeout(resolve,450));
+  assert.equal(recognizers.length, recognizersBeforeSilentStop+2, 'mobile-style early end opens a fresh listening session');
+  recognizers.at(-1).emit('result',{results:[{0:{transcript:'El motor vibra'},isFinal:true}]});
+  get('#assistant-stop-recording').listeners.click();
+  await new Promise(resolve=>setImmediate(resolve));
+  assert.equal(JSON.parse(requests.filter(request=>request.url.endsWith('/chat')).at(-1).body).messages.at(-1).content,'El motor vibra');
+
+  const recognizersBeforeNetworkCut = recognizers.length;
+  get('#assistant-mic').listeners.click();
+  recognizers[recognizersBeforeNetworkCut].emit('error',{error:'network'});
+  await new Promise(resolve=>setTimeout(resolve,1260));
+  assert.equal(recognizers.length, recognizersBeforeNetworkCut+2, 'a transient recognition error does not freeze the microphone');
+  get('#assistant-close').listeners.click();
 });
