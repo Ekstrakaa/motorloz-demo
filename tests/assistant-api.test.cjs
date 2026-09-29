@@ -5,7 +5,9 @@ const { handle } = require('../gemini-assistant.cjs');
 function response() {
   return {
     headers: {},
+    chunks: [],
     setHeader(name, value) { this.headers[name] = value; },
+    write(chunk) { this.chunks.push(Buffer.from(chunk)); },
     end(body) { this.body = body; }
   };
 }
@@ -51,6 +53,29 @@ test('serves the fixed Gemini voice as WAV audio', async () => {
     assert.equal(res.statusCode, 200);
     assert.equal(res.headers['Content-Type'], 'audio/wav');
     assert.equal(Buffer.compare(res.body, wav), 0);
+    assert.equal(request.generation_config.speech_config[0].voice, 'Algieba');
+    assert.equal(request.model, 'gemini-3.8-flash-lite-tts');
+  } finally {
+    global.fetch = previousFetch;
+  }
+});
+
+test('streams fixed-voice audio chunks without waiting for the complete recording', async () => {
+  process.env.GEMINI_API_KEY = 'test-key';
+  const previousFetch = global.fetch;
+  const event = Buffer.from('event: step.delta\ndata: {"event_type":"step.delta","delta":{"type":"audio","data":"AAAA"}}\n\n');
+  let request;
+  global.fetch = async (_url, options) => {
+    request = JSON.parse(options.body);
+    return { ok: true, body: ReadableStream.from([event.subarray(0, 17), event.subarray(17)]) };
+  };
+  try {
+    const res = response();
+    await handle({ method: 'POST', body: { text: 'Hola, te escucho.' }, headers: {}, socket: {} }, res, 'speech-stream');
+    assert.equal(res.statusCode, 200);
+    assert.match(res.headers['Content-Type'], /text\/event-stream/);
+    assert.equal(Buffer.concat(res.chunks).toString(), event.toString());
+    assert.equal(request.stream, true);
     assert.equal(request.generation_config.speech_config[0].voice, 'Algieba');
   } finally {
     global.fetch = previousFetch;

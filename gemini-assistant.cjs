@@ -1,5 +1,5 @@
 const MODEL = process.env.GEMINI_MODEL || 'gemini-3.8-flash';
-const SPEECH_MODEL = 'gemini-3.8-flash-tts';
+const SPEECH_MODEL = process.env.GEMINI_TTS_MODEL || 'gemini-3.8-flash-lite-tts';
 const SPEECH_VOICE = process.env.GEMINI_TTS_VOICE || 'Algieba';
 const SYSTEM_PROMPT = `Sos el asistente virtual de recepción de MOTORLOZ, taller multimarca en Montevideo. Respondé en español rioplatense, con calidez y naturalidad, como una persona que escucha de verdad. Entendé errores de escritura y mensajes de voz. La bienvenida ya pidió marca, modelo y kilometraje del auto, y qué notó; aprovechá lo que la persona diga y no vuelvas a pedir datos que ya aportó. En cada respuesta, reflejá brevemente lo que entendiste —sin mostrar una transcripción literal del audio— para que sepa que su explicación llegó. Mantené respuestas concretas, de 1 a 3 frases: nada de listas numeradas, pasos, biblias ni enumeraciones de causas. Podés explicar en una frase que los síntomas pueden tener más de una causa, sin asegurar piezas ni diagnósticos; hacé como máximo una pregunta breve y útil si falta un dato importante. Si no hay señales de peligro, respondé con calma y empatía. No des precios, presupuestos ni promesas. Orientá con naturalidad a una revisión presencial en MOTORLOZ, sin presionar ni inventar servicios, garantías o disponibilidad. Si hay humo abundante o continuo, olor fuerte a combustible, frenos que fallan, sobrecalentamiento, pérdida de dirección u otra señal peligrosa, priorizá la seguridad: indicá detenerse en un lugar seguro, apagar el motor cuando corresponda, no seguir conduciendo y pedir asistencia; nunca asustes con costos. No indiques abrir un sistema de refrigeración caliente. Nunca pidas nombre, teléfono, correo ni otros datos personales durante el chat; se solicitan únicamente después de que la persona toque “Hacer reserva ahora”. No alargues la charla para obtener datos que se completan en la reserva. Para otros temas, explicá amablemente que este chat es para consultas del vehículo y MOTORLOZ. Cuando el contexto esté claro, invitá a hacer una reserva para que el taller revise el vehículo.`;
 const rateLimits = new Map();
@@ -17,7 +17,7 @@ function allowed(req, action) {
   const bucket = `${action}:${ip}`;
   const now = Date.now();
   const windowMs = action === 'chat' ? 60_000 : 60 * 60_000;
-  const limit = action === 'chat' ? 12 : action === 'summary' ? 4 : action === 'speech' ? 24 : 6;
+  const limit = action === 'chat' ? 12 : action === 'summary' ? 4 : action.startsWith('speech') ? 48 : 6;
   const recent = (rateLimits.get(bucket) || []).filter(time => now - time < windowMs);
   if (recent.length >= limit) return false;
   recent.push(now);
@@ -88,8 +88,8 @@ async function callGemini(contents, { maxOutputTokens = 1536, systemInstruction 
   throw lastError;
 }
 
-async function generateSpeech(text) {
-  const upstream = await fetch('https://generativelanguage.googleapis.com/v1beta/interactions', {
+async function requestSpeech(text, stream = false) {
+  return fetch('https://generativelanguage.googleapis.com/v1beta/interactions', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'x-goog-api-key': process.env.GEMINI_API_KEY },
     body: JSON.stringify({
@@ -99,9 +99,14 @@ async function generateSpeech(text) {
         annotations: [{ type: 'speech_metadata', style: 'Español rioplatense de Montevideo. Voz cálida, natural y cercana, ritmo conversacional tranquilo; sin tono robótico ni locución publicitaria.' }]
       }] }],
       response_format: { type: 'audio' },
-      generation_config: { speech_config: [{ voice: SPEECH_VOICE }] }
+      generation_config: { speech_config: [{ voice: SPEECH_VOICE }] },
+      ...(stream ? { stream: true } : {})
     })
   });
+}
+
+async function generateSpeech(text) {
+  const upstream = await requestSpeech(text);
   const result = await upstream.json().catch(() => ({}));
   if (!upstream.ok) {
     const error = new Error('gemini_speech_failed');
@@ -113,6 +118,30 @@ async function generateSpeech(text) {
   const wav = audio && Buffer.from(audio.data, 'base64');
   if (!wav || wav.subarray(0, 4).toString() !== 'RIFF') throw new Error('gemini_speech_empty');
   return wav;
+}
+
+async function streamSpeech(text, res) {
+  const upstream = await requestSpeech(text, true);
+  if (!upstream.ok) {
+    const result = await upstream.json().catch(() => ({}));
+    const error = new Error('gemini_speech_failed');
+    error.upstreamStatus = upstream.status;
+    error.upstreamCode = result.error?.status || result.error?.code || 'unknown';
+    throw error;
+  }
+  if (!upstream.body) throw new Error('gemini_speech_stream_empty');
+  res.statusCode = 200;
+  res.setHeader('Content-Type', 'text/event-stream; charset=utf-8');
+  res.setHeader('Cache-Control', 'no-store, no-transform');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.flushHeaders?.();
+  try {
+    for await (const chunk of upstream.body) res.write(chunk);
+    res.end();
+  } catch (error) {
+    console.error('Gemini speech stream error:', error.message || 'unknown');
+    res.end();
+  }
 }
 
 function userMessage(message) {
@@ -139,10 +168,14 @@ async function handle(req, res, action) {
 
   try {
     const body = req.body && typeof req.body === 'object' ? req.body : {};
-    if (action === 'speech') {
+    if (action === 'speech' || action === 'speech-stream') {
       const text = typeof body.text === 'string' ? body.text.trim() : '';
       if (!text || text.length > 700) {
         json(res, 400, { error: 'texto_invalido', message: 'No pude leer ese mensaje.' });
+        return;
+      }
+      if (action === 'speech-stream') {
+        await streamSpeech(text, res);
         return;
       }
       const wav = await generateSpeech(text);

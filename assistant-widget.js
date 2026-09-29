@@ -17,6 +17,7 @@
   const resetDialog = document.querySelector('#assistant-reset-confirm');
   const voiceToggle = document.querySelector('#assistant-voice-toggle');
   const voicePlayer = new Audio();
+  const AudioContextClass = window.AudioContext || window.webkitAudioContext;
   const speechCache = new Map();
   const welcomeText = 'Hola, soy tu asistente MOTORLOZ. Estoy acá para escucharte. Mandame un audio corto con la marca, el modelo y el kilometraje del auto, y contame qué notaste. Así entiendo mejor la historia y te oriento con el próximo paso.';
   let history = [];
@@ -24,6 +25,11 @@
   let busy = false;
   let mediaRecorder = null;
   let audioChunks = [];
+  let speechRecognition = null;
+  let recognitionActive = false;
+  let recognitionFinal = '';
+  let recognitionInterim = '';
+  let recordingDraft = '';
   let recordingStart = 0;
   let recordingTimer = null;
   let maxRecordTimer = null;
@@ -32,7 +38,17 @@
   let voiceNeedsGesture = false;
   let voiceRequest = 0;
   let voiceUrl = '';
+  let audioContext = null;
+  let speechAbort = null;
+  let audioSources = new Set();
+  let nextAudioTime = 0;
+  let streamFinished = false;
   try { voiceEnabled = localStorage.getItem('motorloz-voice') !== 'off'; } catch {}
+  if (window.SpeechRecognition || window.webkitSpeechRecognition) {
+    micButton.setAttribute('aria-label', 'Dictar consulta de hasta 60 segundos');
+    micButton.title = 'Dictar consulta';
+    hintEl.textContent = 'Podés escribir o dictar · máximo 60 segundos';
+  }
 
   const esc = value => String(value).replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[character]));
   const getMessageCount = () => history.filter(item => item.role === 'user').length;
@@ -47,6 +63,12 @@
 
   function stopSpeech() {
     voiceRequest += 1;
+    speechAbort?.abort();
+    speechAbort = null;
+    for (const source of audioSources) { try { source.stop(); } catch {} }
+    audioSources.clear();
+    nextAudioTime = 0;
+    streamFinished = false;
     voicePlayer.pause();
     voicePlayer.removeAttribute('src');
     voicePlayer.load();
@@ -55,13 +77,98 @@
     panel.querySelectorAll('.assistant-speak.is-playing,.assistant-speak.is-loading').forEach(button => button.classList.remove('is-playing', 'is-loading'));
   }
 
+  function unlockAudio() {
+    if (!AudioContextClass) return;
+    try {
+      audioContext ||= new AudioContextClass();
+      if (audioContext.state === 'suspended') audioContext.resume().catch(() => {});
+    } catch { audioContext = null; }
+  }
+
+  async function streamReply(text, button, request) {
+    if (!audioContext || audioContext.state !== 'running') throw new Error('audio_context_unavailable');
+    const controller = new AbortController();
+    speechAbort = controller;
+    const response = await fetch('/api/assistant/speech-stream', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text }), signal: controller.signal
+    });
+    if (!response.ok || !response.body) throw new Error('speech_stream_unavailable');
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let pending = '';
+    let oddByte = null;
+    let receivedAudio = false;
+    const handleEvent = block => {
+      const data = block.split(/\r?\n/).filter(line => line.startsWith('data:')).map(line => line.slice(5).trimStart()).join('\n');
+      if (!data || data === '[DONE]') return;
+      let event;
+      try { event = JSON.parse(data); } catch { return; }
+      if (event.event_type !== 'step.delta' || event.delta?.type !== 'audio' || !event.delta.data) return;
+      const raw = atob(event.delta.data);
+      const bytes = new Uint8Array(raw.length + (oddByte === null ? 0 : 1));
+      if (oddByte !== null) bytes[0] = oddByte;
+      for (let i = 0; i < raw.length; i += 1) bytes[i + (oddByte === null ? 0 : 1)] = raw.charCodeAt(i);
+      oddByte = bytes.length % 2 ? bytes.at(-1) : null;
+      const samples = Math.floor(bytes.length / 2);
+      if (!samples || request !== voiceRequest) return;
+      const buffer = audioContext.createBuffer(1, samples, 24000);
+      const channel = buffer.getChannelData(0);
+      for (let i = 0; i < samples; i += 1) {
+        const value = bytes[i * 2] | (bytes[i * 2 + 1] << 8);
+        channel[i] = (value >= 32768 ? value - 65536 : value) / 32768;
+      }
+      const source = audioContext.createBufferSource();
+      source.buffer = buffer;
+      source.connect(audioContext.destination);
+      const start = Math.max(nextAudioTime, audioContext.currentTime + 0.04);
+      source.start(start);
+      nextAudioTime = start + buffer.duration;
+      audioSources.add(source);
+      source.onended = () => {
+        audioSources.delete(source);
+        if (streamFinished && !audioSources.size) button?.classList.remove('is-playing');
+      };
+      receivedAudio = true;
+      button?.classList.remove('is-loading');
+      button?.classList.add('is-playing');
+    };
+    try {
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        if (request !== voiceRequest) return;
+        pending += decoder.decode(value, { stream: true });
+        const blocks = pending.split(/\r?\n\r?\n/);
+        pending = blocks.pop() || '';
+        blocks.forEach(handleEvent);
+      }
+      if (pending.trim()) handleEvent(pending);
+      if (!receivedAudio) throw new Error('speech_stream_empty');
+      streamFinished = true;
+      if (!audioSources.size) button?.classList.remove('is-playing');
+    } finally {
+      if (speechAbort === controller) speechAbort = null;
+    }
+  }
+
   async function speakReply(text, button = null, automatic = false) {
     if (!configured || (automatic && !voiceEnabled)) return;
     stopSpeech();
+    unlockAudio();
     const request = voiceRequest;
     button?.classList.add('is-loading');
     try {
       let audio = speechCache.get(text);
+      if (!audio && audioContext?.state === 'running') {
+        try {
+          await streamReply(text, button, request);
+          return;
+        } catch (error) {
+          if (request !== voiceRequest) return;
+          if (audioSources.size) { streamFinished = true; return; }
+        }
+      }
       if (!audio) {
         const response = await fetch('/api/assistant/speech', {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -244,11 +351,36 @@
     document.querySelector('#assistant-recording').hidden = true;
     micButton.classList.remove('is-recording');
     if (!recorder) return;
+    if (speechRecognition) {
+      const recognizer = speechRecognition;
+      if (recognitionActive) {
+        await new Promise(resolve => {
+          const timeout = setTimeout(resolve, 650);
+          recognizer.addEventListener('end', () => { clearTimeout(timeout); resolve(); }, { once: true });
+          try { recognizer.stop(); } catch { clearTimeout(timeout); resolve(); }
+        });
+      } else try { recognizer.abort(); } catch {}
+      speechRecognition = null;
+      recognitionActive = false;
+    }
     await new Promise(resolve => {
       recorder.addEventListener('stop', resolve, { once: true });
       if (recorder.state !== 'inactive') recorder.stop(); else resolve();
     });
     recorder.stream.getTracks().forEach(track => track.stop());
+    hintEl.hidden = false;
+    input.placeholder = 'Contame qué notaste…';
+    const transcript = [recognitionFinal, recognitionInterim].filter(Boolean).join(' ').trim().slice(0, 1200);
+    recognitionFinal = '';
+    recognitionInterim = '';
+    if (transcript) {
+      audioChunks = [];
+      sendText([recordingDraft, transcript].filter(Boolean).join(' '));
+      recordingDraft = '';
+      return;
+    }
+    input.value = recordingDraft;
+    recordingDraft = '';
     if (!audioChunks.length) return;
     setBusy(true);
     const duration = Math.max(1, Math.round((Date.now() - recordingStart) / 1000));
@@ -305,6 +437,37 @@
       audioChunks = [];
       mediaRecorder.addEventListener('dataavailable', event => { if (event.data.size) audioChunks.push(event.data); });
       mediaRecorder.start();
+      recordingDraft = input.value.trim();
+      recognitionFinal = '';
+      recognitionInterim = '';
+      const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (Recognition) {
+        try {
+          const recognizer = new Recognition();
+          recognizer.lang = 'es-UY';
+          recognizer.continuous = true;
+          recognizer.interimResults = true;
+          recognizer.maxAlternatives = 1;
+          recognizer.addEventListener('start', () => { recognitionActive = true; });
+          recognizer.addEventListener('end', () => { recognitionActive = false; });
+          recognizer.addEventListener('result', event => {
+            const final = [];
+            const interim = [];
+            for (const result of Array.from(event.results)) {
+              const phrase = result[0]?.transcript?.trim();
+              if (phrase) (result.isFinal ? final : interim).push(phrase);
+            }
+            recognitionFinal = final.join(' ');
+            recognitionInterim = interim.join(' ');
+            input.value = [recordingDraft, recognitionFinal, recognitionInterim].filter(Boolean).join(' ').slice(0, 1200);
+            input.style.height = 'auto';
+            input.style.height = `${Math.min(input.scrollHeight, 112)}px`;
+          });
+          recognizer.start();
+          speechRecognition = recognizer;
+          input.placeholder = 'Transcribiendo mientras hablás…';
+        } catch { speechRecognition = null; }
+      }
       recordingStart = Date.now();
       micButton.classList.add('is-recording');
       document.querySelector('#assistant-recording').hidden = false;
@@ -320,6 +483,7 @@
   }
 
   function open() {
+    unlockAudio();
     panel.hidden = false;
     requestAnimationFrame(() => panel.classList.add('is-open'));
     panel.setAttribute('aria-hidden', 'false');
@@ -330,6 +494,9 @@
 
   function close() {
     stopSpeech();
+    try { speechRecognition?.abort(); } catch {}
+    speechRecognition = null;
+    recognitionActive = false;
     if (mediaRecorder) {
       mediaRecorder.stream.getTracks().forEach(track => track.stop());
       if (mediaRecorder.state !== 'inactive') mediaRecorder.stop();
