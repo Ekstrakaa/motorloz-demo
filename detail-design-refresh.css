@@ -157,25 +157,20 @@
 .subaru-section .engine-sketch img { position:relative;z-index:1;transform-origin:50% 68%;filter:drop-shadow(0 18px 13px rgba(7,31,37,.29)) drop-shadow(0 3px 2px rgba(5,31,36,.18))!important;animation:none!important;will-change:transform; }
 .subaru-section .engine-sketch::before { content:"";position:absolute;z-index:0;left:50%;top:77%;width:72%;height:19%;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(ellipse,rgba(7,33,39,.31),rgba(7,33,39,.12) 45%,transparent 76%);filter:blur(10px);opacity:.75; }
 .subaru-section .engine-sketch::after { content:"";position:absolute;z-index:2;left:50%;top:69%;width:14%;aspect-ratio:1;transform:translate(-50%,-50%);border:2px solid rgba(38,152,168,.48);border-right-color:transparent;border-bottom-color:rgba(38,152,168,.12);border-radius:50%;box-shadow:0 0 0 3px rgba(47,178,190,.04),0 0 13px rgba(29,151,165,.17);opacity:0; }
-.subaru-section .engine-sketch.is-revving img { animation:boxer-rev-pulse 1.7s linear infinite!important; }
-.subaru-section .engine-sketch.is-revving::before { animation:boxer-shadow-shift 1.7s linear infinite; }
-.subaru-section .engine-sketch.is-revving::after { opacity:.58;animation:crank-spin .58s linear infinite; }
+.subaru-section .engine-sketch.is-revving img { animation:boxer-rev-pulse 2.1s ease-in-out infinite!important; }
+.subaru-section .engine-sketch.is-revving::before { animation:boxer-shadow-shift 2.1s ease-in-out infinite; }
+.subaru-section .engine-sketch.is-revving::after { opacity:.38;animation:crank-spin .9s linear infinite; }
 @keyframes boxer-rev-pulse {
-  0%,100% { transform:translate(0,-1px) rotate(-.2deg) scale(1.08); }
-  8% { transform:translate(2px,0) rotate(.24deg) scale(1.086); }
-  16% { transform:translate(-2px,1px) rotate(-.28deg) scale(1.079); }
-  24% { transform:translate(3px,-2px) rotate(.3deg) scale(1.09); }
-  32% { transform:translate(-2px,0) rotate(-.25deg) scale(1.083); }
-  40% { transform:translate(3px,-1px) rotate(.34deg) scale(1.096); }
-  48% { transform:translate(-3px,1px) rotate(-.31deg) scale(1.087); }
-  56% { transform:translate(2px,-2px) rotate(.27deg) scale(1.093); }
-  64% { transform:translate(-2px,0) rotate(-.26deg) scale(1.083); }
-  72% { transform:translate(3px,-1px) rotate(.32deg) scale(1.097); }
-  80% { transform:translate(-3px,1px) rotate(-.3deg) scale(1.086); }
-  88% { transform:translate(2px,-2px) rotate(.27deg) scale(1.091); }
-  96% { transform:translate(-1px,0) rotate(-.22deg) scale(1.082); }
+  0%,100% { transform:translate(0,0) rotate(0) scale(1.08); }
+  12% { transform:translate(.65px,-.35px) rotate(.07deg) scale(1.081); }
+  24% { transform:translate(-.6px,.25px) rotate(-.06deg) scale(1.08); }
+  36% { transform:translate(.75px,-.4px) rotate(.08deg) scale(1.083); }
+  48% { transform:translate(-.65px,.25px) rotate(-.06deg) scale(1.08); }
+  60% { transform:translate(.8px,-.4px) rotate(.09deg) scale(1.084); }
+  72% { transform:translate(-.7px,.3px) rotate(-.07deg) scale(1.081); }
+  84% { transform:translate(.7px,-.3px) rotate(.07deg) scale(1.082); }
 }
-@keyframes boxer-shadow-shift { 0%,100% {transform:translate(-50%,-50%) scaleX(1);opacity:.75} 24%,72% {transform:translate(-49%,-50%) scaleX(1.07);opacity:.58} 48%,88% {transform:translate(-51%,-50%) scaleX(.96);opacity:.85} }
+@keyframes boxer-shadow-shift { 0%,100% {transform:translate(-50%,-50%) scaleX(1);opacity:.75} 50% {transform:translate(-50%,-50%) scaleX(1.025);opacity:.7} }
 @keyframes crank-spin { to { transform:translate(-50%,-50%) rotate(1turn); } }
 @media(prefers-reduced-motion:reduce) {
   .subaru-section .engine-sketch.is-revving img,.subaru-section .engine-sketch.is-revving::before,.subaru-section .engine-sketch.is-revving::after { animation:none!important; }

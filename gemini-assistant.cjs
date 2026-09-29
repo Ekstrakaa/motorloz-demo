@@ -1,7 +1,7 @@
-const MODEL = process.env.GEMINI_MODEL || 'gemini-3.8-flash';
+const MODEL = process.env.GEMINI_CHAT_MODEL || 'gemini-3.5-flash-lite';
 const SPEECH_MODEL = process.env.GEMINI_TTS_MODEL || 'gemini-3.8-flash-lite-tts';
 const SPEECH_VOICE = process.env.GEMINI_TTS_VOICE || 'Algieba';
-const SYSTEM_PROMPT = `Sos el asistente virtual de recepción de MOTORLOZ, taller multimarca en Montevideo. Respondé en español rioplatense, con calidez y naturalidad, como una persona que escucha de verdad. Entendé errores de escritura y mensajes de voz. La bienvenida ya pidió marca, modelo y kilometraje del auto, y qué notó; aprovechá lo que la persona diga y no vuelvas a pedir datos que ya aportó. En cada respuesta, reflejá brevemente lo que entendiste —sin mostrar una transcripción literal del audio— para que sepa que su explicación llegó. Mantené respuestas concretas, de 1 a 3 frases: nada de listas numeradas, pasos, biblias ni enumeraciones de causas. Podés explicar en una frase que los síntomas pueden tener más de una causa, sin asegurar piezas ni diagnósticos; hacé como máximo una pregunta breve y útil si falta un dato importante. Si no hay señales de peligro, respondé con calma y empatía. No des precios, presupuestos ni promesas. Orientá con naturalidad a una revisión presencial en MOTORLOZ, sin presionar ni inventar servicios, garantías o disponibilidad. Si hay humo abundante o continuo, olor fuerte a combustible, frenos que fallan, sobrecalentamiento, pérdida de dirección u otra señal peligrosa, priorizá la seguridad: indicá detenerse en un lugar seguro, apagar el motor cuando corresponda, no seguir conduciendo y pedir asistencia; nunca asustes con costos. No indiques abrir un sistema de refrigeración caliente. Nunca pidas nombre, teléfono, correo ni otros datos personales durante el chat; se solicitan únicamente después de que la persona toque “Hacer reserva ahora”. No alargues la charla para obtener datos que se completan en la reserva. Para otros temas, explicá amablemente que este chat es para consultas del vehículo y MOTORLOZ. Cuando el contexto esté claro, invitá a hacer una reserva para que el taller revise el vehículo.`;
+const SYSTEM_PROMPT = `Sos el asistente virtual de recepción de MOTORLOZ, taller multimarca en Montevideo. Respondé en español rioplatense, con calidez y naturalidad. La bienvenida ya pidió marca, modelo, kilometraje y síntomas; no repitas datos aportados. Respondé en una o dos frases cortas, idealmente menos de 220 caracteres, para que la voz empiece y termine pronto. Reflejá brevemente lo que entendiste, sin transcribirlo entero. No hagas listas ni enumeres causas. No asegures diagnósticos, precios, presupuestos, promesas ni disponibilidad. Si falta un dato clave, hacé una sola pregunta breve. Si no hay peligro, orientá con calma a una revisión en MOTORLOZ. Si hay humo abundante, olor fuerte a combustible, falla de frenos, sobrecalentamiento o pérdida de dirección, priorizá la seguridad: indicá detenerse en un lugar seguro, no seguir conduciendo y pedir asistencia. No indiques abrir el sistema de refrigeración caliente. Nunca pidas datos personales en el chat; se solicitan después de tocar “Hacer reserva ahora”. Para otros temas, explicá que el chat es para consultas del vehículo y MOTORLOZ.`;
 const rateLimits = new Map();
 
 function json(res, status, data) {
@@ -38,10 +38,10 @@ function cleanHistory(messages) {
     .filter(item => item.parts[0].text);
 }
 
-async function callGemini(contents, { maxOutputTokens = 1536, systemInstruction = SYSTEM_PROMPT } = {}) {
+async function callGemini(contents, { maxOutputTokens = 768, systemInstruction = SYSTEM_PROMPT, models = [MODEL, 'gemini-3.8-flash', 'gemini-3.7-flash'] } = {}) {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw Object.assign(new Error('not_configured'), { status: 503 });
-  const models = [...new Set([MODEL, 'gemini-3.7-flash', 'gemini-3.6-flash'])];
+  models = [...new Set(models)];
   let lastError = new Error('gemini_output_truncated');
   for (const model of models) {
     for (const tokenLimit of [maxOutputTokens, maxOutputTokens * 2]) {
@@ -55,7 +55,7 @@ async function callGemini(contents, { maxOutputTokens = 1536, systemInstruction 
             contents,
             generationConfig: {
               maxOutputTokens: tokenLimit,
-              ...(model.startsWith('gemini-3') ? { thinkingConfig: { thinkingLevel: 'low' } } : {})
+              ...(model.startsWith('gemini-3') ? { thinkingConfig: { thinkingLevel: model.includes('flash-lite') ? 'minimal' : 'low' } } : {})
             }
           })
         });
@@ -189,19 +189,9 @@ async function handle(req, res, action) {
     }
     const history = cleanHistory(body.messages);
     let contents;
-    let maxOutputTokens = action === 'summary' ? 768 : 1536;
+    let maxOutputTokens = action === 'summary' ? 768 : 768;
 
-    if (action === 'voice') {
-      const audio = typeof body.audio === 'string' ? body.audio : '';
-      if (!audio || audio.length > 4_000_000) {
-        json(res, 400, { error: 'audio_invalido', message: 'No pude procesar esta nota de voz. Probá grabarla otra vez o escribí tu consulta.' });
-        return;
-      }
-      contents = [...history, { role: 'user', parts: [
-        { text: 'Escuchá este mensaje de voz y respondé en texto dentro del chat. No devuelvas una transcripción literal; entendé la consulta y continuá la conversación como recepción de MOTORLOZ.' },
-        { inlineData: { mimeType: 'audio/wav', data: audio } }
-      ] }];
-    } else if (action === 'summary') {
+    if (action === 'summary') {
       if (!history.length) {
         json(res, 400, { error: 'resumen_invalido', message: 'No hay conversación para resumir.' });
         return;

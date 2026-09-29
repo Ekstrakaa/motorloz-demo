@@ -31,7 +31,7 @@ test('retries a token-truncated Gemini response and returns the complete reply',
     assert.equal(res.statusCode, 200);
     assert.equal(JSON.parse(res.body).reply, 'Revisemos ese ruido al frenar con el taller.');
     assert.equal(requests.length, 2);
-    assert.equal(requests[0].generationConfig.thinkingConfig.thinkingLevel, 'low');
+    assert.equal(requests[0].generationConfig.thinkingConfig.thinkingLevel, 'minimal');
     assert.ok(requests[0].generationConfig.maxOutputTokens > 260);
   } finally {
     global.fetch = previousFetch;
@@ -97,9 +97,18 @@ test('uses the backup Gemini model when the primary service is unavailable', asy
     await handle({ method: 'POST', body: { messages: [{ role: 'user', content: 'Ruido al frenar' }] }, headers: {}, socket: {} }, res, 'chat');
     assert.equal(res.statusCode, 200);
     assert.equal(JSON.parse(res.body).reply, 'Podemos revisar ese ruido en el taller.');
-    assert.match(urls[0], /gemini-3\.8-flash/);
-    assert.match(urls[1], /gemini-3\.7-flash/);
+    assert.match(urls[0], /gemini-3\.5-flash-lite/);
+    assert.match(urls[1], /gemini-3\.8-flash/);
   } finally {
     global.fetch = previousFetch;
+  }
+});
+
+test('rejects any former audio-input action', async () => {
+  process.env.GEMINI_API_KEY = 'test-key';
+  for (const action of ['voice', 'transcribe']) {
+    const res = response();
+    await handle({ method:'POST', body:{ audio:'AAAA' }, headers:{}, socket:{} }, res, action);
+    assert.equal(res.statusCode, 404);
   }
 });
