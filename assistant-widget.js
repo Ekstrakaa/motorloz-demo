@@ -397,6 +397,16 @@
     return '';
   }
 
+  function simpleServiceSummary(customerText) {
+    if (/\b(?:ruido|vibra|luz|humo|falla|anda mal|golpe|pozo|pierde|calienta|no arranca)\b/i.test(customerText)) return '';
+    const services = [];
+    if (/\b(?:cambio de aceite|cambiar (?:el )?aceite|service de aceite)\b/i.test(customerText)) services.push('cambio de aceite');
+    if (/\b(?:pastillas? de freno|cambio de pastillas)\b/i.test(customerText)) services.push('revisión o cambio de pastillas de freno');
+    if (/\balineaci[oó]n\b/i.test(customerText)) services.push('alineación');
+    if (/\bbalanceo\b/i.test(customerText)) services.push('balanceo');
+    return services.length ? `Solicita ${services.join(' y ')}.` : '';
+  }
+
   async function requestReply(userMessage) {
     if (!configured || busy) return;
     history.push({ role: 'user', content: userMessage });
@@ -700,12 +710,16 @@
     const mileage = userWords.match(/\b(\d{2,3}(?:[.,]\d{3})?)\s*(?:km|kil[oó]metros)\b/i);
     if (mileageInThousands) bookingForm.elements.mileage.value = `${mileageInThousands[1]}.000 km aprox.`;
     else if (mileage) bookingForm.elements.mileage.value = `${mileage[1]} km`;
-    bookingForm.elements.issue.value = history.filter(item => item.role === 'user')
+    const simpleSummary = simpleServiceSummary(userWords);
+    bookingForm.elements.issue.value = simpleSummary || history.filter(item => item.role === 'user')
       .map(item => item.content.trim())
       .filter(text => text && !/^(hola|buen(as|os) (d[ií]as|tardes|noches))[!.,\s]*$/i.test(text))
+      .filter(text => !/^(?:me llamo|mi nombre es)\s+[\p{L}\s.]+$/iu.test(text))
+      .map(text => text.replace(/\b(?:me llamo|mi nombre es)\s+[\p{L}]+(?:\s+[\p{L}]+)?/iu, '').trim())
       .filter(Boolean).slice(-8).join(' ').slice(0, 800);
-    issueStatus.textContent = 'Preparando un resumen de lo que contaste…';
+    issueStatus.textContent = simpleSummary ? 'Revisá el resumen antes de abrir WhatsApp.' : 'Preparando un resumen de lo que contaste…';
     bookingForm.querySelector('[name="name"]').focus({ preventScroll: true });
+    if (simpleSummary) return;
     summaryAbort?.abort();
     const controller = new AbortController();
     summaryAbort = controller;

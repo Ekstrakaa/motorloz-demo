@@ -103,7 +103,7 @@ test('retries a speech stream on a second model when the first voice hits its qu
   } finally { global.fetch = previousFetch; }
 });
 
-test('the workshop summary uses only customer facts and the stronger summary model', async () => {
+test('the workshop summary uses only customer facts and the fast summary model', async () => {
   process.env.GEMINI_API_KEY = 'test-key';
   const previousFetch = global.fetch;
   let request;
@@ -122,7 +122,7 @@ test('the workshop summary uses only customer facts and the stronger summary mod
     ] }, headers:{}, socket:{} }, res, 'summary');
     assert.equal(res.statusCode, 200);
     assert.match(JSON.parse(res.body).summary, /pozo/);
-    assert.match(modelUrl, /gemini-3\.5-flash:generateContent/);
+    assert.match(modelUrl, /gemini-3\.5-flash-lite:generateContent/);
     assert.match(request.contents[0].parts[0].text, /pozo/);
     assert.doesNotMatch(request.contents[0].parts[0].text, /no hay ruidos ni golpes/);
   } finally { global.fetch = previousFetch; }

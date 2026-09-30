@@ -2,7 +2,7 @@
 
 ## Qué hace hoy
 
-El chat usa `gemini-3.5-flash-lite` para conversar. Al preparar la consulta, `gemini-3.5-flash` redacta una síntesis de **lo dicho por el cliente**; el cliente la puede corregir antes de abrir WhatsApp. La voz usa `gemini-3.8-flash-lite-tts`, con alternativas si el proveedor limita la voz. Una clave de API da acceso a los modelos, pero **no los entrena**.
+El chat usa `gemini-3.5-flash-lite` para conversar. Al preparar una consulta por fallas, ese modelo redacta una síntesis de **lo dicho por el cliente**; el cliente la puede corregir antes de abrir WhatsApp. Para servicios simples, como un cambio de aceite, la web arma una síntesis inmediata sin otra llamada a Gemini. La voz usa `gemini-3.8-flash-lite-tts`, con alternativas si el proveedor limita la voz. Una clave de API da acceso a los modelos, pero **no los entrena**.
 
 El asistente es la recepción inicial: escucha, pregunta por el auto, los síntomas o el mantenimiento solicitado, y prepara el mensaje. No confirma turnos, horarios, precios ni diagnósticos. Puede explicar que Pablo, dueño del taller, o Bruno, del equipo, revisarán el caso, sin prometer su disponibilidad. WhatsApp es el último paso; el equipo del taller revisa la consulta y confirma la coordinación. El número del cliente no se pide en la web: WhatsApp identifica al remitente.
 
@@ -22,7 +22,7 @@ El chat conserva hasta 20 mensajes recientes como contexto para Gemini y recuper
 
 - `GEMINI_API_KEY`: acceso privado a la API; nunca va en el navegador.
 - `GEMINI_CHAT_MODEL`: modelo de conversación (por defecto `gemini-3.5-flash-lite`).
-- `GEMINI_SUMMARY_MODEL`: modelo para la síntesis de recepción (por defecto `gemini-3.5-flash`).
+- `GEMINI_SUMMARY_MODEL`: modelo para la síntesis de recepción (por defecto `gemini-3.5-flash-lite`).
 - `GEMINI_TTS_MODEL` y `GEMINI_TTS_VOICE`: modelo y voz de lectura.
 
 Cambiar estas variables o las instrucciones requiere publicar una nueva versión y volver a probar el chat. El ajuste fino del modelo por la API de Gemini no está disponible actualmente; para este caso se mejora con instrucciones, ejemplos y pruebas. La disponibilidad gratuita depende de los cupos de Gemini: no garantiza voz continua ni tiempos de respuesta constantes. Si falla la voz de Gemini, la web intenta la voz del navegador, que puede variar entre teléfonos.
