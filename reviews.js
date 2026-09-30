@@ -57,7 +57,7 @@
     link.href = review.url;
     link.target = '_blank';
     link.rel = 'noopener noreferrer';
-    link.textContent = review.excerpt ? 'Leer en Google ↗' : 'Ver en Google ↗';
+    link.textContent = review.excerpt ? 'Leer en Google' : 'Ver en Google';
     article.append(top, stars, quote, link);
     return article;
   }

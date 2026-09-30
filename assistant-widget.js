@@ -761,7 +761,7 @@
       if (popup) popup.location.href = url;
     } finally {
       reserveButton.disabled = false;
-      reserveButton.innerHTML = 'Abrir WhatsApp <span>↗</span>';
+      reserveButton.textContent = 'Abrir WhatsApp';
     }
   });
   document.querySelector('#assistant-reserve-later').addEventListener('click', () => {
