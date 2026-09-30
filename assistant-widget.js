@@ -602,6 +602,7 @@
   document.querySelector('#assistant-reserve-start').addEventListener('click', () => {
     reservationPrompt.hidden = true;
     booking.hidden = false;
+    document.querySelector('#assistant-wa-retry').hidden = true;
     booking.scrollTop = 0;
     const userWords = history.filter(item => item.role === 'user').map(item => item.content).join(' ');
     const vehicle = userWords.match(/\b(Subaru|Toyota|Honda|Hyundai|Volkswagen|VW|BMW|Mercedes(?:-Benz)?|Nissan|Mazda|Suzuki|Mitsubishi|Kia|Chevrolet|Peugeot|Audi|Renault|Ford|Jeep|Fiat|Volvo|Citro[eë]n|Dodge|Ferrari|Porsche|Alfa Romeo)\s+([\w-]+(?:\s+[\w-]+)?)/i);
@@ -636,9 +637,10 @@
       '¿Podemos coordinar una revisión? Quedo atento/a a la confirmación del taller.'
     ].filter(Boolean);
     const url = `https://wa.me/${window.MOTORLOZ?.whatsapp || '59891888288'}?text=${encodeURIComponent(lines.join('\n'))}`;
+    const retryLink = document.querySelector('#assistant-wa-retry');
+    retryLink.href = url;
+    retryLink.hidden = false;
     window.open(url, '_blank', 'noopener,noreferrer');
-    booking.hidden = true;
-    bookingForm.reset();
   });
 
   welcome();
