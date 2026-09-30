@@ -1,0 +1,113 @@
+/* One restrained navy-glass language for the site's main calls to action. */
+:is(.header .header-cta, .hero .button.light, .reference-bridge-card .button.primary,
+  .diagnostic-story-copy .button.outline, .contact-bridge-actions .button,
+  #appointment-form .button.primary, #appointment-form .wizard-next,
+  #assistant-reserve-start) {
+  border: 1px solid rgba(165, 230, 235, .68) !important;
+  border-radius: 999px !important;
+  background:
+    radial-gradient(ellipse at 22% -30%, rgba(135, 238, 241, .43), transparent 50%),
+    linear-gradient(145deg, #285460 0%, #123945 48%, #071f2b 100%) !important;
+  color: #f7ffff !important;
+  font-weight: 720 !important;
+  letter-spacing: -.015em !important;
+  text-shadow: 0 1px 1px rgba(0, 20, 28, .3);
+  box-shadow: inset 0 1px rgba(255, 255, 255, .45), inset 0 -2px rgba(1, 15, 22, .45), 0 13px 29px rgba(1, 30, 40, .28) !important;
+  backdrop-filter: blur(15px) saturate(140%);
+  -webkit-backdrop-filter: blur(15px) saturate(140%);
+  transition: transform .28s cubic-bezier(.2,.75,.2,1), box-shadow .28s, border-color .28s, filter .28s !important;
+}
+:is(.header .header-cta, .hero .button.light, .reference-bridge-card .button.primary,
+  .diagnostic-story-copy .button.outline, .contact-bridge-actions .button,
+  #appointment-form .button.primary, #appointment-form .wizard-next,
+  #assistant-reserve-start):is(:hover, :focus-visible) {
+  border-color: rgba(213, 254, 253, .94) !important;
+  filter: brightness(1.13) saturate(1.1) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: inset 0 1px rgba(255, 255, 255, .6), inset 0 -2px rgba(1, 15, 22, .35), 0 18px 38px rgba(1, 30, 40, .35), 0 0 0 4px rgba(77, 194, 207, .12) !important;
+}
+:is(.header .header-cta, .hero .button.light, .reference-bridge-card .button.primary,
+  .diagnostic-story-copy .button.outline, .contact-bridge-actions .button,
+  #appointment-form .button.primary, #appointment-form .wizard-next,
+  #assistant-reserve-start):active { transform: translateY(0) scale(.985) !important; }
+
+:is(.hero .button.light, .reference-bridge-card .button.primary,
+  .diagnostic-story-copy .button.outline, .contact-bridge-actions .button) {
+  min-width: 220px !important;
+  min-height: 53px !important;
+  padding: 12px 24px !important;
+  font-size: 14px !important;
+  line-height: 1.2 !important;
+}
+:is(#assistant-reserve-start, .hero .button.light, .reference-bridge-card .button.primary,
+  .diagnostic-story-copy .button.outline, .contact-bridge-actions .button,
+  #appointment-form .button.primary)::after {
+  opacity: .38 !important;
+  background: linear-gradient(180deg, rgba(255,255,255,.27), transparent) !important;
+}
+
+:is(#contact-open, .header-cta).header-cta::after {
+  content: "" !important;
+  position: absolute !important;
+  inset: -25% auto -25% 0 !important;
+  display: block !important;
+  width: 42% !important;
+  height: auto !important;
+  border-radius: 0 !important;
+  background: linear-gradient(90deg, transparent, rgba(222, 255, 255, .22), transparent) !important;
+  pointer-events: none;
+  animation: motorloz-header-glint 6.5s ease-in-out infinite;
+}
+@keyframes motorloz-header-glint {
+  0%, 58% { transform: translateX(-150%) skewX(-20deg); opacity: 0; }
+  64% { opacity: .75; }
+  82% { transform: translateX(270%) skewX(-20deg); opacity: 0; }
+  100% { transform: translateX(270%) skewX(-20deg); opacity: 0; }
+}
+
+#appointment-form .wizard-back {
+  min-width: 78px;
+  padding-inline: 15px;
+  border: 1px solid rgba(162, 218, 222, .42) !important;
+  border-radius: 999px;
+  background: rgba(47, 102, 111, .17) !important;
+  color: #dbf3f1 !important;
+  box-shadow: inset 0 1px rgba(255, 255, 255, .12);
+  transition: background .25s, border-color .25s, transform .25s;
+}
+#appointment-form .wizard-back:is(:hover, :focus-visible) { border-color: rgba(186, 241, 243, .8) !important; background: rgba(73, 150, 161, .3) !important; transform: translateY(-1px); }
+
+/* Keep the genuine WhatsApp shortcut docked on the right, including on iPhone. */
+:is(#assistant-launcher, .floating-booking).floating-booking {
+  position: fixed !important;
+  top: auto !important;
+  left: auto !important;
+  right: max(15px, env(safe-area-inset-right)) !important;
+  bottom: calc(15px + env(safe-area-inset-bottom)) !important;
+  display: flex !important;
+  width: 50px !important;
+  height: 50px !important;
+  min-height: 50px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  transform: none !important;
+  z-index: 101 !important;
+}
+.floating-booking .floating-whatsapp { width: 50px !important; height: 50px !important; flex: none !important; background: rgba(246, 255, 250, .96) !important; }
+.floating-booking .floating-whatsapp img { display: block; width: 32px !important; height: 32px !important; object-fit: contain; filter: none !important; }
+
+@media (max-width: 760px) {
+  .header .header-cta { min-height: 42px !important; padding-inline: 15px !important; }
+  #appointment-form .wizard-navigation { gap: 10px; }
+  #appointment-form .wizard-next { min-width: 0; }
+  #appointment-form .wizard-stage[data-stage="4"] .wizard-back { min-height: 34px; }
+  :is(#assistant-launcher, .floating-booking).floating-booking { right: max(14px, env(safe-area-inset-right)) !important; bottom: calc(13px + env(safe-area-inset-bottom)) !important; }
+  body:has(#turno:target .wizard-stage[data-stage="4"].is-current) :is(.assistant-launcher, .floating-booking) { opacity: 0 !important; visibility: hidden !important; pointer-events: none !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  :is(#contact-open, .header-cta).header-cta::after { animation: none !important; display: none !important; }
+  :is(.header .header-cta, .hero .button.light, .reference-bridge-card .button.primary,
+    .diagnostic-story-copy .button.outline, .contact-bridge-actions .button,
+    #appointment-form .button.primary, #appointment-form .wizard-next,
+    #assistant-reserve-start, #appointment-form .wizard-back) { transition: none !important; }
+}

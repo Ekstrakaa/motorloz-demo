@@ -7,10 +7,9 @@
   const observer = new IntersectionObserver(entries => {
     for (const entry of entries) {
       if (!entry.isIntersecting) continue;
-      const index = links.indexOf(entry.target);
-      setTimeout(() => entry.target.classList.add('is-visible'), index * 90);
-      observer.unobserve(entry.target);
+      links.forEach((link, index) => setTimeout(() => link.classList.add('is-visible'), index * 110));
+      observer.disconnect();
     }
-  }, { threshold: .25 });
-  links.forEach(link => observer.observe(link));
+  }, { threshold: .2 });
+  observer.observe(row);
 })();

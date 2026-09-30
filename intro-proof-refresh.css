@@ -16,7 +16,7 @@
 }
 #taller .intro-proof-link {
   display: grid;
-  grid-template-columns: 54px minmax(0, 1fr);
+  grid-template-columns: 62px minmax(0, 1fr);
   align-items: center;
   gap: 13px;
   min-width: 0;
@@ -31,17 +31,17 @@
 #taller .intro-proof-link:focus-visible { outline: 2px solid #138b9a; outline-offset: -3px; }
 #taller .proof-icon {
   display: block;
-  width: 54px;
-  height: 54px;
-  background-image: url('assets/motorloz-icon-atlas.png');
+  width: 62px;
+  height: 62px;
+  background-image: url('assets/intro-proof-icons.png');
   background-repeat: no-repeat;
-  background-size: 400% 400%;
+  background-size: 300% 100%;
   filter: drop-shadow(0 5px 7px rgba(0, 44, 51, .14));
   transform-origin: center;
 }
-#taller .proof-icon[data-icon-index="8"] { background-position: 0% 66.666%; }
-#taller .proof-icon[data-icon-index="10"] { background-position: 66.666% 66.666%; }
-#taller .proof-icon[data-icon-index="6"] { background-position: 66.666% 33.333%; }
+#taller .proof-icon[data-proof-icon="multimarca"] { background-position: 0% 50%; }
+#taller .proof-icon[data-proof-icon="diagnostico"] { background-position: 50% 50%; }
+#taller .proof-icon[data-proof-icon="boxer"] { background-position: 100% 50%; }
 #taller .proof-copy { display: grid; gap: 3px; min-width: 0; }
 #taller .proof-copy b { color: #17282b; font-size: 14px; line-height: 1.2; }
 #taller .proof-copy small { color: #51696c; font-size: 11px; line-height: 1.4; }
@@ -52,8 +52,8 @@
   letter-spacing: .06em;
   text-transform: uppercase;
 }
-#taller .intro-proof-row.proof-motion-ready .intro-proof-link { opacity: 0; transform: translateY(14px); }
-#taller .intro-proof-row.proof-motion-ready .intro-proof-link.is-visible { opacity: 1; transform: translateY(0); }
+#taller .intro-proof-row.proof-motion-ready .intro-proof-link { opacity: 0; filter: blur(7px); clip-path: inset(0 100% 0 0); }
+#taller .intro-proof-row.proof-motion-ready .intro-proof-link.is-visible { opacity: 1; filter: blur(0); clip-path: inset(0 0 0 0); transition: opacity .7s, filter .8s, clip-path .9s cubic-bezier(.2,.75,.2,1); }
 #taller .intro-proof-link.is-visible .proof-icon { animation: proof-icon-breathe 4s ease-in-out infinite; }
 #taller .intro-proof-link:nth-child(2) .proof-icon { animation-delay: .5s; }
 #taller .intro-proof-link:nth-child(3) .proof-icon { animation-delay: 1s; }
@@ -66,7 +66,7 @@
     border-radius: 16px;
   }
   #taller .intro-proof-link {
-    grid-template-columns: 46px minmax(0, 1fr) auto;
+    grid-template-columns: 52px minmax(0, 1fr) auto;
     gap: 11px;
     min-height: 70px;
     padding: 9px 13px;
@@ -74,12 +74,12 @@
     border-bottom: 1px solid rgba(34,132,141,.14);
   }
   #taller .intro-proof-link:last-child { border-bottom: 0; }
-  #taller .proof-icon { width: 46px; height: 46px; }
+  #taller .proof-icon { width: 52px; height: 52px; }
   #taller .proof-copy b { font-size: 13px; }
   #taller .proof-copy small { font-size: 10px; }
   #taller .proof-action { grid-column: 3; grid-row: 1; font-size: 9px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  #taller .intro-proof-row.proof-motion-ready .intro-proof-link { opacity: 1; transform: none; }
+  #taller .intro-proof-row.proof-motion-ready .intro-proof-link { opacity: 1; filter: none; clip-path: none; }
   #taller .intro-proof-link.is-visible .proof-icon { animation: none; }
 }
