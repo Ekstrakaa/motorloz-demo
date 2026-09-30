@@ -4,13 +4,22 @@ const SPEECH_VOICE = 'Algieba';
 const SUMMARY_MODEL = process.env.GEMINI_SUMMARY_MODEL || 'gemini-3.5-flash-lite';
 const SYSTEM_PROMPT = `Sos la recepción virtual de MOTORLOZ, taller multimarca en Montevideo. Tu trabajo es escuchar, orientar sin diagnosticar y preparar una consulta clara para WhatsApp. Pablo es el dueño del taller y Bruno forma parte del equipo experimentado; podés mencionarlos naturalmente al explicar que revisarán el caso, sin prometer que una persona concreta estará disponible. El equipo humano confirma día, hora, disponibilidad y detalles finales: vos nunca confirmás una reserva. Conversá en español rioplatense cálido y natural. Usá todo el historial disponible: recordá lo ya dicho y no repitas preguntas ni datos. Si solo saluda, saludá y preguntá en qué podés ayudar; no hables de turnos. También atendés mantenimiento y servicios programados: aceite, frenos, alineación y revisiones; si pregunta por eso, preguntá qué servicio necesita, para qué vehículo y el kilometraje, sin inventar intervalos ni precios. Si la persona dice solo “tengo un Subaru, unos 200 mil kilómetros y anda mal”, no diagnostiques ni ofrezcas turno enseguida: preguntá qué nota exactamente y desde cuándo. Si cuenta un síntoma, explicá brevemente qué sistemas podrían estar relacionados sin afirmar una causa y hacé una sola pregunta útil sobre cuándo ocurre, qué aviso aparece, cómo se siente o si empezó después de un pozo, golpe o movimiento brusco. Preguntá sobre golpes solo cuando sea pertinente; nunca sugieras que ocurrió si el cliente no lo dijo. Procurá reunir sin interrogatorio: nombre, marca, modelo, año, kilometraje aproximado, síntomas, circunstancias y desde cuándo. Si no sabe año, modelo o kilometraje exacto, aceptá la aproximación. Después de que el cliente responda al menos una pregunta de seguimiento y ya tengas los datos esenciales, ofrecé preparar la consulta estructurada para WhatsApp. Si pide turno antes, seguí la conversación para obtener lo esencial y pedí el nombre si falta; no lo des por confirmado. Nunca pidas teléfono: WhatsApp ya identifica al remitente. No mandes al formulario general de la página. Cuando ya sea oportuno pasar a WhatsApp, decí que la persona puede tocar “Preparar solicitud” debajo del chat para revisar el borrador; no escribas el mensaje de WhatsApp dentro de tu respuesta, no inventes enlaces y no prometas respuesta inmediata del taller. Respondé en 2 a 4 frases breves, normalmente menos de 400 caracteres; no seas telegráfico ni escribas una biblia. No repitas “traelo al taller” ni ofrezcas reservar en cada respuesta. No asegures precios, presupuestos, repuestos ni disponibilidad. No afirmes que es seguro conducir sin una evaluación: si hay humo abundante, olor fuerte a combustible, falla de frenos, sobrecalentamiento, pérdida de dirección o daño tras un impacto, indicá detenerse en lugar seguro, no seguir conduciendo y pedir asistencia. No indiques abrir el sistema de refrigeración caliente. Para otros temas, explicá con amabilidad que el chat ayuda con consultas sobre vehículos y MOTORLOZ.`;
 const rateLimits = new Map();
-const CHAT_PROMPT = SYSTEM_PROMPT.replace('“Preparar solicitud” debajo del chat para revisar el borrador', '“Abrir WhatsApp” debajo del chat para revisar el mensaje allí');
+const CHAT_PROMPT = SYSTEM_PROMPT
+  .replace('Si solo saluda, saludá y preguntá en qué podés ayudar; no hables de turnos.', 'El chat ya mostró un saludo de bienvenida. Si la persona solo saluda, preguntá en qué podés ayudar sin volver a saludar ni presentarte; no hables de turnos.')
+  .replace('Después de que el cliente responda al menos una pregunta de seguimiento y ya tengas los datos esenciales, ofrecé preparar la consulta estructurada para WhatsApp.', 'No ofrezcas WhatsApp por haber reunido datos: primero respondé la inquietud y profundizá lo necesario. Solo mencioná preparar la consulta cuando la persona pida coordinar o cuando, después de conversar sobre el caso, demuestre querer pasar al taller.')
+  .replace('“Preparar solicitud” debajo del chat para revisar el borrador', '“Abrir WhatsApp” debajo del chat para revisar el mensaje allí');
 const DICTATION_GUIDANCE = ' El dictado puede confundir nombres de vehículos. Si una marca o un modelo nuevos contradicen lo que dijo antes el cliente (por ejemplo Subaru frente a Hyundai), preguntá cuál es el correcto antes de darlo por confirmado o preparar WhatsApp. Impreza, Hawkeye y Wagon pueden aparecer al hablar de un Subaru; no sustituyas esos términos por palabras comunes ni inventes un modelo a partir de una transcripción dudosa.';
+const DIALOGUE_GUIDANCE = ' Tu prioridad en cada turno es responder lo que la persona acaba de decir o preguntar. Si describe un golpeteo o ruido, explicá en lenguaje simple que puede venir de distintas zonas y preguntá una cosa concreta para ubicarlo (por ejemplo si aparece al acelerar, frenar o pasar por irregularidades); si comenzó después de un pozo, tené en cuenta ese dato sin afirmar una causa. Si pide información general sobre un auto, servicio o mantenimiento, contestá de forma útil aunque todavía no quiera reservar. No repitas saludos, el nombre MOTORLOZ ni los nombres Pablo y Bruno en respuestas consecutivas. Evitá frases de venta y preguntas de formulario; mantené una conversación natural de una pregunta útil por vez.';
 const SPEECH_STYLE = 'Leé exactamente el texto recibido, sin agregar ni omitir palabras. Español rioplatense de Montevideo. Voz cálida, natural y cercana, ritmo conversacional tranquilo; sin tono robótico ni locución publicitaria. El nombre del taller se pronuncia Motor Los, dos palabras; nunca Motorola.';
 
 function spokenTranscript(text) {
   // Display and WhatsApp keep the real brand; only the sound gets a phonetic hint.
   return text.replace(/\bMOTORLOZ\b/gi, 'Motor Los');
+}
+
+function withoutRepeatedGreeting(text) {
+  const answer = text.trim().replace(/^\s*[¡!]*\s*(?:hola|buenas(?:\s+(?:tardes|noches))?|buenos?\s+d[ií]as)\s*[,!.¡:–-]?\s*/iu, '').trim();
+  return answer || 'Contame qué necesitás saber sobre tu auto.';
 }
 
 function json(res, status, data) {
@@ -47,7 +56,7 @@ function cleanHistory(messages) {
     .filter(item => item.parts[0].text);
 }
 
-async function callGemini(contents, { maxOutputTokens = 768, systemInstruction = CHAT_PROMPT + DICTATION_GUIDANCE, models = [MODEL, 'gemini-3.8-flash', 'gemini-3.7-flash'] } = {}) {
+async function callGemini(contents, { maxOutputTokens = 768, systemInstruction = CHAT_PROMPT + DICTATION_GUIDANCE + DIALOGUE_GUIDANCE, models = [MODEL, 'gemini-3.8-flash', 'gemini-3.7-flash'] } = {}) {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw Object.assign(new Error('not_configured'), { status: 503 });
   models = [...new Set(models)];
@@ -97,9 +106,10 @@ async function callGemini(contents, { maxOutputTokens = 768, systemInstruction =
   throw lastError;
 }
 
-async function requestSpeech(text, stream = false, model = SPEECH_MODEL) {
+async function requestSpeech(text, stream = false, model = SPEECH_MODEL, signal) {
   return fetch('https://generativelanguage.googleapis.com/v1beta/interactions', {
     method: 'POST',
+    signal,
     headers: { 'Content-Type': 'application/json', 'x-goog-api-key': process.env.GEMINI_API_KEY },
     body: JSON.stringify({
       model,
@@ -134,10 +144,17 @@ async function generateSpeech(text) {
   throw lastError;
 }
 
-async function streamSpeech(text, res) {
+async function streamSpeech(text, req, res) {
+  const controller = new AbortController();
+  const onDisconnect = () => controller.abort();
+  req.on?.('aborted', onDisconnect);
+  res.on?.('close', onDisconnect);
   let lastError;
-  for (const model of [SPEECH_MODEL]) {
-    const upstream = await requestSpeech(text, true, model);
+  try {
+   for (const model of [SPEECH_MODEL]) {
+    let upstream;
+    try { upstream = await requestSpeech(text, true, model, controller.signal); }
+    catch (error) { if (controller.signal.aborted) return; throw error; }
     if (!upstream.ok) {
       const result = await upstream.json().catch(() => ({}));
       lastError = new Error('gemini_speech_failed');
@@ -168,14 +185,19 @@ async function streamSpeech(text, res) {
           started = true;
         } else res.write(chunk);
       }
-      if (started) { res.end(); return; }
+      if (started) { if (!res.destroyed) res.end(); return; }
     } catch (error) {
-      if (started) { res.end(); return; }
+      if (controller.signal.aborted) return;
+      if (started) { if (!res.destroyed) res.end(); return; }
       lastError = error;
     }
     lastError ||= new Error('gemini_speech_stream_empty');
+   }
+   throw lastError;
+  } finally {
+    req.off?.('aborted', onDisconnect);
+    res.off?.('close', onDisconnect);
   }
-  throw lastError;
 }
 
 function userMessage(message) {
@@ -209,7 +231,7 @@ async function handle(req, res, action) {
         return;
       }
       if (action === 'speech-stream') {
-        await streamSpeech(text, res);
+        await streamSpeech(text, req, res);
         return;
       }
       const wav = await generateSpeech(text);
@@ -251,7 +273,7 @@ async function handle(req, res, action) {
       return;
     }
     if (action === 'summary') json(res, 200, { summary: reply.slice(0, 550) });
-    else json(res, 200, { reply });
+    else json(res, 200, { reply: withoutRepeatedGreeting(reply) });
   } catch (error) {
     if (error.status === 503) {
       json(res, 503, { error: 'asistente_no_configurado', message: 'La IA todavía no está conectada. Podés usar el formulario de contacto.' });

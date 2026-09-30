@@ -1,5 +1,6 @@
 const assert = require('node:assert/strict');
 const test = require('node:test');
+const { EventEmitter } = require('node:events');
 const { handle } = require('../gemini-assistant.cjs');
 
 function response() {
@@ -22,7 +23,7 @@ test('retries a token-truncated Gemini response and returns the complete reply',
       ok: true,
       json: async () => requests.length === 1
         ? { candidates: [{ finishReason: 'MAX_TOKENS', content: { parts: [{ text: 'Hola, entiendo que' }] } }] }
-        : { candidates: [{ finishReason: 'STOP', content: { parts: [{ text: 'Revisemos ese ruido al frenar con el taller.' }] } }] }
+        : { candidates: [{ finishReason: 'STOP', content: { parts: [{ text: '¡Hola! Revisemos ese ruido al frenar con el taller.' }] } }] }
     };
   };
   try {
@@ -33,6 +34,8 @@ test('retries a token-truncated Gemini response and returns the complete reply',
     assert.equal(requests.length, 2);
     assert.equal(requests[0].generationConfig.thinkingConfig.thinkingLevel, 'minimal');
     assert.ok(requests[0].generationConfig.maxOutputTokens > 260);
+    assert.match(requests[0].systemInstruction.parts[0].text, /No ofrezcas WhatsApp por haber reunido datos/);
+    assert.match(requests[0].systemInstruction.parts[0].text, /Si describe un golpeteo o ruido/);
   } finally {
     global.fetch = previousFetch;
   }
@@ -82,6 +85,25 @@ test('streams fixed-voice audio chunks without waiting for the complete recordin
   } finally {
     global.fetch = previousFetch;
   }
+});
+
+test('stops generating voice when the visitor interrupts playback', async () => {
+  process.env.GEMINI_API_KEY = 'test-key';
+  const previousFetch = global.fetch;
+  let aborted = false;
+  global.fetch = async (_url, options) => new Promise((_resolve, reject) => {
+    options.signal.addEventListener('abort', () => { aborted = true; reject(new Error('aborted')); });
+  });
+  try {
+    const req = Object.assign(new EventEmitter(), { method:'POST', body:{ text:'Hola, soy MOTORLOZ.' }, headers:{}, socket:{} });
+    const res = Object.assign(new EventEmitter(), response());
+    const handling = handle(req, res, 'speech-stream');
+    await new Promise(resolve => setImmediate(resolve));
+    res.emit('close');
+    await handling;
+    assert.equal(aborted, true);
+    assert.equal(res.body, undefined);
+  } finally { global.fetch = previousFetch; }
 });
 
 test('keeps the one voice and model when speech reaches its quota', async () => {

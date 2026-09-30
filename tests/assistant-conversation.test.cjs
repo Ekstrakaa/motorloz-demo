@@ -57,6 +57,7 @@ test('the first greeting and successive replies speak in the same voice flow wit
     'Quiero reservar un turno': 'Claro, podemos preparar una consulta para coordinarlo.',
     'Me llamo Ana': 'Gracias, Ana. Contame un poco más de la falla.',
     'Desde que pasé un pozo vibra la caja y se enciende la luz del motor al acelerar': 'Entiendo. Esa combinación merece revisión; Pablo o Bruno pueden evaluar el auto. ¿Querés que preparemos la consulta para WhatsApp?',
+    'Prepará la consulta para WhatsApp': 'Claro, podés revisar el mensaje antes de enviarlo.',
     '¿Y si falla la voz?': 'Te sigo respondiendo por escrito.',
     'Probá otra vez la voz': 'Ahora sí, te escucho.'
   };
@@ -134,7 +135,9 @@ test('the first greeting and successive replies speak in the same voice flow wit
   await send('Me llamo Ana');
   assert.equal(get('#assistant-reservation-prompt').hidden, true);
   await send('Desde que pasé un pozo vibra la caja y se enciende la luz del motor al acelerar');
-  assert.equal(get('#assistant-reservation-prompt').hidden, false, 'the WhatsApp option appears after a substantive follow-up');
+  assert.equal(get('#assistant-reservation-prompt').hidden, true, 'symptom details alone do not push the customer toward WhatsApp');
+  await send('Prepará la consulta para WhatsApp');
+  assert.equal(get('#assistant-reservation-prompt').hidden, false, 'the WhatsApp option appears when the customer asks for it');
 
   await get('#assistant-reserve-start').listeners.click();
   const draft = new URL(popup.location.href).searchParams.get('text');

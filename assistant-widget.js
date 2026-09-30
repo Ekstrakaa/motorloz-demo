@@ -397,6 +397,14 @@
       bookingDismissed = false;
     }
     const customerTurns = history.filter(item => item.role === 'user');
+    const latestUser = customerTurns.at(-1)?.content?.trim() || '';
+    const earlierAssistant = history.slice(0, -1).filter(item => item.role === 'assistant').at(-1)?.content || '';
+    const explicitHandoff = /\b(?:quiero|necesito|pod[eé]s|podemos|me gustar[ií]a|hagamos|haceme)\b.{0,60}\b(?:turno|reserv\w*|agend\w*|coordin\w*|consult\w*|whatsapp)\b/i.test(latestUser)
+      || /(?:abrir|abr[ií]|preparar|prepar[aá]|mandar|mand[aá]|enviar|envi[aá]|pasemos)\s.{0,45}\b(?:whatsapp|consulta|solicitud|turno)\b/i.test(latestUser)
+      || /\b(?:reservame|agendame)\b/i.test(latestUser);
+    const acceptedOffer = /^(?:s[ií]|dale|ok|perfecto|hacelo|preparalo|vamos)(?:[.!\s]|$)/i.test(latestUser)
+      && /(?:whatsapp|preparar (?:la |una )?consulta|coordinar)/i.test(earlierAssistant);
+    if (!explicitHandoff && !acceptedOffer) return;
     const issueTurns = customerTurns.filter(item => {
       const words = item.content.trim();
       return words.length >= 22 && !/^(?:hola|buen(?:os|as)|me llamo|mi nombre es)\b/i.test(words) && !/^(?:(?:quiero|necesito) (?:(?:un )?turno|(?:reservar|agendar|coordinar)(?: (?:un )?turno)?)|reservame|agendame)[.!?\s]*$/i.test(words);
