@@ -24,7 +24,7 @@ function element() {
   };
 }
 
-test('two successive replies speak their own text and a greeting does not trigger booking', async () => {
+test('the first greeting and successive replies speak in the same voice flow without triggering booking', async () => {
   const nodes = new Map();
   const get = selector => {
     if (!nodes.has(selector)) nodes.set(selector, element());
@@ -90,7 +90,8 @@ test('two successive replies speak their own text and a greeting does not trigge
   vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../assistant-widget.js'), 'utf8'), context);
   get('#assistant-launcher').listeners.click();
   await new Promise(resolve => setTimeout(resolve, 120));
-  assert.equal(spokenTexts.length, 0, 'the welcome does not consume the reply voice quota');
+  assert.equal(spokenTexts.length, 1, 'opening the chat speaks the visible greeting');
+  assert.match(spokenTexts[0], /^Hola, soy tu asistente MOTORLOZ\. Contame qué notaste en tu auto/);
   assert.equal(get('#assistant-input').focusCount, 0, 'mobile opening leaves the keyboard closed');
   assert.equal(get('#assistant-window').style.getPropertyValue('--assistant-keyboard-offset'), '300px');
 

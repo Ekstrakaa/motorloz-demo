@@ -1,0 +1,22 @@
+/* One paced editorial entrance per element; readable if motion is unavailable. */
+.story-entry {
+  opacity:.08;
+  transform:translate3d(0,26px,0);
+  filter:blur(5px);
+  transition:opacity 1.25s cubic-bezier(.18,.7,.22,1) var(--story-delay,0ms),
+             transform 1.35s cubic-bezier(.18,.75,.2,1) var(--story-delay,0ms),
+             filter 1.25s ease var(--story-delay,0ms);
+}
+.story-entry-line { clip-path:inset(0 16% 0 0); }
+.story-entry.is-story-visible {
+  opacity:1;
+  transform:none;
+  filter:none;
+  clip-path:inset(0);
+}
+@media(max-width:760px) {
+  .story-entry { transform:translate3d(0,19px,0); }
+}
+@media(prefers-reduced-motion:reduce) {
+  .story-entry,.story-entry.is-story-visible { opacity:1!important;transform:none!important;filter:none!important;clip-path:none!important;transition:none!important; }
+}

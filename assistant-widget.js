@@ -52,6 +52,9 @@
   let activeSpeechButton = null;
   let muted = false;
   let lastSpokenText = '';
+  let welcomeSpoken = false;
+  let welcomePlayed = false;
+  let openSession = 0;
   let audioContext = null;
   let audioSources = new Set();
   let nextAudioTime = 0;
@@ -141,6 +144,7 @@
       source.connect(audioContext.destination);
       const start = Math.max(nextAudioTime, audioContext.currentTime + .035);
       source.start(start);
+      if (text === welcomeText) welcomePlayed = true;
       nextAudioTime = start + buffer.duration;
       audioSources.add(source);
       source.onended = () => {
@@ -217,6 +221,7 @@
     voicePlayer.src = voiceUrl;
     voicePlayer.currentTime = 0;
     await voicePlayer.play();
+    if (text === welcomeText) welcomePlayed = true;
     if (request !== voiceRequest) return;
     statusEl.textContent = 'Disponible para conversar';
     muteButton.classList.remove('is-loading');
@@ -264,6 +269,7 @@
       } else if (error.status === 429) {
         statusEl.textContent = 'Chat disponible · voz sin cupo por ahora';
       }
+      if (text === welcomeText && !retryScheduled) welcomeSpoken = welcomePlayed;
     } finally {
       if (request === voiceRequest && !retryScheduled) muteButton.classList.remove('is-loading');
     }
@@ -701,6 +707,7 @@
 
   function open() {
     clearTimeout(closeTimer);
+    const session = ++openSession;
     unlockAudio();
     panel.hidden = false;
     pageScrollY = window.scrollY || 0;
@@ -711,7 +718,11 @@
     requestAnimationFrame(() => panel.classList.add('is-open'));
     panel.setAttribute('aria-hidden', 'false');
     launcher.setAttribute('aria-expanded', 'true');
-    checkStatus();
+    checkStatus().then(() => {
+      if (session !== openSession || panel.hidden || !configured || muted || history.length || welcomeSpoken) return;
+      welcomeSpoken = true;
+      speakReply(welcomeText);
+    });
     window.setTimeout(() => {
       if (panel.hidden) return;
       const mobile = window.innerWidth && window.innerWidth <= 600;
@@ -720,6 +731,8 @@
   }
 
   function close() {
+    openSession += 1;
+    if (!welcomePlayed && !history.length) welcomeSpoken = false;
     stopSpeech();
     cancelDictation();
     document.documentElement?.classList.remove('assistant-chat-open');
@@ -737,7 +750,7 @@
   document.querySelector('#assistant-close').addEventListener('click', close);
   document.querySelector('#assistant-new').addEventListener('click', () => { resetDialog.hidden = false; });
   document.querySelector('#assistant-reset-no').addEventListener('click', () => { resetDialog.hidden = true; });
-  document.querySelector('#assistant-reset-yes').addEventListener('click', () => { resetDialog.hidden = true; stopSpeech(); cancelDictation(); welcome(); try { window.sessionStorage?.removeItem(conversationKey); } catch {} input.focus({preventScroll:true}); });
+  document.querySelector('#assistant-reset-yes').addEventListener('click', () => { resetDialog.hidden = true; stopSpeech(); cancelDictation(); welcome(); welcomePlayed = false; welcomeSpoken = configured && !muted; if (welcomeSpoken) speakReply(welcomeText); try { window.sessionStorage?.removeItem(conversationKey); } catch {} input.focus({preventScroll:true}); });
   muteButton.addEventListener('click', () => {
     muted = !muted;
     updateMuteButton();
