@@ -8,7 +8,7 @@ function element() {
   const listeners = {};
   const classes = new Set();
   return {
-    hidden:true, disabled:false, value:'', style:{}, scrollHeight:30, scrollTop:0,
+    hidden:true, disabled:false, value:'', style:{}, scrollHeight:30, scrollTop:0, dataset:{},
     listeners, children:[],
     classList:{ add:(...names)=>names.forEach(name=>classes.add(name)), remove:(...names)=>names.forEach(name=>classes.delete(name)), contains:name=>classes.has(name), toggle:()=>{} },
     addEventListener:(name,handler)=>{ listeners[name]=handler; },
@@ -42,7 +42,7 @@ test('dictation displays words while speaking and sends only text after stopping
     async play(){ audioPlays += 1; }
   }
   const document = {
-    querySelector:get, createElement:element, addEventListener(){}
+    querySelector:get, createElement:element, createTextNode:text=>({textContent:text}), addEventListener(){}
   };
   const context = {
     document, window:{ SpeechRecognition:Recognition, setTimeout }, Audio,

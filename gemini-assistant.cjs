@@ -1,7 +1,8 @@
 const MODEL = process.env.GEMINI_CHAT_MODEL || 'gemini-3.5-flash-lite';
 const SPEECH_MODEL = process.env.GEMINI_TTS_MODEL || 'gemini-3.8-flash-lite-tts';
 const SPEECH_VOICE = process.env.GEMINI_TTS_VOICE || 'Algieba';
-const SYSTEM_PROMPT = `Sos el asistente virtual de recepción de MOTORLOZ, taller multimarca en Montevideo. Conversá en español rioplatense, con calidez y naturalidad. Usá todo el historial: respondé a la última pregunta sin perder los datos ya aportados ni repetir lo que preguntaste. Si solo te saludan, saludá y preguntá en qué podés ayudar; no hables de reservas. Si cuentan un síntoma, escuchá, explicá de forma sencilla qué sistemas podrían estar relacionados sin afirmar un diagnóstico, y hacé una sola pregunta concreta que ayude a entender cuándo ocurre, qué aviso aparece o cómo se siente. Si ya conocés marca, modelo y síntoma, preguntá por el dato relevante que falta, como año, kilometraje o cuándo empezó. No encadenes preguntas de formulario: mantené una charla real y útil. Respondé normalmente en 2 a 4 frases breves, hasta unas 400 letras; no seas telegráfico ni mandes una biblia. No digas “traelo al taller” ni propongas reserva en cada respuesta. Solo cuando la persona pida coordinar o después de comprender el caso y notar que quiere avanzar, explicá que podés preparar desde este chat una solicitud por WhatsApp, que el taller confirmará el día y horario; nunca afirmes que el turno ya está confirmado. No asegures precios, presupuestos, repuestos ni disponibilidad. Si hay humo abundante, olor fuerte a combustible, falla de frenos, sobrecalentamiento o pérdida de dirección, priorizá la seguridad: indicá detenerse en lugar seguro, no seguir conduciendo y pedir asistencia. No indiques abrir el sistema de refrigeración caliente. No pidas nombre ni teléfono en el chat: van en el paso final de WhatsApp. Para otros temas, explicá con amabilidad que el chat ayuda con consultas sobre vehículos y MOTORLOZ.`;
+const SUMMARY_MODEL = process.env.GEMINI_SUMMARY_MODEL || 'gemini-3.5-flash';
+const SYSTEM_PROMPT = `Sos la recepción virtual de MOTORLOZ, taller multimarca en Montevideo. Tu trabajo es escuchar, orientar sin diagnosticar y preparar una consulta clara para WhatsApp. Pablo es el dueño del taller y Bruno forma parte del equipo experimentado; podés mencionarlos naturalmente al explicar que revisarán el caso, sin prometer que una persona concreta estará disponible. El equipo humano confirma día, hora, disponibilidad y detalles finales: vos nunca confirmás una reserva. Conversá en español rioplatense cálido y natural. Usá todo el historial disponible: recordá lo ya dicho y no repitas preguntas ni datos. Si solo saluda, saludá y preguntá en qué podés ayudar; no hables de turnos. También atendés mantenimiento y servicios programados: aceite, frenos, alineación y revisiones; si pregunta por eso, preguntá qué servicio necesita, para qué vehículo y el kilometraje, sin inventar intervalos ni precios. Si la persona dice solo “tengo un Subaru, unos 200 mil kilómetros y anda mal”, no diagnostiques ni ofrezcas turno enseguida: preguntá qué nota exactamente y desde cuándo. Si cuenta un síntoma, explicá brevemente qué sistemas podrían estar relacionados sin afirmar una causa y hacé una sola pregunta útil sobre cuándo ocurre, qué aviso aparece, cómo se siente o si empezó después de un pozo, golpe o movimiento brusco. Preguntá sobre golpes solo cuando sea pertinente; nunca sugieras que ocurrió si el cliente no lo dijo. Procurá reunir sin interrogatorio: nombre, marca, modelo, año, kilometraje aproximado, síntomas, circunstancias y desde cuándo. Si no sabe año, modelo o kilometraje exacto, aceptá la aproximación. Después de que el cliente responda al menos una pregunta de seguimiento y ya tengas los datos esenciales, ofrecé preparar la consulta estructurada para WhatsApp. Si pide turno antes, seguí la conversación para obtener lo esencial y pedí el nombre si falta; no lo des por confirmado. Nunca pidas teléfono: WhatsApp ya identifica al remitente. No mandes al formulario general de la página. Respondé en 2 a 4 frases breves, normalmente menos de 400 caracteres; no seas telegráfico ni escribas una biblia. No repitas “traelo al taller” ni ofrezcas reservar en cada respuesta. No asegures precios, presupuestos, repuestos ni disponibilidad. No afirmes que es seguro conducir sin una evaluación: si hay humo abundante, olor fuerte a combustible, falla de frenos, sobrecalentamiento, pérdida de dirección o daño tras un impacto, indicá detenerse en lugar seguro, no seguir conduciendo y pedir asistencia. No indiques abrir el sistema de refrigeración caliente. Para otros temas, explicá con amabilidad que el chat ayuda con consultas sobre vehículos y MOTORLOZ.`;
 const rateLimits = new Map();
 
 function json(res, status, data) {
@@ -217,11 +218,14 @@ async function handle(req, res, action) {
     let maxOutputTokens = action === 'summary' ? 768 : 768;
 
     if (action === 'summary') {
-      if (!history.length) {
+      const customerStatements = Array.isArray(body.messages) ? body.messages
+        .filter(item => item?.role === 'user' && typeof item.content === 'string')
+        .slice(-12).map(item => item.content.trim().slice(0, 800)).filter(Boolean) : [];
+      if (!customerStatements.length) {
         json(res, 400, { error: 'resumen_invalido', message: 'No hay conversación para resumir.' });
         return;
       }
-      contents = userMessage(`Prepará para el mecánico de MOTORLOZ un único párrafo breve, máximo 2 frases y 500 caracteres. Incluí marca, modelo, año y kilometraje solo si la persona los mencionó; resumí en sus palabras qué ocurrió, síntomas, cuándo aparecen y detalles que aclaró. No diagnostiques ni inventes causas, piezas, datos del vehículo o gravedad. No incluyas nombres, teléfonos, matrículas, precios ni consejos nuevos. Esta es una síntesis de recepción, no un diagnóstico.\n\nConversación:\n${body.messages.slice(-12).map(item => `${item.role === 'assistant' ? 'Asistente' : 'Cliente'}: ${String(item.content || '').slice(0, 1200)}`).join('\n')}`);
+      contents = userMessage(`Escribí para un mecánico la sección “Qué ocurre” de una consulta inicial. Usá SOLAMENTE las afirmaciones del cliente que siguen. Incluí todos los síntomas concretos que mencionó, cuándo y en qué condiciones aparecen, y cualquier hecho previo que el cliente relaciona con el problema, sin omitir detalles importantes. Redactá 2 a 4 oraciones claras, máximo 550 caracteres, sin repetir ni hacer una lista de palabras sueltas. No incluyas saludos, pedidos de turno, nombre, teléfono, marca, modelo, año o kilometraje: esos datos van en otras secciones. No conviertas preguntas del asistente en hechos, no infieras síntomas negados, no inventes causas ni des un diagnóstico. Si el cliente expresa incertidumbre, mantenela con expresiones como “según comenta” o “al parecer”. Devolvé solo el texto para el mecánico.\n\nDicho por el cliente, en orden:\n${customerStatements.map((text, index) => `${index + 1}. ${text}`).join('\n')}`);
     } else if (action === 'chat') {
       if (!history.length || history[history.length - 1].role !== 'user') {
         json(res, 400, { error: 'mensaje_invalido', message: 'Escribí una consulta para continuar.' });
@@ -233,12 +237,12 @@ async function handle(req, res, action) {
       return;
     }
 
-    const reply = await callGemini(contents, { maxOutputTokens });
+    const reply = await callGemini(contents, { maxOutputTokens, ...(action === 'summary' ? { models: [SUMMARY_MODEL, MODEL] } : {}) });
     if (!reply) {
       json(res, 502, { error: 'respuesta_vacia', message: 'No pude armar una respuesta ahora. Intentá de nuevo.' });
       return;
     }
-    if (action === 'summary') json(res, 200, { summary: reply.slice(0, 520) });
+    if (action === 'summary') json(res, 200, { summary: reply.slice(0, 550) });
     else json(res, 200, { reply });
   } catch (error) {
     if (error.status === 503) {

@@ -14,14 +14,19 @@
   const booking = document.querySelector('#assistant-booking');
   const reservationPrompt = document.querySelector('#assistant-reservation-prompt');
   const bookingForm = document.querySelector('#assistant-booking-form');
+  const issueStatus = document.querySelector('#assistant-issue-status');
   const resetDialog = document.querySelector('#assistant-reset-confirm');
   const recordingState = document.querySelector('#assistant-recording-state');
   const muteButton = document.querySelector('#assistant-mute');
   const voicePlayer = new Audio();
   const AudioContextClass = window.AudioContext || window.webkitAudioContext;
   const speechCache = new Map();
-  const welcomeText = 'Hola, soy tu asistente MOTORLOZ. Contame qué notaste en tu auto y, si podés, la marca, el modelo y el kilometraje.';
+  const welcomeText = 'Hola, soy tu asistente MOTORLOZ. Contame qué notaste en tu auto o qué mantenimiento o servicio buscás. Si sabés la marca, el modelo y el kilometraje, decímelos también. Podés escribir o tocar el micrófono; al terminar, tocá Terminar y enviar.';
+  const conversationKey = 'motorloz-assistant-conversation-v1';
   let history = [];
+  let intakeHistoryKey = '';
+  let bookingDismissed = false;
+  let summaryAbort = null;
   let configured = false;
   let statusChecked = false;
   let busy = false;
@@ -51,9 +56,10 @@
   let audioSources = new Set();
   let nextAudioTime = 0;
   let streamFinished = false;
+  let pageScrollY = 0;
   const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   micButton.title = Recognition ? 'Dictar y enviar como texto' : 'Dictado no disponible en este navegador';
-  hintEl.textContent = Recognition ? 'Dictá y tocá Terminar · se envía como texto' : 'Escribí o usá el dictado del teclado';
+  hintEl.textContent = Recognition ? 'Tocá el micrófono para dictar · se enviará solo texto' : 'Escribí o usá el dictado del teclado';
 
   function stopSpeech() {
     voiceRequest += 1;
@@ -109,7 +115,7 @@
     let received = false;
     let oddByte = null;
     let pending = '';
-    const firstAudioTimeout = setTimeout(() => { if (!received) controller.abort(); }, 9000);
+    const firstAudioTimeout = setTimeout(() => { if (!received) controller.abort(); }, 5000);
     const handleBlock = block => {
       const data = block.split(/\r?\n/).filter(line => line.startsWith('data:')).map(line => line.slice(5).trimStart()).join('\n');
       if (!data || data === '[DONE]') return;
@@ -244,7 +250,7 @@
         } catch (error) {
           if (request !== voiceRequest) return;
           if (audioSources.size) { streamFinished = true; return; }
-          if (error.status === 429) { browserSpeech(text, request); return; }
+          if (browserSpeech(text, request)) return;
         }
       }
       const controller = new AbortController();
@@ -264,6 +270,28 @@
   function bubble(text, role, extra = {}) {
     const row = document.createElement('div');
     row.className = `assistant-message assistant-message-${role}`;
+    if (extra.welcome) {
+      row.classList.add('assistant-message-welcome');
+      const kicker = document.createElement('span');
+      kicker.className = 'assistant-welcome-kicker';
+      kicker.textContent = 'RECEPCIÓN DIGITAL  /  MOTORLOZ';
+      const heading = document.createElement('p');
+      heading.className = 'assistant-welcome-heading';
+      heading.append(document.createTextNode('Hola, soy tu asistente '));
+      const brand = document.createElement('strong');
+      brand.textContent = 'MOTORLOZ.';
+      heading.append(brand);
+      const description = document.createElement('p');
+      description.className = 'assistant-welcome-description';
+      description.textContent = 'Contame qué notaste en tu auto o qué mantenimiento o servicio buscás. Si sabés la marca, el modelo y el kilometraje, decímelos también.';
+      const voiceTip = document.createElement('div');
+      voiceTip.className = 'assistant-welcome-voice';
+      voiceTip.textContent = '⌁  Podés escribir o tocar el micrófono. Al terminar, tocá “Terminar y enviar”.';
+      row.append(kicker, heading, description, voiceTip);
+      messagesEl.append(row);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+      return row;
+    }
     const copy = document.createElement('p');
     copy.textContent = text;
     row.append(copy);
@@ -278,8 +306,10 @@
     booking.hidden = true;
     reservationPrompt.hidden = true;
     history = [];
+    intakeHistoryKey = '';
+    bookingDismissed = false;
     lastSpokenText = welcomeText;
-    const greeting = bubble(welcomeText, 'assistant');
+    const greeting = bubble(welcomeText, 'assistant', { welcome:true });
     if (statusChecked && !configured) bubble('La conexión con la inteligencia artificial todavía no está configurada. El formulario de consulta sigue disponible en la página.', 'assistant');
     messagesEl.scrollTop = 0;
     return greeting;
@@ -322,10 +352,49 @@
     form.setAttribute('aria-busy', String(value));
   }
 
-  function maybeShowBooking(userMessage) {
-    if (/\b(turno|reserv(a|ar|arlo|arme|ación)|agend(a|ar|arme)|coordinar una (visita|revisión)|llevar(lo|la)? al taller)\b/i.test(userMessage)) {
-      reservationPrompt.hidden = false;
+  function saveConversation() {
+    try { window.sessionStorage?.setItem(conversationKey, JSON.stringify(history.slice(-20))); } catch {}
+  }
+
+  function restoreConversation() {
+    try {
+      const stored = JSON.parse(window.sessionStorage?.getItem(conversationKey) || '[]');
+      if (!Array.isArray(stored)) return;
+      const restored = stored.slice(-20).filter(item => item && ['user', 'assistant'].includes(item.role) && typeof item.content === 'string' && item.content.trim()).map(item => ({ role:item.role, content:item.content.slice(0, 1200) }));
+      if (!restored.length) return;
+      history = restored;
+      for (const item of restored) bubble(item.content, item.role);
+      lastSpokenText = restored.filter(item => item.role === 'assistant').at(-1)?.content || welcomeText;
+    } catch {}
+  }
+
+  function maybeShowBooking() {
+    if (bookingDismissed) {
+      if (!/\b(?:turno|reservar|agendar|coordinar)\b/i.test(history.at(-2)?.content || '')) return;
+      bookingDismissed = false;
     }
+    const customerTurns = history.filter(item => item.role === 'user');
+    const issueTurns = customerTurns.filter(item => {
+      const words = item.content.trim();
+      return words.length >= 22 && !/^(?:hola|buen(?:os|as)|me llamo|mi nombre es)\b/i.test(words) && !/^(?:(?:quiero|necesito) (?:(?:un )?turno|(?:reservar|agendar|coordinar)(?: (?:un )?turno)?)|reservame|agendame)[.!?\s]*$/i.test(words);
+    });
+    const customerText = customerTurns.map(item => item.content).join(' ');
+    const hasVehicle = /\b(?:Subaru|Toyota|Honda|Hyundai|Volkswagen|VW|BMW|Mercedes|Nissan|Mazda|Suzuki|Mitsubishi|Kia|Chevrolet|Peugeot|Audi|Renault|Ford|Jeep|Fiat|Volvo|Citro[eë]n|Dodge|Ferrari|Porsche|Alfa Romeo|auto|coche|camioneta|veh[ií]culo)\b/i.test(customerText);
+    const discussedProblem = issueTurns.some(item => /\b(?:falla|fallas|anda mal|ruido|vibra|luz|humo|frena|freno|arranca|motor|caja|pierde|calienta|golpe|pozo|problema|s[ií]ntoma|mantenimiento|service|aceite|pastillas|alineaci[oó]n|filtros|cambio|revisi[oó]n)\b/i.test(item.content));
+    if (hasVehicle && discussedProblem && issueTurns.length >= 2 && customerName()) reservationPrompt.hidden = false;
+  }
+
+  function customerName() {
+    for (let index = history.length - 1; index >= 0; index -= 1) {
+      const item = history[index];
+      if (item.role !== 'user') continue;
+      const explicit = item.content.match(/\b(?:me llamo|mi nombre es)\s+([\p{L}]+(?:\s+[\p{L}]+){0,2})/iu);
+      if (explicit) return explicit[1].split(/\s+(?:y|tengo|soy|con)\b/i)[0].trim();
+      const previous = history[index - 1];
+      const answer = item.content.trim().replace(/[.!?]+$/, '');
+      if (previous?.role === 'assistant' && /(?:c[oó]mo te llam[aá]s|tu nombre)/i.test(previous.content) && /^[\p{L}]+(?:\s+[\p{L}]+){0,2}$/u.test(answer)) return answer;
+    }
+    return '';
   }
 
   async function requestReply(userMessage) {
@@ -346,10 +415,11 @@
       const replyText = String(result.reply || '').trim();
       if (!replyText) throw new Error('No pude responder en este momento.');
       history.push({ role: 'assistant', content: replyText });
+      saveConversation();
       bubble(replyText, 'assistant');
       lastSpokenText = replyText;
       speakReply(replyText);
-      maybeShowBooking(userMessage);
+      maybeShowBooking();
     } catch (error) {
       pending.remove();
       history.pop();
@@ -389,9 +459,12 @@
     recognitionRestartTimer = null;
     document.querySelector('#assistant-recording').hidden = true;
     micButton.classList.remove('is-recording');
+    micButton.setAttribute('aria-pressed', 'false');
+    micButton.setAttribute('aria-label', 'Empezar dictado');
+    micButton.title = 'Empezar dictado';
     hintEl.hidden = false;
-    input.placeholder = 'Contame qué notaste…';
-    recordingState.textContent = 'Escuchando';
+    input.placeholder = 'Escribí tu consulta…';
+    recordingState.textContent = 'Grabando';
   }
 
   function failDictation(message) {
@@ -445,7 +518,7 @@
     speechRecognition = recognizer;
     recognitionStartedAt = Date.now();
     recognizer.addEventListener('start', () => {
-      if (session === dictationSession) recordingState.textContent = 'Escuchando';
+      if (session === dictationSession) recordingState.textContent = 'Grabando';
     });
     recognizer.addEventListener('result', event => {
       if (session !== dictationSession || speechRecognition !== recognizer) return;
@@ -514,6 +587,9 @@
     recognitionInterim = '';
     recordingStart = Date.now();
     micButton.classList.add('is-recording');
+    micButton.setAttribute('aria-pressed', 'true');
+    micButton.setAttribute('aria-label', 'Terminar dictado y enviar texto');
+    micButton.title = 'Terminar dictado y enviar texto';
     document.querySelector('#assistant-recording').hidden = false;
     hintEl.hidden = true;
     input.placeholder = 'Tus palabras aparecen acá…';
@@ -542,12 +618,17 @@
     const coveredHeight = viewport ? Math.max(0, (window.innerHeight || visibleHeight) - viewport.height - viewport.offsetTop) : 0;
     panel.style.setProperty?.('--assistant-visible-height', `${visibleHeight}px`);
     panel.style.setProperty?.('--assistant-keyboard-offset', `${coveredHeight}px`);
+    panel.style.setProperty?.('--assistant-visible-width', `${viewport?.width || window.innerWidth}px`);
+    panel.style.setProperty?.('--assistant-viewport-top', `${viewport?.offsetTop || 0}px`);
+    panel.style.setProperty?.('--assistant-viewport-left', `${viewport?.offsetLeft || 0}px`);
   }
 
   function open() {
     clearTimeout(closeTimer);
     unlockAudio();
     panel.hidden = false;
+    pageScrollY = window.scrollY || 0;
+    document.body?.style?.setProperty?.('--assistant-page-lock-top', `${-pageScrollY}px`);
     document.documentElement?.classList.add('assistant-chat-open');
     document.body?.classList.add('assistant-chat-open');
     syncViewport();
@@ -567,6 +648,7 @@
     cancelDictation();
     document.documentElement?.classList.remove('assistant-chat-open');
     document.body?.classList.remove('assistant-chat-open');
+    window.scrollTo?.(0, pageScrollY);
     panel.classList.remove('is-open');
     panel.setAttribute('aria-hidden', 'true');
     launcher.setAttribute('aria-expanded', 'false');
@@ -579,7 +661,7 @@
   document.querySelector('#assistant-close').addEventListener('click', close);
   document.querySelector('#assistant-new').addEventListener('click', () => { resetDialog.hidden = false; });
   document.querySelector('#assistant-reset-no').addEventListener('click', () => { resetDialog.hidden = true; });
-  document.querySelector('#assistant-reset-yes').addEventListener('click', () => { resetDialog.hidden = true; stopSpeech(); cancelDictation(); welcome(); if (configured) speakReply(welcomeText); input.focus({preventScroll:true}); });
+  document.querySelector('#assistant-reset-yes').addEventListener('click', () => { resetDialog.hidden = true; stopSpeech(); cancelDictation(); summaryAbort?.abort(); bookingForm.reset(); welcome(); try { window.sessionStorage?.removeItem(conversationKey); } catch {} if (configured) speakReply(welcomeText); input.focus({preventScroll:true}); });
   muteButton.addEventListener('click', () => {
     muted = !muted;
     updateMuteButton();
@@ -590,7 +672,7 @@
   document.querySelector('#assistant-stop-recording').addEventListener('click', finishDictation);
   document.querySelector('#assistant-mic').addEventListener('click', () => dictating ? finishDictation() : startDictation());
   document.querySelector('#assistant-privacy-link').addEventListener('click', event => { event.preventDefault(); close(); document.querySelector('#turno').scrollIntoView({ behavior: 'smooth' }); });
-  document.querySelector('#assistant-booking-close').addEventListener('click', () => { booking.hidden = true; messagesEl.scrollTop = messagesEl.scrollHeight; });
+  document.querySelector('#assistant-booking-close').addEventListener('click', () => { summaryAbort?.abort(); booking.hidden = true; messagesEl.scrollTop = messagesEl.scrollHeight; });
   form.addEventListener('submit', event => { event.preventDefault(); if (dictating) finishDictation(); else sendText(input.value); });
   input.addEventListener('input', () => { input.style.height = 'auto'; input.style.height = `${Math.min(input.scrollHeight, 112)}px`; });
   input.addEventListener('keydown', event => { if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); form.requestSubmit(); } });
@@ -599,34 +681,65 @@
   window.visualViewport?.addEventListener('scroll', syncViewport);
   window.addEventListener?.('resize', syncViewport);
 
-  document.querySelector('#assistant-reserve-start').addEventListener('click', () => {
+  document.querySelector('#assistant-reserve-start').addEventListener('click', async () => {
     reservationPrompt.hidden = true;
     booking.hidden = false;
     document.querySelector('#assistant-wa-retry').hidden = true;
     booking.scrollTop = 0;
     const userWords = history.filter(item => item.role === 'user').map(item => item.content).join(' ');
-    const vehicle = userWords.match(/\b(Subaru|Toyota|Honda|Hyundai|Volkswagen|VW|BMW|Mercedes(?:-Benz)?|Nissan|Mazda|Suzuki|Mitsubishi|Kia|Chevrolet|Peugeot|Audi|Renault|Ford|Jeep|Fiat|Volvo|Citro[eë]n|Dodge|Ferrari|Porsche|Alfa Romeo)\s+([\w-]+(?:\s+[\w-]+)?)/i);
-    if (vehicle) bookingForm.elements.vehicle.value = `${vehicle[1]} ${vehicle[2]}`.replace(/\s+(?:19|20)\d{2}$/, '').replace(/\s+(de|del|con|a|al|en)$/i, '');
+    if (intakeHistoryKey === userWords) { bookingForm.querySelector('[name="name"]').focus({ preventScroll:true }); return; }
+    intakeHistoryKey = userWords;
+    bookingForm.elements.issue.dataset.edited = 'false';
+    const name = customerName();
+    if (name && !bookingForm.elements.name.value) bookingForm.elements.name.value = name;
+    const vehicle = userWords.match(/\b(Subaru|Toyota|Honda|Hyundai|Volkswagen|VW|BMW|Mercedes(?:-Benz)?|Nissan|Mazda|Suzuki|Mitsubishi|Kia|Chevrolet|Peugeot|Audi|Renault|Ford|Jeep|Fiat|Volvo|Citro[eë]n|Dodge|Ferrari|Porsche|Alfa Romeo)\b(?:\s+([A-Za-zÀ-ÿ][A-Za-zÀ-ÿ0-9-]+))?/i);
+    if (vehicle) bookingForm.elements.vehicle.value = vehicle[2] && !/^(?:de|del|con|a|al|en|me|anda|tiene|unos?|aprox|kil[oó]metros)$/i.test(vehicle[2]) ? `${vehicle[1]} ${vehicle[2]}` : vehicle[1];
     const year = userWords.match(/\b(19[89]\d|20[0-3]\d)\b/);
     if (year) bookingForm.elements.year.value = year[1];
+    const mileageInThousands = userWords.match(/\b(\d{1,3})\s*mil\s*(?:km|kil[oó]metros)?\b/i);
     const mileage = userWords.match(/\b(\d{2,3}(?:[.,]\d{3})?)\s*(?:km|kil[oó]metros)\b/i);
-    if (mileage) bookingForm.elements.mileage.value = `${mileage[1]} km`;
+    if (mileageInThousands) bookingForm.elements.mileage.value = `${mileageInThousands[1]}.000 km aprox.`;
+    else if (mileage) bookingForm.elements.mileage.value = `${mileage[1]} km`;
     bookingForm.elements.issue.value = history.filter(item => item.role === 'user')
       .map(item => item.content.trim())
       .filter(text => text && !/^(hola|buen(as|os) (d[ií]as|tardes|noches))[!.,\s]*$/i.test(text))
-      .filter(Boolean).slice(-4).join(' ').slice(0, 600);
+      .filter(Boolean).slice(-8).join(' ').slice(0, 800);
+    issueStatus.textContent = 'Preparando un resumen de lo que contaste…';
     bookingForm.querySelector('[name="name"]').focus({ preventScroll: true });
+    summaryAbort?.abort();
+    const controller = new AbortController();
+    summaryAbort = controller;
+    const timeout = setTimeout(() => controller.abort(), 15_000);
+    try {
+      const response = await fetch('/api/assistant/summary', {
+        method:'POST', headers:{ 'Content-Type':'application/json' },
+        body:JSON.stringify({ messages:history }), signal:controller.signal
+      });
+      const result = await response.json();
+      if (response.ok && !booking.hidden && summaryAbort === controller && bookingForm.elements.issue.dataset.edited !== 'true') {
+        const summary = String(result.summary || '').trim();
+        if (summary) bookingForm.elements.issue.value = summary;
+        issueStatus.textContent = 'Revisá el resumen y corregí cualquier detalle antes de abrir WhatsApp.';
+      }
+    } catch {
+      if (!booking.hidden && summaryAbort === controller) issueStatus.textContent = 'Revisá y ajustá este texto antes de abrir WhatsApp.';
+    } finally {
+      clearTimeout(timeout);
+      if (summaryAbort === controller) summaryAbort = null;
+    }
   });
   document.querySelector('#assistant-reserve-later').addEventListener('click', () => {
+    bookingDismissed = true;
     reservationPrompt.hidden = true;
   });
+  bookingForm.elements.issue.addEventListener('input', () => { bookingForm.elements.issue.dataset.edited = 'true'; issueStatus.textContent = 'Tu versión será la que llegue a WhatsApp.'; });
   bookingForm.addEventListener('submit', event => {
     event.preventDefault();
     const data = new FormData(bookingForm);
     const values = Object.fromEntries(data.entries());
     const sections = [
       '*CONSULTA MOTORLOZ*\nPreparada desde el asistente',
-      `*01 · CONTACTO*\n- Nombre: ${values.name.trim()}\n- Teléfono: ${values.phone.trim()}`,
+      `*01 · CLIENTE*\n- Nombre: ${values.name.trim()}`,
       [
         '*02 · VEHÍCULO*',
         `- Marca y modelo: ${values.vehicle.trim()}`,
@@ -649,5 +762,6 @@
   });
 
   welcome();
+  restoreConversation();
   if (new URLSearchParams(location.search).get('asistente') === '1') open();
 })();

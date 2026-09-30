@@ -1,0 +1,147 @@
+/* MOTORLOZ digital reception: a restrained glass layer over the existing chat. */
+.assistant-window {
+  border-color: rgba(104, 202, 210, .35);
+  background: linear-gradient(155deg, #102125 0%, #0b1518 48%, #0b1114 100%);
+  box-shadow: 0 30px 90px rgba(0, 5, 7, .62), inset 0 1px rgba(255, 255, 255, .08);
+  isolation: isolate;
+}
+.assistant-window::after {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  pointer-events: none;
+  content: "";
+  background: radial-gradient(ellipse 80% 35% at 100% 0%, rgba(43, 188, 199, .11), transparent 76%);
+}
+.assistant-header {
+  border-bottom-color: rgba(134, 205, 208, .14);
+  background: linear-gradient(118deg, rgba(36, 78, 85, .54), rgba(12, 27, 31, .72));
+  backdrop-filter: blur(18px);
+}
+.assistant-identity h2 { font-size: 15px; font-weight: 740; letter-spacing: -.035em; }
+.assistant-identity p { letter-spacing: .035em; }
+.assistant-disclosure { background: rgba(9, 24, 27, .67); }
+.assistant-messages { gap: 15px; background: linear-gradient(180deg, rgba(9, 22, 25, .55), transparent 45%); }
+.assistant-message p {
+  border-color: rgba(117, 177, 183, .2);
+  border-radius: 7px 17px 17px 17px;
+  background: linear-gradient(148deg, rgba(31, 57, 61, .83), rgba(17, 33, 37, .88));
+  box-shadow: 0 7px 20px rgba(0, 5, 8, .18), inset 0 1px rgba(255, 255, 255, .045);
+  font-size: 13px;
+  line-height: 1.55;
+}
+.assistant-message-user p {
+  border-color: rgba(93, 205, 215, .5);
+  border-radius: 17px 7px 17px 17px;
+  background: linear-gradient(130deg, #20575e, #17434a);
+}
+.assistant-message-welcome {
+  max-width: 100%;
+  align-self: stretch;
+  padding: 17px 18px 16px;
+  border: 1px solid rgba(112, 197, 203, .32);
+  border-radius: 18px 18px 18px 7px;
+  background: linear-gradient(135deg, rgba(46, 102, 108, .27), rgba(19, 38, 42, .83) 45%, rgba(13, 25, 29, .9));
+  box-shadow: inset 0 1px rgba(255, 255, 255, .1), 0 18px 35px rgba(0, 7, 9, .2);
+  backdrop-filter: blur(16px);
+}
+.assistant-welcome-kicker {
+  display: block;
+  margin-bottom: 13px;
+  color: #71cdd4;
+  font: 700 9px/1.25 ui-monospace, SFMono-Regular, Consolas, monospace;
+  letter-spacing: .13em;
+}
+.assistant-message-welcome .assistant-welcome-heading,
+.assistant-message-welcome .assistant-welcome-description {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+.assistant-message-welcome .assistant-welcome-heading {
+  color: #f6fbfa;
+  font-size: clamp(17px, 4vw, 20px);
+  font-weight: 700;
+  line-height: 1.16;
+  letter-spacing: -.045em;
+}
+.assistant-welcome-heading strong { color: #4cc5d0; font-weight: 800; }
+.assistant-message-welcome .assistant-welcome-description { margin-top: 11px; color: #c9d7d8; font-size: 12px; line-height: 1.55; }
+.assistant-welcome-voice {
+  margin-top: 15px;
+  padding: 9px 11px;
+  border-top: 1px solid rgba(114, 192, 199, .25);
+  color: #a8d4d7;
+  font-size: 11px;
+  line-height: 1.4;
+}
+.assistant-composer {
+  border-top-color: rgba(107, 190, 196, .27);
+  background: linear-gradient(180deg, rgba(12, 26, 29, .94), #0b1417);
+}
+.assistant-composer-row { border-color: rgba(120, 181, 185, .34); background: rgba(31, 53, 57, .46); }
+.assistant-composer textarea { font-size: 16px; }
+.assistant-mic { border: 1px solid rgba(72, 193, 202, .35); color: #73d6de; background: rgba(45, 126, 135, .17); }
+.assistant-mic.is-recording {
+  border-color: #f49b91;
+  background: rgba(147, 43, 43, .32);
+  color: #ffd7d1;
+  animation: assistant-record-pulse 1.1s ease-in-out infinite alternate;
+}
+.assistant-mic.is-recording svg { display: none; }
+.assistant-mic.is-recording::after { width: 13px; height: 13px; border-radius: 3px; background: currentColor; content: ""; }
+.assistant-composer-meta { min-height: 22px; font-size: 10px; }
+.assistant-composer-meta #assistant-recording {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 5px;
+  width: 100%;
+  color: #ffd1cb;
+  font-weight: 680;
+}
+.assistant-composer-meta #assistant-recording[hidden] { display: none; }
+.assistant-composer-meta #assistant-recording button {
+  margin-left: auto;
+  padding: 5px 8px;
+  border: 1px solid rgba(255, 169, 159, .5);
+  border-radius: 8px;
+  background: rgba(121, 34, 32, .32);
+  color: #ffe4de;
+  text-decoration: none;
+  font-weight: 700;
+}
+.assistant-reservation-prompt { border-top-color: rgba(89, 196, 205, .35); background: linear-gradient(115deg, #173238, #0c1d22); }
+.assistant-reservation-prompt strong { font-size: 12px; }
+.assistant-reservation-prompt>button:not(.assistant-reserve-later) { border: 1px solid rgba(133, 226, 232, .52); background: linear-gradient(155deg, #5bcdd5, #2eb6c1); }
+
+@media (max-width: 600px) {
+  html.assistant-chat-open { overflow: hidden; }
+  body.assistant-chat-open {
+    position: fixed;
+    top: var(--assistant-page-lock-top, 0px);
+    left: 0;
+    right: 0;
+    width: 100%;
+    overflow: hidden;
+  }
+  .assistant-window {
+    left: calc(var(--assistant-viewport-left, 0px) + 7px);
+    right: auto;
+    top: calc(var(--assistant-viewport-top, 0px) + 7px);
+    bottom: auto;
+    width: calc(var(--assistant-visible-width, 100vw) - 14px);
+    max-width: none;
+    height: calc(var(--assistant-visible-height, 100dvh) - 14px);
+    min-height: 0;
+    max-height: calc(var(--assistant-visible-height, 100dvh) - 14px);
+    transform-origin: bottom center;
+  }
+  .assistant-message-welcome { padding: 15px 15px 13px; }
+  .assistant-messages { min-height: 0; }
+  .assistant-composer { padding-bottom: max(8px, env(safe-area-inset-bottom, 0px)); }
+  .assistant-composer-meta #assistant-recording button { min-height: 29px; }
+}
+@media (prefers-reduced-motion: reduce) { .assistant-mic.is-recording { animation: none; } }

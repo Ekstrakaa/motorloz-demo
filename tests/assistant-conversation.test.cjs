@@ -9,7 +9,7 @@ function element() {
   const classes = new Set();
   const styleValues = new Map();
   return {
-    hidden: true, disabled: false, value: '', children: [], listeners, focusCount: 0,
+    hidden: true, disabled: false, value: '', children: [], listeners, focusCount: 0, dataset: {},
     style: { setProperty: (key, value) => styleValues.set(key, value), getPropertyValue: key => styleValues.get(key) },
     classList: { add: name => classes.add(name), remove: name => classes.delete(name), contains: name => classes.has(name), toggle: () => {} },
     addEventListener: (name, listener) => { listeners[name] = listener; },
@@ -30,12 +30,13 @@ test('two successive replies speak their own text and a greeting does not trigge
     if (!nodes.has(selector)) nodes.set(selector, element());
     return nodes.get(selector);
   };
-  get('#assistant-booking-form').elements = Object.fromEntries(['issue', 'vehicle', 'year', 'mileage'].map(name => [name, element()]));
+  get('#assistant-booking-form').elements = Object.fromEntries(['name', 'issue', 'vehicle', 'year', 'mileage'].map(name => [name, element()]));
   get('#assistant-booking-form').querySelector = () => element();
   const spokenTexts = [];
   const chatHistories = [];
   const contexts = [];
   let openedUrl = '';
+  const session = new Map();
   class AudioContext {
     constructor() { this.state = 'suspended'; this.currentTime = 0; this.destination = {}; this.resumes = 0; contexts.push(this); }
     addEventListener() {}
@@ -49,8 +50,10 @@ test('two successive replies speak their own text and a greeting does not trigge
   }
   const replies = {
     Hola: '¡Hola! ¿Qué está pasando con tu auto?',
-    'Se encendió una luz en el tablero': 'Entiendo. ¿Qué luz se encendió y cuándo apareció?',
-    'Quiero reservar un turno': 'Claro, podemos preparar una consulta para coordinarlo.'
+    'Tengo un Subaru, unos 200 mil kilómetros y anda mal': 'Entiendo. ¿Qué notás exactamente y desde cuándo empezó?',
+    'Quiero reservar un turno': 'Claro, podemos preparar una consulta para coordinarlo.',
+    'Me llamo Ana': 'Gracias, Ana. Contame un poco más de la falla.',
+    'Desde que pasé un pozo vibra la caja y se enciende la luz del motor al acelerar': 'Entiendo. Esa combinación merece revisión; Pablo o Bruno pueden evaluar el auto. ¿Querés que preparemos la consulta para WhatsApp?'
   };
   const fetch = async (url, options) => {
     if (url.endsWith('/status')) return { ok: true, json: async () => ({ configured: true }) };
@@ -60,6 +63,7 @@ test('two successive replies speak their own text and a greeting does not trigge
       const message = messages.at(-1).content;
       return { ok: true, json: async () => ({ reply: replies[message] }) };
     }
+    if (url.endsWith('/summary')) return { ok:true, json:async () => ({ summary:'La luz del tablero se encendió y el cliente quiere revisar el auto.' }) };
     if (url.endsWith('/speech-stream')) {
       const text = JSON.parse(options.body).text;
       spokenTexts.push(text);
@@ -70,11 +74,11 @@ test('two successive replies speak their own text and a greeting does not trigge
     throw new Error(`Unexpected URL: ${url}`);
   };
   const context = {
-    document: { querySelector: get, createElement: element, documentElement: element(), body: element(), addEventListener() {} },
-    window: { AudioContext, SpeechRecognition: null, innerWidth: 393, innerHeight: 800, open: url => { openedUrl = url; },
+    document: { querySelector: get, createElement: element, createTextNode: text => ({ textContent:text }), documentElement: element(), body: element(), addEventListener() {} },
+    window: { AudioContext, SpeechRecognition: null, innerWidth: 393, innerHeight: 800, open: url => { openedUrl = url; }, sessionStorage: { getItem:key=>session.get(key), setItem:(key,value)=>session.set(key,value), removeItem:key=>session.delete(key) },
       visualViewport: { height: 500, offsetTop: 0, addEventListener() {} }, setTimeout, addEventListener() {} },
     Audio, location: { search: '' }, URLSearchParams, URL: { revokeObjectURL() {} },
-    FormData: class { entries() { return Object.entries({ name:'Prueba', phone:'099000000', vehicle:'Subaru Forester', year:'2014', mileage:'130.000 km', issue:'Se encendió la luz del motor al acelerar.', availability:'', priority:'Consulta coordinada' }); } },
+    FormData: class { entries() { return Object.entries({ name:'Prueba', vehicle:'Subaru Forester', year:'2014', mileage:'130.000 km', issue:'Se encendió la luz del motor al acelerar.', availability:'', priority:'Consulta coordinada' }); } },
     fetch, setTimeout, clearTimeout, setInterval, clearInterval,
     requestAnimationFrame: callback => callback(), AbortController, TextDecoder, atob
   };
@@ -92,6 +96,7 @@ test('two successive replies speak their own text and a greeting does not trigge
   await send('Hola');
   assert.equal(spokenTexts.at(-1), replies.Hola);
   assert.equal(get('#assistant-reservation-prompt').hidden, true);
+  assert.equal(JSON.parse(session.get('motorloz-assistant-conversation-v1'))[0].content, 'Hola');
   assert.equal(get('#assistant-input').focusCount, 0, 'answer does not refocus and move the page');
 
   const spokenBeforeReopen = spokenTexts.length;
@@ -102,9 +107,9 @@ test('two successive replies speak their own text and a greeting does not trigge
   assert.equal(spokenTexts.length, spokenBeforeReopen, 'reopening does not restart the welcome audio');
 
   contexts[0].state = 'interrupted';
-  await send('Se encendió una luz en el tablero');
-  assert.equal(spokenTexts.at(-1), replies['Se encendió una luz en el tablero']);
-  assert.deepEqual(chatHistories.at(-1).map(item => item.content), ['Hola', replies.Hola, 'Se encendió una luz en el tablero']);
+  await send('Tengo un Subaru, unos 200 mil kilómetros y anda mal');
+  assert.equal(spokenTexts.at(-1), replies['Tengo un Subaru, unos 200 mil kilómetros y anda mal']);
+  assert.deepEqual(chatHistories.at(-1).map(item => item.content), ['Hola', replies.Hola, 'Tengo un Subaru, unos 200 mil kilómetros y anda mal']);
   assert.ok(contexts[0].resumes >= 2, 'the next user gesture resumes interrupted audio');
   assert.equal(get('#assistant-reservation-prompt').hidden, true);
 
@@ -112,14 +117,25 @@ test('two successive replies speak their own text and a greeting does not trigge
   const beforeMuteReply = spokenTexts.length;
   await send('Quiero reservar un turno');
   assert.equal(spokenTexts.length, beforeMuteReply, 'muting the header silences the next answer');
-  assert.equal(get('#assistant-reservation-prompt').hidden, false);
+  assert.equal(get('#assistant-reservation-prompt').hidden, true, 'asking for a turn is too early without useful symptom details');
   get('#assistant-mute').listeners.click();
   assert.equal(spokenTexts.at(-1), replies['Quiero reservar un turno'], 'unmuting reads the current answer');
 
+  await send('Me llamo Ana');
+  assert.equal(get('#assistant-reservation-prompt').hidden, true);
+  await send('Desde que pasé un pozo vibra la caja y se enciende la luz del motor al acelerar');
+  assert.equal(get('#assistant-reservation-prompt').hidden, false, 'the WhatsApp option appears after a substantive follow-up');
+
   get('#assistant-reserve-start').listeners.click();
+  await new Promise(resolve => setTimeout(resolve, 0));
+  assert.equal(get('#assistant-booking-form').elements.name.value, 'Ana');
+  assert.equal(get('#assistant-booking-form').elements.vehicle.value, 'Subaru');
+  assert.equal(get('#assistant-booking-form').elements.mileage.value, '200.000 km aprox.');
+  assert.equal(get('#assistant-booking-form').elements.issue.value, 'La luz del tablero se encendió y el cliente quiere revisar el auto.');
   get('#assistant-booking-form').listeners.submit({ preventDefault() {} });
   const draft = new URL(openedUrl).searchParams.get('text');
-  assert.match(draft, /\*CONSULTA MOTORLOZ\*\nPreparada desde el asistente\n\n\*01 · CONTACTO\*/);
+  assert.match(draft, /\*CONSULTA MOTORLOZ\*\nPreparada desde el asistente\n\n\*01 · CLIENTE\*/);
+  assert.doesNotMatch(draft, /Tel[eé]fono|099000000/);
   assert.match(draft, /\n\n\*02 · VEHÍCULO\*\n- Marca y modelo: Subaru Forester/);
   assert.match(draft, /\n\n\*03 · QUÉ OCURRE\*\nSe encendió la luz del motor al acelerar\./);
   assert.match(draft, /\n\n\*04 · COORDINACIÓN\*/);

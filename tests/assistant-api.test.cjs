@@ -103,6 +103,31 @@ test('retries a speech stream on a second model when the first voice hits its qu
   } finally { global.fetch = previousFetch; }
 });
 
+test('the workshop summary uses only customer facts and the stronger summary model', async () => {
+  process.env.GEMINI_API_KEY = 'test-key';
+  const previousFetch = global.fetch;
+  let request;
+  let modelUrl;
+  global.fetch = async (url, options) => {
+    modelUrl = url;
+    request = JSON.parse(options.body);
+    return { ok:true, json:async () => ({ candidates:[{ finishReason:'STOP', content:{ parts:[{ text:'Se enciende la luz al acelerar. Tras pasar un pozo empezó un ruido, vibra la caja y sale más humo blanco.' }] } }] }) };
+  };
+  try {
+    const res = response();
+    await handle({ method:'POST', body:{ messages:[
+      { role:'user', content:'Se enciende la luz al acelerar; vibra la caja y sale más humo blanco.' },
+      { role:'assistant', content:'Entonces no hay ruidos ni golpes, ¿verdad?' },
+      { role:'user', content:'Después de pasar un pozo empezó un ruido raro.' }
+    ] }, headers:{}, socket:{} }, res, 'summary');
+    assert.equal(res.statusCode, 200);
+    assert.match(JSON.parse(res.body).summary, /pozo/);
+    assert.match(modelUrl, /gemini-3\.5-flash:generateContent/);
+    assert.match(request.contents[0].parts[0].text, /pozo/);
+    assert.doesNotMatch(request.contents[0].parts[0].text, /no hay ruidos ni golpes/);
+  } finally { global.fetch = previousFetch; }
+});
+
 test('uses the backup Gemini model when the primary service is unavailable', async () => {
   process.env.GEMINI_API_KEY = 'test-key';
   const previousFetch = global.fetch;
