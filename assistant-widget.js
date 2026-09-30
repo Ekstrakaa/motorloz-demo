@@ -599,7 +599,7 @@
   window.visualViewport?.addEventListener('scroll', syncViewport);
   window.addEventListener?.('resize', syncViewport);
 
-  document.querySelector('#assistant-reserve-start').addEventListener('click', async () => {
+  document.querySelector('#assistant-reserve-start').addEventListener('click', () => {
     reservationPrompt.hidden = true;
     booking.hidden = false;
     booking.scrollTop = 0;
@@ -610,21 +610,16 @@
     if (year) bookingForm.elements.year.value = year[1];
     const mileage = userWords.match(/\b(\d{2,3}(?:[.,]\d{3})?)\s*(?:km|kil[oó]metros)\b/i);
     if (mileage) bookingForm.elements.mileage.value = `${mileage[1]} km`;
-    bookingForm.elements.issue.value = history.filter(item => item.role === 'user').slice(-3).map(item => item.content).join(' ').slice(0, 500);
+    bookingForm.elements.issue.value = history.filter(item => item.role === 'user')
+      .map(item => item.content.trim())
+      .filter(text => text && !/^(hola|buen(as|os) (d[ií]as|tardes|noches))[!.,\s]*$/i.test(text))
+      .map(text => text.replace(/(?:quiero|me gustar[ií]a)\s+(?:coordinar|reservar|agendar)\s+(?:un\s+)?(?:turno|cita)[^.?!]*/ig, '').replace(/\s+\./g, '.').replace(/\.{2,}/g, '.').trim())
+      .filter(Boolean).slice(-4).join(' ').slice(0, 600);
     bookingForm.querySelector('[name="name"]').focus({ preventScroll: true });
-    try {
-      const response = await fetch('/api/assistant/summary', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: history })
-      });
-      const result = await response.json();
-      if (response.ok && !booking.hidden && !bookingForm.elements.issue.dataset.edited) bookingForm.elements.issue.value = String(result.summary || '').trim().slice(0, 600) || bookingForm.elements.issue.value;
-    } catch {}
   });
   document.querySelector('#assistant-reserve-later').addEventListener('click', () => {
     reservationPrompt.hidden = true;
   });
-  bookingForm.elements.issue.addEventListener('input', () => { bookingForm.elements.issue.dataset.edited = 'true'; });
   bookingForm.addEventListener('submit', event => {
     event.preventDefault();
     const data = new FormData(bookingForm);
@@ -645,7 +640,6 @@
     window.open(url, '_blank', 'noopener,noreferrer');
     booking.hidden = true;
     bookingForm.reset();
-    delete bookingForm.elements.issue.dataset.edited;
   });
 
   welcome();
