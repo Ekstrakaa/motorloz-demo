@@ -114,6 +114,14 @@
     } catch { audioContext = null; }
   }
 
+  async function speechError(response) {
+    const detail = typeof response.json === 'function' ? await response.json().catch(() => ({})) : {};
+    const error = new Error('speech_unavailable');
+    error.status = response.status;
+    error.reason = detail.error || '';
+    return error;
+  }
+
   async function streamSpeech(text, button, request) {
     if (!audioContext || audioContext.state !== 'running') throw new Error('audio_context_unavailable');
     const controller = new AbortController();
@@ -168,9 +176,7 @@
         body:JSON.stringify({text}), signal:controller.signal
       });
       if (!response.ok || !response.body) {
-        const error = new Error('speech_stream_unavailable');
-        error.status = response.status;
-        throw error;
+        throw await speechError(response);
       }
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
@@ -203,9 +209,7 @@
       body: JSON.stringify({ text }), signal
     });
     if (!response.ok) {
-      const error = new Error('speech_unavailable');
-      error.status = response.status;
-      throw error;
+      throw await speechError(response);
     }
     const audio = await response.blob();
     if (audio.type !== 'audio/wav' || audio.size < 44) throw new Error('speech_invalid');
@@ -261,7 +265,9 @@
       if (request !== voiceRequest) return;
       activeSpeechButton = null;
       muteButton.classList.remove('is-speaking');
-      if (error.status === 429 && retryCount < 3 && !muted && !panel.hidden) {
+      if (error.status === 429 && error.reason === 'limite_temporal') {
+        statusEl.textContent = 'Límite de voz del sitio alcanzado · intentá más tarde';
+      } else if (error.status === 429 && retryCount < 3 && !muted && !panel.hidden) {
         statusEl.textContent = 'Voz ocupada · reintentando';
         retryScheduled = true;
         speechRetryTimer = setTimeout(() => {
@@ -269,7 +275,7 @@
           if (request === voiceRequest && !muted && !panel.hidden) speakReply(text, button, retryCount + 1);
         }, [2500, 7000, 15000][retryCount]);
       } else if (error.status === 429) {
-        statusEl.textContent = 'Chat disponible · voz sin cupo por ahora';
+        statusEl.textContent = 'Proveedor de voz sin cupo · intentá más tarde';
       } else if (retryCount < 2 && !muted && !panel.hidden) {
         statusEl.textContent = 'Reconectando la voz…';
         retryScheduled = true;

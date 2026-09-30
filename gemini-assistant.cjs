@@ -218,7 +218,7 @@ async function handle(req, res, action) {
     return;
   }
   if (!allowed(req, action)) {
-    json(res, 429, { error: 'limite_temporal', message: 'Esperá un momento antes de enviar otro mensaje.' });
+    json(res, 429, { error: 'limite_temporal', message: action.startsWith('speech') ? 'Se alcanzó el límite temporal de voz del sitio. Intentá más tarde.' : 'Esperá un momento antes de enviar otro mensaje.' });
     return;
   }
 

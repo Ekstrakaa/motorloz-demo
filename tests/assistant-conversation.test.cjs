@@ -34,6 +34,7 @@ test('the first greeting and successive replies speak in the same voice flow wit
   const chatHistories = [];
   const contexts = [];
   let failSpeech = false;
+  let speechFailureReason = 'cuota_gemini_alcanzada';
   let transientSpeechFailures = 0;
   let deviceVoiceCalls = 0;
   let wavCalls = 0;
@@ -59,7 +60,8 @@ test('the first greeting and successive replies speak in the same voice flow wit
     'Desde que pasé un pozo vibra la caja y se enciende la luz del motor al acelerar': 'Entiendo. Esa combinación merece revisión; Pablo o Bruno pueden evaluar el auto. ¿Querés que preparemos la consulta para WhatsApp?',
     'Prepará la consulta para WhatsApp': 'Claro, podés revisar el mensaje antes de enviarlo.',
     '¿Y si falla la voz?': 'Te sigo respondiendo por escrito.',
-    'Probá otra vez la voz': 'Ahora sí, te escucho.'
+    'Probá otra vez la voz': 'Ahora sí, te escucho.',
+    '¿Qué pasó con el cupo?': 'El chat sigue disponible por texto.'
   };
   const fetch = async (url, options) => {
     if (url.endsWith('/status')) return { ok: true, json: async () => ({ configured: true }) };
@@ -72,7 +74,7 @@ test('the first greeting and successive replies speak in the same voice flow wit
     if (url.endsWith('/summary')) return { ok:true, json:async () => ({ summary:'La luz del tablero se encendió y el cliente quiere revisar el auto.' }) };
     if (url.endsWith('/speech-stream')) {
       speechAttempts += 1;
-      if (failSpeech) return { ok:false, status:429 };
+      if (failSpeech) return { ok:false, status:429, json:async () => ({ error:speechFailureReason }) };
       if (transientSpeechFailures > 0) { transientSpeechFailures -= 1; return { ok:false, status:503 }; }
       const text = JSON.parse(options.body).text;
       spokenTexts.push(text);
@@ -168,5 +170,13 @@ test('the first greeting and successive replies speak in the same voice flow wit
   await new Promise(resolve => setTimeout(resolve, 80));
   assert.equal(spokenTexts.at(-1), replies['Probá otra vez la voz'], 'a transient voice failure retries automatically');
   assert.equal(get('#assistant-status').textContent, 'Disponible para conversar');
+
+  failSpeech = true;
+  speechFailureReason = 'limite_temporal';
+  await send('¿Qué pasó con el cupo?');
+  assert.equal(get('#assistant-status').textContent, 'Límite de voz del sitio alcanzado · intentá más tarde');
+  const attemptsAtSiteLimit = speechAttempts;
+  await new Promise(resolve => setTimeout(resolve, 80));
+  assert.equal(speechAttempts, attemptsAtSiteLimit, 'a site limit does not trigger futile short retries');
 
 });
