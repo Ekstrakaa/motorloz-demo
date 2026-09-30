@@ -48,6 +48,7 @@
   let voiceRequest = 0;
   let voiceUrl = '';
   let speechAbort = null;
+  let speechRetryTimer = null;
   let activeSpeechButton = null;
   let muted = false;
   let lastSpokenText = '';
@@ -62,6 +63,8 @@
 
   function stopSpeech() {
     voiceRequest += 1;
+    clearTimeout(speechRetryTimer);
+    speechRetryTimer = null;
     speechAbort?.abort();
     speechAbort = null;
     activeSpeechButton = null;
@@ -220,7 +223,7 @@
     muteButton.classList.add('is-speaking');
   }
 
-  async function speakReply(text, button = null) {
+  async function speakReply(text, button = null, retryCount = 0) {
     if (!configured || muted || !text) return;
     stopSpeech();
     unlockAudio();
@@ -228,6 +231,7 @@
     activeSpeechButton = muteButton;
     lastSpokenText = text;
     muteButton.classList.add('is-loading');
+    let retryScheduled = false;
     try {
       if (audioContext) {
         try {
@@ -250,9 +254,18 @@
       if (request !== voiceRequest) return;
       activeSpeechButton = null;
       muteButton.classList.remove('is-speaking');
-      if (error.status === 429) statusEl.textContent = 'Chat disponible · voz sin cupo';
+      if (error.status === 429 && retryCount < 2 && !muted && !panel.hidden) {
+        statusEl.textContent = 'Voz ocupada · reintentando';
+        retryScheduled = true;
+        speechRetryTimer = setTimeout(() => {
+          speechRetryTimer = null;
+          if (request === voiceRequest && !muted && !panel.hidden) speakReply(text, button, retryCount + 1);
+        }, [7000, 18000][retryCount]);
+      } else if (error.status === 429) {
+        statusEl.textContent = 'Chat disponible · voz sin cupo por ahora';
+      }
     } finally {
-      if (request === voiceRequest) muteButton.classList.remove('is-loading');
+      if (request === voiceRequest && !retryScheduled) muteButton.classList.remove('is-loading');
     }
   }
   voicePlayer.addEventListener('ended', () => {

@@ -36,6 +36,7 @@ test('two successive replies speak their own text and a greeting does not trigge
   let failSpeech = false;
   let deviceVoiceCalls = 0;
   let wavCalls = 0;
+  let speechAttempts = 0;
   const popup = { location: { href: '' }, opener: null };
   const session = new Map();
   class AudioContext {
@@ -67,6 +68,7 @@ test('two successive replies speak their own text and a greeting does not trigge
     }
     if (url.endsWith('/summary')) return { ok:true, json:async () => ({ summary:'La luz del tablero se encendió y el cliente quiere revisar el auto.' }) };
     if (url.endsWith('/speech-stream')) {
+      speechAttempts += 1;
       if (failSpeech) return { ok:false, status:429 };
       const text = JSON.parse(options.body).text;
       spokenTexts.push(text);
@@ -82,7 +84,7 @@ test('two successive replies speak their own text and a greeting does not trigge
     window: { AudioContext, SpeechRecognition: null, speechSynthesis: { speak: () => { deviceVoiceCalls += 1; }, cancel() {}, getVoices: () => [{ lang:'es-UY' }] }, SpeechSynthesisUtterance: class {}, innerWidth: 393, innerHeight: 800, open: () => popup, sessionStorage: { getItem:key=>session.get(key), setItem:(key,value)=>session.set(key,value), removeItem:key=>session.delete(key) },
       visualViewport: { height: 500, offsetTop: 0, addEventListener() {} }, setTimeout, addEventListener() {} },
     Audio, location: { search: '' }, URLSearchParams, URL: { revokeObjectURL() {} },
-    fetch, setTimeout, clearTimeout, setInterval, clearInterval,
+    fetch, setTimeout: (callback, delay) => setTimeout(callback, delay >= 7000 ? 45 : delay), clearTimeout, setInterval, clearInterval,
     requestAnimationFrame: callback => callback(), AbortController, TextDecoder, atob
   };
   vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../assistant-widget.js'), 'utf8'), context);
@@ -146,6 +148,12 @@ test('two successive replies speak their own text and a greeting does not trigge
   await send('¿Y si falla la voz?');
   assert.equal(deviceVoiceCalls, 0, 'a quota failure never switches to the phone voice');
   assert.equal(wavCalls, 0, 'a quota failure does not make another request for the same model');
-  assert.equal(get('#assistant-status').textContent, 'Chat disponible · voz sin cupo');
+  assert.equal(get('#assistant-status').textContent, 'Voz ocupada · reintentando');
+  const attemptsBeforeRecovery = speechAttempts;
+  failSpeech = false;
+  await new Promise(resolve => setTimeout(resolve, 80));
+  assert.ok(speechAttempts > attemptsBeforeRecovery, 'the voice retries after a temporary quota error');
+  assert.equal(spokenTexts.at(-1), replies['¿Y si falla la voz?']);
+  assert.equal(get('#assistant-status').textContent, 'Disponible para conversar');
 
 });
