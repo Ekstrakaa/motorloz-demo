@@ -149,6 +149,7 @@
       };
       received = true;
       clearTimeout(firstAudioTimeout);
+      statusEl.textContent = 'Disponible para conversar';
       muteButton.classList.remove('is-loading');
       muteButton.classList.add('is-speaking');
     };
@@ -192,7 +193,11 @@
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ text }), signal
     });
-    if (!response.ok) throw new Error('speech_unavailable');
+    if (!response.ok) {
+      const error = new Error('speech_unavailable');
+      error.status = response.status;
+      throw error;
+    }
     const audio = await response.blob();
     if (audio.type !== 'audio/wav' || audio.size < 44) throw new Error('speech_invalid');
     speechCache.set(text, audio);
@@ -210,6 +215,7 @@
     voicePlayer.currentTime = 0;
     await voicePlayer.play();
     if (request !== voiceRequest) return;
+    statusEl.textContent = 'Disponible para conversar';
     muteButton.classList.remove('is-loading');
     muteButton.classList.add('is-speaking');
   }
@@ -234,6 +240,7 @@
         } catch (error) {
           if (request !== voiceRequest) return;
           if (audioSources.size) { streamFinished = true; return; }
+          if (error.status === 429) throw error;
         }
       }
       const controller = new AbortController();
@@ -243,6 +250,7 @@
       if (request !== voiceRequest) return;
       activeSpeechButton = null;
       muteButton.classList.remove('is-speaking');
+      if (error.status === 429) statusEl.textContent = 'Chat disponible · voz sin cupo';
     } finally {
       if (request === voiceRequest) muteButton.classList.remove('is-loading');
     }
@@ -315,8 +323,7 @@
       const refreshGreeting = !statusChecked || (!wasConfigured && configured && !history.length);
       statusChecked = true;
       if (refreshGreeting && !history.length) {
-        const greeting = welcome();
-        if (configured && panel.classList.contains('is-open')) speakReply(welcomeText);
+        welcome();
       }
     } catch {
       statusEl.textContent = 'Conexión no disponible';
@@ -717,7 +724,7 @@
   document.querySelector('#assistant-close').addEventListener('click', close);
   document.querySelector('#assistant-new').addEventListener('click', () => { resetDialog.hidden = false; });
   document.querySelector('#assistant-reset-no').addEventListener('click', () => { resetDialog.hidden = true; });
-  document.querySelector('#assistant-reset-yes').addEventListener('click', () => { resetDialog.hidden = true; stopSpeech(); cancelDictation(); welcome(); try { window.sessionStorage?.removeItem(conversationKey); } catch {} if (configured) speakReply(welcomeText); input.focus({preventScroll:true}); });
+  document.querySelector('#assistant-reset-yes').addEventListener('click', () => { resetDialog.hidden = true; stopSpeech(); cancelDictation(); welcome(); try { window.sessionStorage?.removeItem(conversationKey); } catch {} input.focus({preventScroll:true}); });
   muteButton.addEventListener('click', () => {
     muted = !muted;
     updateMuteButton();

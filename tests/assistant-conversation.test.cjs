@@ -35,6 +35,7 @@ test('two successive replies speak their own text and a greeting does not trigge
   const contexts = [];
   let failSpeech = false;
   let deviceVoiceCalls = 0;
+  let wavCalls = 0;
   const popup = { location: { href: '' }, opener: null };
   const session = new Map();
   class AudioContext {
@@ -73,7 +74,7 @@ test('two successive replies speak their own text and a greeting does not trigge
       let sent = false;
       return { ok: true, body: { getReader: () => ({ read: async () => sent ? { done: true } : (sent = true, { value: event, done: false }) }) } };
     }
-    if (url.endsWith('/speech')) return { ok:false, status:429 };
+    if (url.endsWith('/speech')) { wavCalls += 1; return { ok:false, status:429 }; }
     throw new Error(`Unexpected URL: ${url}`);
   };
   const context = {
@@ -87,6 +88,7 @@ test('two successive replies speak their own text and a greeting does not trigge
   vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../assistant-widget.js'), 'utf8'), context);
   get('#assistant-launcher').listeners.click();
   await new Promise(resolve => setTimeout(resolve, 120));
+  assert.equal(spokenTexts.length, 0, 'the welcome does not consume the reply voice quota');
   assert.equal(get('#assistant-input').focusCount, 0, 'mobile opening leaves the keyboard closed');
   assert.equal(get('#assistant-window').style.getPropertyValue('--assistant-keyboard-offset'), '300px');
 
@@ -143,5 +145,7 @@ test('two successive replies speak their own text and a greeting does not trigge
   failSpeech = true;
   await send('¿Y si falla la voz?');
   assert.equal(deviceVoiceCalls, 0, 'a quota failure never switches to the phone voice');
+  assert.equal(wavCalls, 0, 'a quota failure does not make another request for the same model');
+  assert.equal(get('#assistant-status').textContent, 'Chat disponible · voz sin cupo');
 
 });
