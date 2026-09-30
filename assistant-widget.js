@@ -795,6 +795,9 @@
   }
 
   launcher.addEventListener('click', () => panel.classList.contains('is-open') ? close() : open());
+  document.querySelector('#diagnostic-chat-open')?.addEventListener('click', () => {
+    if (!panel.classList.contains('is-open')) open();
+  });
   document.querySelector('#assistant-close').addEventListener('click', close);
   document.querySelector('#assistant-new').addEventListener('click', () => { resetDialog.hidden = false; });
   document.querySelector('#assistant-reset-no').addEventListener('click', () => { resetDialog.hidden = true; });

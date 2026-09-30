@@ -1,0 +1,121 @@
+/* Final mobile details use the same dark glass, restrained cyan, and real brand mark. */
+#ubicacion .location-directions {
+  min-height: 50px !important;
+  padding: 11px 19px !important;
+  border: 1px solid rgba(113, 208, 216, .7) !important;
+  border-radius: 999px !important;
+  background: linear-gradient(125deg, rgba(17, 57, 66, .98), rgba(8, 29, 37, .98)) !important;
+  color: #f4fbfa !important;
+  box-shadow: inset 0 1px rgba(255, 255, 255, .18), 0 10px 25px rgba(13, 53, 62, .16) !important;
+  text-shadow: none !important;
+  letter-spacing: .01em;
+  transition: transform .24s ease, box-shadow .24s ease, border-color .24s ease;
+}
+#ubicacion .location-directions svg { color: #7cdee4 !important; }
+#ubicacion .location-directions:hover,
+#ubicacion .location-directions:focus-visible {
+  transform: translateY(-2px);
+  border-color: #9ceef0 !important;
+  box-shadow: inset 0 1px rgba(255, 255, 255, .2), 0 14px 29px rgba(13, 53, 62, .22) !important;
+}
+
+#assistant-launcher.assistant-launcher {
+  width: 96px !important;
+  min-width: 96px !important;
+  height: 58px !important;
+  padding: 0 !important;
+  border: 1px solid rgba(113, 208, 216, .65) !important;
+  border-radius: 17px !important;
+  background: linear-gradient(145deg, rgba(24, 62, 70, .97), rgba(7, 20, 25, .98)) !important;
+  box-shadow: inset 0 1px rgba(255, 255, 255, .15), 0 8px 22px rgba(0, 12, 16, .33) !important;
+  backdrop-filter: blur(14px);
+}
+#assistant-launcher.assistant-launcher::after { content: none !important; display: none !important; }
+#assistant-launcher .assistant-launcher-avatar {
+  position: relative !important;
+  width: 94px !important;
+  height: 56px !important;
+  overflow: hidden !important;
+  border-radius: inherit !important;
+}
+#assistant-launcher .assistant-launcher-avatar img {
+  position: absolute !important;
+  top: -16px !important;
+  left: 3px !important;
+  width: 290px !important;
+  max-width: none !important;
+  height: auto !important;
+  object-fit: initial !important;
+}
+#assistant-launcher:is(:hover, :focus-visible) {
+  transform: translateY(-2px) !important;
+  border-color: #9ceef0 !important;
+  box-shadow: inset 0 1px rgba(255, 255, 255, .22), 0 13px 26px rgba(0, 12, 16, .39) !important;
+}
+
+@media (max-width: 760px) {
+  .google-review-bar { text-align: center !important; }
+  .google-review-bar .review-section-title {
+    width: 100% !important;
+    justify-items: center !important;
+    text-align: center !important;
+  }
+
+  .appointment.wizard-ready .appointment-intro,
+  .appointment.wizard-ready .appointment-intro .eyebrow,
+  .appointment.wizard-ready .appointment-intro h2,
+  .appointment.wizard-ready .appointment-intro>p {
+    text-align: center !important;
+  }
+  .appointment.wizard-ready .appointment-intro h2,
+  .appointment.wizard-ready .appointment-intro>p { margin-inline: auto !important; }
+  .appointment.wizard-ready .appointment-steps {
+    max-width: 360px !important;
+    margin: 16px auto 0 !important;
+    text-align: left !important;
+  }
+
+  footer .footer-brand {
+    width: 100% !important;
+    height: 78px !important;
+    overflow: hidden !important;
+  }
+  footer .footer-brand .brand-art {
+    width: min(320px, 84vw) !important;
+    max-width: 100% !important;
+    height: auto !important;
+    max-height: none !important;
+    margin-inline: auto !important;
+    object-fit: initial !important;
+    transform: translateY(-10px) !important;
+  }
+  footer .footer-links {
+    gap: 2px !important;
+    margin: 8px auto 10px !important;
+    padding: 0 !important;
+  }
+  footer .footer-links a,
+  footer .footer-links a:last-child { min-height: 30px !important; }
+
+  #assistant-launcher.assistant-launcher {
+    right: max(14px, env(safe-area-inset-right)) !important;
+    bottom: calc(71px + env(safe-area-inset-bottom, 0px)) !important;
+    width: 82px !important;
+    min-width: 82px !important;
+    height: 52px !important;
+    border-radius: 15px !important;
+  }
+  #assistant-launcher .assistant-launcher-avatar img {
+    top: -13px !important;
+    width: 250px !important;
+  }
+  #assistant-launcher .assistant-launcher-avatar {
+    width: 80px !important;
+    height: 50px !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #ubicacion .location-directions,
+  #assistant-launcher.assistant-launcher { transition: none !important; }
+}
