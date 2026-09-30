@@ -88,8 +88,8 @@
     if (focusHeading && window.matchMedia('(max-width: 760px)').matches) {
       document.activeElement?.blur?.();
       stages[index].querySelector('h3').focus({ preventScroll: true });
-      const sectionTop = document.querySelector('#turno').getBoundingClientRect().top;
-      window.scrollTo({ top: window.scrollY + sectionTop - 62, behavior: 'instant' });
+      const formTop = form.getBoundingClientRect().top;
+      window.scrollTo({ top: window.scrollY + formTop - 70, behavior: 'instant' });
     }
   }
 

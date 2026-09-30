@@ -281,3 +281,51 @@
 @media (max-width: 760px) and (max-height: 620px) {
   main>#turno.appointment.wizard-ready { min-height: 0 !important; }
 }
+
+/* Keep the workshop introduction visible above the compact mobile wizard. */
+@media (max-width: 760px) {
+  .appointment.wizard-ready .section-label { display:flex!important;margin:0 20px 18px!important; }
+  .appointment.wizard-ready .appointment-grid { display:grid!important;gap:14px!important; }
+  .appointment.wizard-ready .appointment-intro {
+    display:block!important;width:calc(100% - 40px);max-width:460px;
+    margin:0 auto!important;text-align:left!important;
+  }
+  .appointment.wizard-ready .appointment-intro .eyebrow,
+  .appointment.wizard-ready .appointment-intro h2,
+  .appointment.wizard-ready .appointment-intro>p { text-align:left!important;margin-inline:0!important; }
+  .appointment.wizard-ready .appointment-intro .eyebrow { margin-bottom:11px!important;font-size:9px!important; }
+  .appointment.wizard-ready .appointment-intro h2 {
+    max-width:none!important;margin:0 0 10px!important;
+    font-size:clamp(31px,8.5vw,39px)!important;line-height:1.04!important;
+  }
+  .appointment.wizard-ready .appointment-intro>p:not(.eyebrow) {
+    max-width:38ch!important;margin:0!important;font-size:12px!important;line-height:1.55!important;
+  }
+  .appointment.wizard-ready .appointment-steps {
+    display:grid!important;gap:0!important;max-width:none!important;
+    margin:15px 0 0!important;padding:5px 12px!important;
+  }
+  .appointment.wizard-ready .appointment-steps li {
+    justify-content:flex-start!important;min-height:32px!important;padding:5px 0!important;
+    gap:9px!important;font-size:11px!important;line-height:1.25!important;
+  }
+  .appointment.wizard-ready .appointment-steps li span { flex:0 0 23px!important;font-size:10px!important; }
+  .appointment.wizard-ready .appointment-office {
+    display:block!important;width:calc(100% - 40px)!important;max-width:460px!important;
+    margin:0 auto 5px!important;
+  }
+  .appointment.wizard-ready .appointment-office img {
+    width:100%!important;height:auto!important;max-height:165px!important;
+    aspect-ratio:2.1!important;object-fit:cover!important;object-position:center 54%!important;
+  }
+  .appointment.wizard-ready .appointment-office figcaption { padding:5px 0 0!important;font-size:10px!important; }
+}
+
+/* Give the customer photo carousel its own light finish before the dark form. */
+.customer-gallery {
+  padding-bottom:clamp(70px,7vw,104px)!important;
+  background:linear-gradient(180deg,rgba(240,243,242,0),#f0f2f0 55%,#f0f2f0)!important;
+}
+@media (max-width:760px) {
+  .customer-gallery { padding-bottom:68px!important; }
+}
