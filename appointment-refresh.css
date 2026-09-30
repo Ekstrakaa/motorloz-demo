@@ -171,7 +171,7 @@
   main>#turno.appointment.wizard-ready {
     display: block !important;
     min-height: 0 !important;
-    padding: 18px 0 24px !important;
+    padding: 18px 0 clamp(60px, 16vw, 76px) !important;
     scroll-margin-top: 0 !important;
   }
   .appointment.wizard-ready .section-label,
@@ -279,7 +279,7 @@
   #appointment-form .wizard-stage[data-stage="4"] .form-note { display: none; }
 }
 @media (max-width: 760px) and (max-height: 620px) {
-  main>#turno.appointment.wizard-ready { min-height: 0 !important; }
+  main>#turno.appointment.wizard-ready { min-height: 0 !important; padding-bottom: 48px !important; }
 }
 
 /* Keep the workshop introduction visible above the compact mobile wizard. */
