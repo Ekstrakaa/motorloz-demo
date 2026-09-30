@@ -10,7 +10,7 @@ function element() {
   return {
     hidden:true, disabled:false, value:'', style:{}, scrollHeight:30, scrollTop:0,
     listeners, children:[],
-    classList:{ add:(...names)=>names.forEach(name=>classes.add(name)), remove:(...names)=>names.forEach(name=>classes.delete(name)), toggle:()=>{} },
+    classList:{ add:(...names)=>names.forEach(name=>classes.add(name)), remove:(...names)=>names.forEach(name=>classes.delete(name)), contains:name=>classes.has(name), toggle:()=>{} },
     addEventListener:(name,handler)=>{ listeners[name]=handler; },
     setAttribute(){}, removeAttribute(){}, focus(){}, load(){}, pause(){},
     append(...children){ this.children.push(...children); },

@@ -22,7 +22,9 @@
   const welcomeText = 'Hola, soy tu asistente MOTORLOZ. Contame qué notaste en tu auto y, si podés, la marca, el modelo y el kilometraje.';
   let history = [];
   let configured = false;
+  let statusChecked = false;
   let busy = false;
+  let closeTimer = null;
   let speechRecognition = null;
   let dictating = false;
   let finishingDictation = false;
@@ -38,11 +40,10 @@
   let recognitionRestartTimer = null;
   let rapidRecognitionStops = 0;
   let recognitionStartedAt = 0;
-  let reservationDismissedAt = 0;
   let voiceRequest = 0;
   let voiceUrl = '';
   let speechAbort = null;
-  let speechQueue = [];
+  let activeSpeechButton = null;
   let audioContext = null;
   let audioSources = new Set();
   let nextAudioTime = 0;
@@ -50,13 +51,12 @@
   const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   micButton.title = Recognition ? 'Dictar y enviar como texto' : 'Dictado no disponible en este navegador';
   hintEl.textContent = Recognition ? 'Dictá y tocá Terminar · se envía como texto' : 'Escribí o usá el dictado del teclado';
-  const getMessageCount = () => history.filter(item => item.role === 'user').length;
 
   function stopSpeech() {
     voiceRequest += 1;
     speechAbort?.abort();
     speechAbort = null;
-    speechQueue = [];
+    activeSpeechButton = null;
     for (const source of audioSources) { try { source.stop(); } catch {} }
     audioSources.clear();
     nextAudioTime = 0;
@@ -72,8 +72,15 @@
   function unlockAudio() {
     if (!AudioContextClass) return;
     try {
-      audioContext ||= new AudioContextClass();
-      if (audioContext.state === 'suspended') {
+      if (!audioContext) {
+        audioContext = new AudioContextClass();
+        audioContext.addEventListener?.('statechange', () => {
+          if (audioContext.state !== 'running' && activeSpeechButton && !panel.hidden) {
+            audioContext.resume().catch(() => {});
+          }
+        });
+      }
+      if (audioContext.state !== 'running') {
         audioContext.resume().catch(() => {});
         const silent = audioContext.createBuffer(1, 1, 24000);
         const source = audioContext.createBufferSource();
@@ -157,25 +164,6 @@
     }
   }
 
-  function speechParts(text) {
-    const sentences = text.match(/[^.!?]+[.!?]?/g) || [text];
-    const parts = [];
-    for (const sentence of sentences) {
-      let value = sentence.trim();
-      if (!value) continue;
-      while (value.length > 125) {
-        const clause = Math.max(value.lastIndexOf(', ', 112), value.lastIndexOf('; ', 112));
-        const cut = clause >= 55 ? clause + 1 : Math.max(55, value.lastIndexOf(' ', 112));
-        parts.push(value.slice(0, cut).trim());
-        value = value.slice(cut).trim();
-      }
-      if (!value) continue;
-      if (parts.length && `${parts.at(-1)} ${value}`.length <= 115) parts[parts.length - 1] += ` ${value}`;
-      else parts.push(value);
-    }
-    return parts.length ? parts : [text];
-  }
-
   async function fetchSpeech(text, signal) {
     if (speechCache.has(text)) return speechCache.get(text);
     const response = await fetch('/api/assistant/speech', {
@@ -190,15 +178,16 @@
     return audio;
   }
 
-  async function playSpeechPart(part, button, request) {
+  async function playSpeechPart(text, button, request, controller) {
     if (request !== voiceRequest || panel.hidden) return;
-    const audio = await part;
+    const audio = await fetchSpeech(text, controller.signal);
     if (request !== voiceRequest || panel.hidden) return;
     if (voiceUrl) URL.revokeObjectURL(voiceUrl);
     voiceUrl = URL.createObjectURL(audio);
     voicePlayer.src = voiceUrl;
     voicePlayer.currentTime = 0;
     await voicePlayer.play();
+    if (request !== voiceRequest) return;
     button?.classList.remove('is-loading');
     button?.classList.add('is-playing');
   }
@@ -208,11 +197,12 @@
     stopSpeech();
     unlockAudio();
     const request = voiceRequest;
+    activeSpeechButton = button;
     button?.classList.add('is-loading');
     try {
       if (audioContext) {
         try {
-          if (audioContext.state === 'suspended') await Promise.race([
+          if (audioContext.state !== 'running') await Promise.race([
             audioContext.resume().catch(() => {}),
             new Promise(resolve => setTimeout(resolve, 1800))
           ]);
@@ -225,8 +215,7 @@
       }
       const controller = new AbortController();
       speechAbort = controller;
-      speechQueue = speechParts(text).map(part => fetchSpeech(part, controller.signal));
-      await playSpeechPart(speechQueue.shift(), button, request);
+      await playSpeechPart(text, button, request, controller);
     } catch (error) {
       if (request !== voiceRequest) return;
       if (error.name === 'NotAllowedError') {
@@ -238,15 +227,9 @@
       button?.classList.remove('is-loading');
     }
   }
-  voicePlayer.addEventListener('ended', async () => {
-    if (!speechQueue.length) {
-      panel.querySelectorAll('.assistant-speak.is-playing').forEach(button => button.classList.remove('is-playing'));
-      return;
-    }
-    const next = speechQueue.shift();
-    const button = panel.querySelector('.assistant-speak.is-playing');
-    try { await playSpeechPart(next, button, voiceRequest); }
-    catch { button?.classList.remove('is-playing'); }
+  voicePlayer.addEventListener('ended', () => {
+    activeSpeechButton?.classList.remove('is-playing');
+    activeSpeechButton = null;
   });
   function bubble(text, role, extra = {}) {
     const row = document.createElement('div');
@@ -275,9 +258,8 @@
     booking.hidden = true;
     reservationPrompt.hidden = true;
     history = [];
-    reservationDismissedAt = 0;
     const greeting = bubble(welcomeText, 'assistant');
-    if (!configured) bubble('La conexión con la inteligencia artificial todavía no está configurada. El formulario de consulta sigue disponible en la página.', 'assistant');
+    if (statusChecked && !configured) bubble('La conexión con la inteligencia artificial todavía no está configurada. El formulario de consulta sigue disponible en la página.', 'assistant');
     messagesEl.scrollTop = 0;
     return greeting;
   }
@@ -286,6 +268,7 @@
     try {
       const response = await fetch('/api/assistant/status', { cache: 'no-store' });
       const status = await response.json();
+      const wasConfigured = configured;
       configured = Boolean(status.configured);
       statusEl.textContent = configured ? 'Disponible para conversar' : 'Falta conectar la IA';
       panel.classList.toggle('is-offline', !configured);
@@ -293,15 +276,20 @@
       sendButton.disabled = !configured;
       micButton.disabled = !configured;
       if (!configured) hintEl.textContent = 'El asistente se activa al configurar la conexión privada.';
-      const greeting = welcome();
-      if (configured && !panel.hidden) speakReply(welcomeText, greeting.querySelector('.assistant-speak'));
+      const refreshGreeting = !statusChecked || (!wasConfigured && configured && !history.length);
+      statusChecked = true;
+      if (refreshGreeting && !history.length) {
+        const greeting = welcome();
+        if (configured && panel.classList.contains('is-open')) speakReply(welcomeText, greeting.querySelector('.assistant-speak'));
+      }
     } catch {
       statusEl.textContent = 'Conexión no disponible';
       configured = false;
+      statusChecked = true;
       input.disabled = true;
       sendButton.disabled = true;
       micButton.disabled = true;
-      welcome();
+      if (!history.length) welcome();
     }
   }
 
@@ -310,12 +298,13 @@
     workingEl.hidden = !value;
     sendButton.disabled = value || !configured;
     micButton.disabled = value || !configured;
-    input.disabled = value || !configured;
+    form.setAttribute('aria-busy', String(value));
   }
 
-  function maybeShowBooking() {
-    const count = getMessageCount();
-    if (count >= 1 && (reservationDismissedAt === 0 || count >= reservationDismissedAt + 2)) reservationPrompt.hidden = false;
+  function maybeShowBooking(userMessage) {
+    if (/\b(turno|reserv(a|ar|arlo|arme|ación)|agend(a|ar|arme)|coordinar una (visita|revisión)|llevar(lo|la)? al taller)\b/i.test(userMessage)) {
+      reservationPrompt.hidden = false;
+    }
   }
 
   async function requestReply(userMessage) {
@@ -333,10 +322,12 @@
       const result = await response.json();
       pending.remove();
       if (!response.ok) throw new Error(result.message || 'No pude responder en este momento.');
-      history.push({ role: 'assistant', content: result.reply });
-      const reply = bubble(result.reply, 'assistant');
-      speakReply(result.reply, reply.querySelector('.assistant-speak'));
-      maybeShowBooking();
+      const replyText = String(result.reply || '').trim();
+      if (!replyText) throw new Error('No pude responder en este momento.');
+      history.push({ role: 'assistant', content: replyText });
+      const reply = bubble(replyText, 'assistant');
+      speakReply(replyText, reply.querySelector('.assistant-speak'));
+      maybeShowBooking(userMessage);
     } catch (error) {
       pending.remove();
       history.pop();
@@ -344,13 +335,12 @@
     } finally {
       clearTimeout(timeout);
       setBusy(false);
-      input.focus({ preventScroll: true });
     }
   }
 
   function sendText(value) {
     const text = String(value || '').trim();
-    if (!text || busy) return;
+    if (!text || busy || !configured) return;
     stopSpeech();
     unlockAudio();
     bubble(text, 'user');
@@ -522,28 +512,48 @@
     clearDictationUi();
   }
 
+  function syncViewport() {
+    if (panel.hidden) return;
+    const viewport = window.visualViewport;
+    const visibleHeight = viewport?.height || window.innerHeight;
+    if (!visibleHeight) return;
+    const coveredHeight = viewport ? Math.max(0, (window.innerHeight || visibleHeight) - viewport.height - viewport.offsetTop) : 0;
+    panel.style.setProperty?.('--assistant-visible-height', `${visibleHeight}px`);
+    panel.style.setProperty?.('--assistant-keyboard-offset', `${coveredHeight}px`);
+  }
+
   function open() {
+    clearTimeout(closeTimer);
     unlockAudio();
     panel.hidden = false;
+    document.documentElement?.classList.add('assistant-chat-open');
+    document.body?.classList.add('assistant-chat-open');
+    syncViewport();
     requestAnimationFrame(() => panel.classList.add('is-open'));
     panel.setAttribute('aria-hidden', 'false');
     launcher.setAttribute('aria-expanded', 'true');
     checkStatus();
-    window.setTimeout(() => (configured ? input : document.querySelector('#assistant-close')).focus({ preventScroll: true }), 90);
+    window.setTimeout(() => {
+      if (panel.hidden) return;
+      const mobile = window.innerWidth && window.innerWidth <= 600;
+      (configured && !mobile ? input : document.querySelector('#assistant-close')).focus({ preventScroll: true });
+    }, 90);
   }
 
   function close() {
     stopSpeech();
     cancelDictation();
+    document.documentElement?.classList.remove('assistant-chat-open');
+    document.body?.classList.remove('assistant-chat-open');
     panel.classList.remove('is-open');
     panel.setAttribute('aria-hidden', 'true');
     launcher.setAttribute('aria-expanded', 'false');
     resetDialog.hidden = true;
-    window.setTimeout(() => { panel.hidden = true; welcome(); }, 220);
+    closeTimer = window.setTimeout(() => { panel.hidden = true; }, 220);
     launcher.focus({ preventScroll: true });
   }
 
-  launcher.addEventListener('click', () => panel.hidden ? open() : close());
+  launcher.addEventListener('click', () => panel.classList.contains('is-open') ? close() : open());
   document.querySelector('#assistant-close').addEventListener('click', close);
   document.querySelector('#assistant-new').addEventListener('click', () => { resetDialog.hidden = false; });
   document.querySelector('#assistant-reset-no').addEventListener('click', () => { resetDialog.hidden = true; });
@@ -556,6 +566,9 @@
   input.addEventListener('input', () => { input.style.height = 'auto'; input.style.height = `${Math.min(input.scrollHeight, 112)}px`; });
   input.addEventListener('keydown', event => { if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); form.requestSubmit(); } });
   document.addEventListener('keydown', event => { if (event.key === 'Escape' && !panel.hidden) close(); });
+  window.visualViewport?.addEventListener('resize', syncViewport);
+  window.visualViewport?.addEventListener('scroll', syncViewport);
+  window.addEventListener?.('resize', syncViewport);
 
   document.querySelector('#assistant-reserve-start').addEventListener('click', () => {
     reservationPrompt.hidden = true;
@@ -564,7 +577,6 @@
     bookingForm.querySelector('[name="name"]').focus({ preventScroll: true });
   });
   document.querySelector('#assistant-reserve-later').addEventListener('click', () => {
-    reservationDismissedAt = getMessageCount();
     reservationPrompt.hidden = true;
   });
   bookingForm.addEventListener('submit', async event => {
