@@ -34,6 +34,7 @@ test('the first greeting and successive replies speak in the same voice flow wit
   const chatHistories = [];
   const contexts = [];
   let failSpeech = false;
+  let transientSpeechFailures = 0;
   let deviceVoiceCalls = 0;
   let wavCalls = 0;
   let speechAttempts = 0;
@@ -56,7 +57,8 @@ test('the first greeting and successive replies speak in the same voice flow wit
     'Quiero reservar un turno': 'Claro, podemos preparar una consulta para coordinarlo.',
     'Me llamo Ana': 'Gracias, Ana. Contame un poco más de la falla.',
     'Desde que pasé un pozo vibra la caja y se enciende la luz del motor al acelerar': 'Entiendo. Esa combinación merece revisión; Pablo o Bruno pueden evaluar el auto. ¿Querés que preparemos la consulta para WhatsApp?',
-    '¿Y si falla la voz?': 'Te sigo respondiendo por escrito.'
+    '¿Y si falla la voz?': 'Te sigo respondiendo por escrito.',
+    'Probá otra vez la voz': 'Ahora sí, te escucho.'
   };
   const fetch = async (url, options) => {
     if (url.endsWith('/status')) return { ok: true, json: async () => ({ configured: true }) };
@@ -70,13 +72,14 @@ test('the first greeting and successive replies speak in the same voice flow wit
     if (url.endsWith('/speech-stream')) {
       speechAttempts += 1;
       if (failSpeech) return { ok:false, status:429 };
+      if (transientSpeechFailures > 0) { transientSpeechFailures -= 1; return { ok:false, status:503 }; }
       const text = JSON.parse(options.body).text;
       spokenTexts.push(text);
       const event = new TextEncoder().encode(`data: ${JSON.stringify({ event_type: 'step.delta', delta: { type: 'audio', data: 'AAAA' } })}\n\n`);
       let sent = false;
       return { ok: true, body: { getReader: () => ({ read: async () => sent ? { done: true } : (sent = true, { value: event, done: false }) }) } };
     }
-    if (url.endsWith('/speech')) { wavCalls += 1; return { ok:false, status:429 }; }
+    if (url.endsWith('/speech')) { wavCalls += 1; return { ok:false, status:failSpeech ? 429 : 503 }; }
     throw new Error(`Unexpected URL: ${url}`);
   };
   const context = {
@@ -84,7 +87,7 @@ test('the first greeting and successive replies speak in the same voice flow wit
     window: { AudioContext, SpeechRecognition: null, speechSynthesis: { speak: () => { deviceVoiceCalls += 1; }, cancel() {}, getVoices: () => [{ lang:'es-UY' }] }, SpeechSynthesisUtterance: class {}, innerWidth: 393, innerHeight: 800, open: () => popup, sessionStorage: { getItem:key=>session.get(key), setItem:(key,value)=>session.set(key,value), removeItem:key=>session.delete(key) },
       visualViewport: { height: 500, offsetTop: 0, addEventListener() {} }, setTimeout, addEventListener() {} },
     Audio, location: { search: '' }, URLSearchParams, URL: { revokeObjectURL() {} },
-    fetch, setTimeout: (callback, delay) => setTimeout(callback, delay >= 7000 ? 45 : delay), clearTimeout, setInterval, clearInterval,
+    fetch, setTimeout: (callback, delay) => setTimeout(callback, delay >= 700 ? 45 : delay), clearTimeout, setInterval, clearInterval,
     requestAnimationFrame: callback => callback(), AbortController, TextDecoder, atob
   };
   vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../assistant-widget.js'), 'utf8'), context);
@@ -155,6 +158,12 @@ test('the first greeting and successive replies speak in the same voice flow wit
   await new Promise(resolve => setTimeout(resolve, 80));
   assert.ok(speechAttempts > attemptsBeforeRecovery, 'the voice retries after a temporary quota error');
   assert.equal(spokenTexts.at(-1), replies['¿Y si falla la voz?']);
+  assert.equal(get('#assistant-status').textContent, 'Disponible para conversar');
+
+  transientSpeechFailures = 1;
+  await send('Probá otra vez la voz');
+  await new Promise(resolve => setTimeout(resolve, 80));
+  assert.equal(spokenTexts.at(-1), replies['Probá otra vez la voz'], 'a transient voice failure retries automatically');
   assert.equal(get('#assistant-status').textContent, 'Disponible para conversar');
 
 });

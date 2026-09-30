@@ -20,3 +20,10 @@
 @media(prefers-reduced-motion:reduce) {
   .story-entry,.story-entry.is-story-visible { opacity:1!important;transform:none!important;filter:none!important;clip-path:none!important;transition:none!important; }
 }
+
+/* The atlas artwork in this cell extends into its neighbor; mask that stray sliver. */
+.why-grid .why-icon[data-icon-index="9"] { clip-path:inset(0 0 0 14%); }
+.why-grid .why-card:hover,.why-grid .why-card:focus-visible {
+  background:transparent!important;
+  border-bottom-color:rgba(89,204,213,.48)!important;
+}

@@ -49,12 +49,14 @@ test('serves the fixed Gemini voice as WAV audio', async () => {
   };
   try {
     const res = response();
-    await handle({ method: 'POST', body: { text: 'Hola, ¿cómo estás?' }, headers: {}, socket: {} }, res, 'speech');
+    await handle({ method: 'POST', body: { text: 'Hola, soy MOTORLOZ, Pablo Lozano.' }, headers: {}, socket: {} }, res, 'speech');
     assert.equal(res.statusCode, 200);
     assert.equal(res.headers['Content-Type'], 'audio/wav');
     assert.equal(Buffer.compare(res.body, wav), 0);
     assert.equal(request.generation_config.speech_config[0].voice, 'Algieba');
     assert.equal(request.model, 'gemini-3.8-flash-lite-tts');
+    assert.equal(request.input[0].content[0].text, 'Hola, soy Motor Los, Pablo Lozano.');
+    assert.match(request.input[0].content[0].annotations[0].style, /nunca Motorola/);
   } finally {
     global.fetch = previousFetch;
   }

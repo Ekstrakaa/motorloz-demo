@@ -3,6 +3,8 @@ const test = require('node:test');
 const vm = require('node:vm');
 const fs = require('node:fs');
 const path = require('node:path');
+const termsWindow = {};
+vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../assistant-dictation-terms.js'), 'utf8'), { window:termsWindow });
 
 function element() {
   const listeners = {};
@@ -44,7 +46,7 @@ test('dictation displays words while speaking and sends only text after stopping
     querySelector:get, createElement:element, createTextNode:text=>({textContent:text}), addEventListener(){}
   };
   const context = {
-    document, window:{ SpeechRecognition:Recognition, setTimeout }, Audio,
+    document, window:{ SpeechRecognition:Recognition, MOTORLOZ_DICTATION:termsWindow.MOTORLOZ_DICTATION, setTimeout }, Audio,
     location:{ search:'' }, URLSearchParams,
     fetch:async (url,options) => {
       requests.push({url,body:options?.body});
@@ -60,6 +62,7 @@ test('dictation displays words while speaking and sends only text after stopping
   await new Promise(resolve=>setImmediate(resolve));
   get('#assistant-mic').listeners.click();
   assert.equal(recognizers[0].continuous,false);
+  assert.equal(recognizers[0].maxAlternatives,3);
   recognizers[0].emit('result',{results:[{0:{transcript:'Mi auto hace ruido al frenar'},isFinal:true}]});
   assert.equal(get('#assistant-input').value,'Mi auto hace ruido al frenar');
   recognizers[0].emit('end');

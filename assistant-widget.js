@@ -44,6 +44,7 @@
   let finishTimer = null;
   let recognitionRestartTimer = null;
   let rapidRecognitionStops = 0;
+  let phraseBiasDisabled = false;
   let recognitionStartedAt = 0;
   let voiceRequest = 0;
   let voiceUrl = '';
@@ -61,6 +62,7 @@
   let streamFinished = false;
   let pageScrollY = 0;
   const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const dictationTerms = window.MOTORLOZ_DICTATION || { normalize: text => text, choose: result => result?.[0]?.transcript?.trim() || '' };
   micButton.title = Recognition ? 'Dictar y enviar como texto' : 'Dictado no disponible en este navegador';
   hintEl.textContent = Recognition ? 'Tocá el micrófono para dictar · se enviará solo texto' : 'Escribí o usá el dictado del teclado';
 
@@ -119,7 +121,7 @@
     let received = false;
     let oddByte = null;
     let pending = '';
-    const firstAudioTimeout = setTimeout(() => { if (!received) controller.abort(); }, 5000);
+    const firstAudioTimeout = setTimeout(() => { if (!received) controller.abort(); }, 9500);
     const handleBlock = block => {
       const data = block.split(/\r?\n/).filter(line => line.startsWith('data:')).map(line => line.slice(5).trimStart()).join('\n');
       if (!data || data === '[DONE]') return;
@@ -259,15 +261,24 @@
       if (request !== voiceRequest) return;
       activeSpeechButton = null;
       muteButton.classList.remove('is-speaking');
-      if (error.status === 429 && retryCount < 2 && !muted && !panel.hidden) {
+      if (error.status === 429 && retryCount < 3 && !muted && !panel.hidden) {
         statusEl.textContent = 'Voz ocupada · reintentando';
         retryScheduled = true;
         speechRetryTimer = setTimeout(() => {
           speechRetryTimer = null;
           if (request === voiceRequest && !muted && !panel.hidden) speakReply(text, button, retryCount + 1);
-        }, [7000, 18000][retryCount]);
+        }, [2500, 7000, 15000][retryCount]);
       } else if (error.status === 429) {
         statusEl.textContent = 'Chat disponible · voz sin cupo por ahora';
+      } else if (retryCount < 2 && !muted && !panel.hidden) {
+        statusEl.textContent = 'Reconectando la voz…';
+        retryScheduled = true;
+        speechRetryTimer = setTimeout(() => {
+          speechRetryTimer = null;
+          if (request === voiceRequest && !muted && !panel.hidden) speakReply(text, button, retryCount + 1);
+        }, [700, 1800][retryCount]);
+      } else {
+        statusEl.textContent = 'No pude reproducir la voz · tocá el parlante para reintentar';
       }
       if (text === welcomeText && !retryScheduled) welcomeSpoken = welcomePlayed;
     } finally {
@@ -524,7 +535,9 @@
   }
 
   function dictatedText() {
-    return [recordingDraft, ...dictationSegments, recognitionFinal, recognitionInterim].filter(Boolean).join(' ').trim().slice(0, 1200);
+    const raw = [recordingDraft, ...dictationSegments, recognitionFinal, recognitionInterim].filter(Boolean).join(' ').trim().slice(0, 1200);
+    const context = history.filter(item => item.role === 'user').map(item => item.content).join(' ');
+    return dictationTerms.normalize(raw, context);
   }
 
   function showDictatedText() {
@@ -591,10 +604,20 @@
     if (session !== dictationSession || !dictating || finishingDictation) return;
     const recognizer = new Recognition();
     recognizer.lang = 'es-UY';
+    const Phrase = window.SpeechRecognitionPhrase;
+    if (Phrase && !phraseBiasDisabled && 'phrases' in recognizer) {
+      try {
+        recognizer.phrases = [
+          ['Subaru Impreza', 5], ['Impreza', 4], ['Hawkeye', 4], ['Subaru Hawkeye', 5],
+          ['Wagon', 3], ['MOTORLOZ', 4], ['kilometraje', 2], ['embrague', 2],
+          ['pastillas de freno', 2], ['suspensión', 2]
+        ].map(([phrase, boost]) => new Phrase(phrase, boost));
+      } catch {} // Older browsers continue with ordinary dictation.
+    }
     // Short recognition sessions work more reliably on mobile; each end starts a fresh one.
     recognizer.continuous = false;
     recognizer.interimResults = true;
-    recognizer.maxAlternatives = 1;
+    recognizer.maxAlternatives = 3;
     let endFallbackTimer = null;
     let transientFailure = false;
     speechRecognition = recognizer;
@@ -606,8 +629,13 @@
       if (session !== dictationSession || speechRecognition !== recognizer) return;
       const final = [];
       const interim = [];
+      const context = [
+        ...history.filter(item => item.role === 'user').map(item => item.content),
+        recordingDraft, ...dictationSegments,
+        ...Array.from(event.results).map(result => result[0]?.transcript || '')
+      ].join(' ');
       for (const result of Array.from(event.results)) {
-        const phrase = result[0]?.transcript?.trim();
+        const phrase = dictationTerms.choose(result, context);
         if (phrase) (result.isFinal ? final : interim).push(phrase);
       }
       recognitionFinal = final.join(' ');
@@ -634,6 +662,12 @@
     };
     recognizer.addEventListener('error', event => {
       if (session !== dictationSession || speechRecognition !== recognizer) return;
+      if (event.error === 'phrases-not-supported') {
+        phraseBiasDisabled = true;
+        transientFailure = true;
+        endFallbackTimer = setTimeout(onEnd, 150);
+        return;
+      }
       if (['no-speech', 'aborted', 'network'].includes(event.error)) {
         transientFailure = event.error === 'network';
         endFallbackTimer = setTimeout(onEnd, 800);
