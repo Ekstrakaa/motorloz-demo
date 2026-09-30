@@ -30,10 +30,12 @@ test('two successive replies speak their own text and a greeting does not trigge
     if (!nodes.has(selector)) nodes.set(selector, element());
     return nodes.get(selector);
   };
-  get('#assistant-booking-form').elements = { issue: element() };
+  get('#assistant-booking-form').elements = Object.fromEntries(['issue', 'vehicle', 'year', 'mileage'].map(name => [name, element()]));
+  get('#assistant-booking-form').querySelector = () => element();
   const spokenTexts = [];
   const chatHistories = [];
   const contexts = [];
+  let openedUrl = '';
   class AudioContext {
     constructor() { this.state = 'suspended'; this.currentTime = 0; this.destination = {}; this.resumes = 0; contexts.push(this); }
     addEventListener() {}
@@ -69,9 +71,10 @@ test('two successive replies speak their own text and a greeting does not trigge
   };
   const context = {
     document: { querySelector: get, createElement: element, documentElement: element(), body: element(), addEventListener() {} },
-    window: { AudioContext, SpeechRecognition: null, innerWidth: 393, innerHeight: 800,
+    window: { AudioContext, SpeechRecognition: null, innerWidth: 393, innerHeight: 800, open: url => { openedUrl = url; },
       visualViewport: { height: 500, offsetTop: 0, addEventListener() {} }, setTimeout, addEventListener() {} },
     Audio, location: { search: '' }, URLSearchParams, URL: { revokeObjectURL() {} },
+    FormData: class { entries() { return Object.entries({ name:'Prueba', phone:'099000000', vehicle:'Subaru Forester', year:'2014', mileage:'130.000 km', issue:'Se encendió la luz del motor al acelerar.', availability:'', priority:'Consulta coordinada' }); } },
     fetch, setTimeout, clearTimeout, setInterval, clearInterval,
     requestAnimationFrame: callback => callback(), AbortController, TextDecoder, atob
   };
@@ -112,5 +115,15 @@ test('two successive replies speak their own text and a greeting does not trigge
   assert.equal(get('#assistant-reservation-prompt').hidden, false);
   get('#assistant-mute').listeners.click();
   assert.equal(spokenTexts.at(-1), replies['Quiero reservar un turno'], 'unmuting reads the current answer');
+
+  get('#assistant-reserve-start').listeners.click();
+  get('#assistant-booking-form').listeners.submit({ preventDefault() {} });
+  const draft = new URL(openedUrl).searchParams.get('text');
+  assert.match(draft, /\*CONSULTA MOTORLOZ\*\nPreparada desde el asistente\n\n\*01 · CONTACTO\*/);
+  assert.match(draft, /\n\n\*02 · VEHÍCULO\*\n- Marca y modelo: Subaru Forester/);
+  assert.match(draft, /\n\n\*03 · QUÉ OCURRE\*\nSe encendió la luz del motor al acelerar\./);
+  assert.match(draft, /\n\n\*04 · COORDINACIÓN\*/);
+  assert.doesNotMatch(draft, /�/);
+  assert.equal(get('#assistant-wa-retry').href, openedUrl);
 
 });

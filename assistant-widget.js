@@ -624,19 +624,24 @@
     event.preventDefault();
     const data = new FormData(bookingForm);
     const values = Object.fromEntries(data.entries());
-    const lines = [
-      '🔧 *Consulta desde el asistente MOTORLOZ*',
-      '',
-      `👤 *Contacto:* ${values.name.trim()} · ${values.phone.trim()}`,
-      `🚗 *Vehículo:* ${values.vehicle.trim()}${values.year ? ` (${values.year})` : ''}`,
-      values.mileage ? `🛣️ *Kilometraje:* ${values.mileage.trim()}` : '',
-      `📝 *Lo que noté:* ${values.issue.trim()}`,
-      `📅 *Coordinación:* ${values.priority}`,
-      values.availability ? `🕒 *Disponibilidad:* ${values.availability.trim()}` : '',
-      '',
-      '¿Podemos coordinar una revisión? Quedo atento/a a la confirmación del taller.'
-    ].filter(Boolean);
-    const url = `https://wa.me/${window.MOTORLOZ?.whatsapp || '59891888288'}?text=${encodeURIComponent(lines.join('\n'))}`;
+    const sections = [
+      '*CONSULTA MOTORLOZ*\nPreparada desde el asistente',
+      `*01 · CONTACTO*\n- Nombre: ${values.name.trim()}\n- Teléfono: ${values.phone.trim()}`,
+      [
+        '*02 · VEHÍCULO*',
+        `- Marca y modelo: ${values.vehicle.trim()}`,
+        values.year ? `- Año: ${values.year}` : '',
+        values.mileage ? `- Kilometraje: ${values.mileage.trim()}` : ''
+      ].filter(Boolean).join('\n'),
+      `*03 · QUÉ OCURRE*\n${values.issue.trim()}`,
+      [
+        '*04 · COORDINACIÓN*',
+        `- Prioridad: ${values.priority}`,
+        values.availability ? `- Disponibilidad: ${values.availability.trim()}` : ''
+      ].filter(Boolean).join('\n'),
+      '¿Podemos coordinar una revisión? Quedo atento/a a la confirmación de día y horario.'
+    ];
+    const url = `https://wa.me/${window.MOTORLOZ?.whatsapp || '59891888288'}?text=${encodeURIComponent(sections.join('\n\n'))}`;
     const retryLink = document.querySelector('#assistant-wa-retry');
     retryLink.href = url;
     retryLink.hidden = false;
