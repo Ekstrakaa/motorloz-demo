@@ -613,7 +613,6 @@
     bookingForm.elements.issue.value = history.filter(item => item.role === 'user')
       .map(item => item.content.trim())
       .filter(text => text && !/^(hola|buen(as|os) (d[ií]as|tardes|noches))[!.,\s]*$/i.test(text))
-      .map(text => text.replace(/(?:quiero|me gustar[ií]a)\s+(?:coordinar|reservar|agendar)\s+(?:un\s+)?(?:turno|cita)[^.?!]*/ig, '').replace(/\s+\./g, '.').replace(/\.{2,}/g, '.').trim())
       .filter(Boolean).slice(-4).join(' ').slice(0, 600);
     bookingForm.querySelector('[name="name"]').focus({ preventScroll: true });
   });
