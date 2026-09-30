@@ -30,12 +30,12 @@ test('two successive replies speak their own text and a greeting does not trigge
     if (!nodes.has(selector)) nodes.set(selector, element());
     return nodes.get(selector);
   };
-  get('#assistant-booking-form').elements = Object.fromEntries(['name', 'issue', 'vehicle', 'year', 'mileage'].map(name => [name, element()]));
-  get('#assistant-booking-form').querySelector = () => element();
   const spokenTexts = [];
   const chatHistories = [];
   const contexts = [];
-  let openedUrl = '';
+  let failSpeech = false;
+  let deviceVoiceCalls = 0;
+  const popup = { location: { href: '' }, opener: null };
   const session = new Map();
   class AudioContext {
     constructor() { this.state = 'suspended'; this.currentTime = 0; this.destination = {}; this.resumes = 0; contexts.push(this); }
@@ -53,7 +53,8 @@ test('two successive replies speak their own text and a greeting does not trigge
     'Tengo un Subaru, unos 200 mil kilómetros y anda mal': 'Entiendo. ¿Qué notás exactamente y desde cuándo empezó?',
     'Quiero reservar un turno': 'Claro, podemos preparar una consulta para coordinarlo.',
     'Me llamo Ana': 'Gracias, Ana. Contame un poco más de la falla.',
-    'Desde que pasé un pozo vibra la caja y se enciende la luz del motor al acelerar': 'Entiendo. Esa combinación merece revisión; Pablo o Bruno pueden evaluar el auto. ¿Querés que preparemos la consulta para WhatsApp?'
+    'Desde que pasé un pozo vibra la caja y se enciende la luz del motor al acelerar': 'Entiendo. Esa combinación merece revisión; Pablo o Bruno pueden evaluar el auto. ¿Querés que preparemos la consulta para WhatsApp?',
+    '¿Y si falla la voz?': 'Te sigo respondiendo por escrito.'
   };
   const fetch = async (url, options) => {
     if (url.endsWith('/status')) return { ok: true, json: async () => ({ configured: true }) };
@@ -65,20 +66,21 @@ test('two successive replies speak their own text and a greeting does not trigge
     }
     if (url.endsWith('/summary')) return { ok:true, json:async () => ({ summary:'La luz del tablero se encendió y el cliente quiere revisar el auto.' }) };
     if (url.endsWith('/speech-stream')) {
+      if (failSpeech) return { ok:false, status:429 };
       const text = JSON.parse(options.body).text;
       spokenTexts.push(text);
       const event = new TextEncoder().encode(`data: ${JSON.stringify({ event_type: 'step.delta', delta: { type: 'audio', data: 'AAAA' } })}\n\n`);
       let sent = false;
       return { ok: true, body: { getReader: () => ({ read: async () => sent ? { done: true } : (sent = true, { value: event, done: false }) }) } };
     }
+    if (url.endsWith('/speech')) return { ok:false, status:429 };
     throw new Error(`Unexpected URL: ${url}`);
   };
   const context = {
     document: { querySelector: get, createElement: element, createTextNode: text => ({ textContent:text }), documentElement: element(), body: element(), addEventListener() {} },
-    window: { AudioContext, SpeechRecognition: null, innerWidth: 393, innerHeight: 800, open: url => { openedUrl = url; }, sessionStorage: { getItem:key=>session.get(key), setItem:(key,value)=>session.set(key,value), removeItem:key=>session.delete(key) },
+    window: { AudioContext, SpeechRecognition: null, speechSynthesis: { speak: () => { deviceVoiceCalls += 1; }, cancel() {}, getVoices: () => [{ lang:'es-UY' }] }, SpeechSynthesisUtterance: class {}, innerWidth: 393, innerHeight: 800, open: () => popup, sessionStorage: { getItem:key=>session.get(key), setItem:(key,value)=>session.set(key,value), removeItem:key=>session.delete(key) },
       visualViewport: { height: 500, offsetTop: 0, addEventListener() {} }, setTimeout, addEventListener() {} },
     Audio, location: { search: '' }, URLSearchParams, URL: { revokeObjectURL() {} },
-    FormData: class { entries() { return Object.entries({ name:'Prueba', vehicle:'Subaru Forester', year:'2014', mileage:'130.000 km', issue:'Se encendió la luz del motor al acelerar.', availability:'', priority:'Consulta coordinada' }); } },
     fetch, setTimeout, clearTimeout, setInterval, clearInterval,
     requestAnimationFrame: callback => callback(), AbortController, TextDecoder, atob
   };
@@ -126,20 +128,20 @@ test('two successive replies speak their own text and a greeting does not trigge
   await send('Desde que pasé un pozo vibra la caja y se enciende la luz del motor al acelerar');
   assert.equal(get('#assistant-reservation-prompt').hidden, false, 'the WhatsApp option appears after a substantive follow-up');
 
-  get('#assistant-reserve-start').listeners.click();
-  await new Promise(resolve => setTimeout(resolve, 0));
-  assert.equal(get('#assistant-booking-form').elements.name.value, 'Ana');
-  assert.equal(get('#assistant-booking-form').elements.vehicle.value, 'Subaru');
-  assert.equal(get('#assistant-booking-form').elements.mileage.value, '200.000 km aprox.');
-  assert.equal(get('#assistant-booking-form').elements.issue.value, 'La luz del tablero se encendió y el cliente quiere revisar el auto.');
-  get('#assistant-booking-form').listeners.submit({ preventDefault() {} });
-  const draft = new URL(openedUrl).searchParams.get('text');
+  await get('#assistant-reserve-start').listeners.click();
+  const draft = new URL(popup.location.href).searchParams.get('text');
   assert.match(draft, /\*CONSULTA MOTORLOZ\*\nPreparada desde el asistente\n\n\*01 · CLIENTE\*/);
   assert.doesNotMatch(draft, /Tel[eé]fono|099000000/);
-  assert.match(draft, /\n\n\*02 · VEHÍCULO\*\n- Marca y modelo: Subaru Forester/);
-  assert.match(draft, /\n\n\*03 · QUÉ OCURRE\*\nSe encendió la luz del motor al acelerar\./);
+  assert.match(draft, /- Nombre: Ana/);
+  assert.match(draft, /\n\n\*02 · VEHÍCULO\*\n- Marca y modelo: Subaru\n- Kilometraje: 200\.000 km aprox\./);
+  assert.match(draft, /\n\n\*03 · QUÉ NECESITA\*\nLa luz del tablero se encendió y el cliente quiere revisar el auto\./);
   assert.match(draft, /\n\n\*04 · COORDINACIÓN\*/);
   assert.doesNotMatch(draft, /�/);
-  assert.equal(get('#assistant-wa-retry').href, openedUrl);
+  assert.equal(get('#assistant-wa-retry').href, popup.location.href);
+  assert.equal(get('#assistant-reservation-prompt').hidden, false, 'the conversation stays available while WhatsApp opens');
+
+  failSpeech = true;
+  await send('¿Y si falla la voz?');
+  assert.equal(deviceVoiceCalls, 0, 'a quota failure never switches to the phone voice');
 
 });

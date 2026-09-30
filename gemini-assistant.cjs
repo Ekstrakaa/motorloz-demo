@@ -1,9 +1,10 @@
 const MODEL = process.env.GEMINI_CHAT_MODEL || 'gemini-3.5-flash-lite';
-const SPEECH_MODEL = process.env.GEMINI_TTS_MODEL || 'gemini-3.8-flash-lite-tts';
-const SPEECH_VOICE = process.env.GEMINI_TTS_VOICE || 'Algieba';
+const SPEECH_MODEL = 'gemini-3.8-flash-lite-tts';
+const SPEECH_VOICE = 'Algieba';
 const SUMMARY_MODEL = process.env.GEMINI_SUMMARY_MODEL || 'gemini-3.5-flash-lite';
 const SYSTEM_PROMPT = `Sos la recepción virtual de MOTORLOZ, taller multimarca en Montevideo. Tu trabajo es escuchar, orientar sin diagnosticar y preparar una consulta clara para WhatsApp. Pablo es el dueño del taller y Bruno forma parte del equipo experimentado; podés mencionarlos naturalmente al explicar que revisarán el caso, sin prometer que una persona concreta estará disponible. El equipo humano confirma día, hora, disponibilidad y detalles finales: vos nunca confirmás una reserva. Conversá en español rioplatense cálido y natural. Usá todo el historial disponible: recordá lo ya dicho y no repitas preguntas ni datos. Si solo saluda, saludá y preguntá en qué podés ayudar; no hables de turnos. También atendés mantenimiento y servicios programados: aceite, frenos, alineación y revisiones; si pregunta por eso, preguntá qué servicio necesita, para qué vehículo y el kilometraje, sin inventar intervalos ni precios. Si la persona dice solo “tengo un Subaru, unos 200 mil kilómetros y anda mal”, no diagnostiques ni ofrezcas turno enseguida: preguntá qué nota exactamente y desde cuándo. Si cuenta un síntoma, explicá brevemente qué sistemas podrían estar relacionados sin afirmar una causa y hacé una sola pregunta útil sobre cuándo ocurre, qué aviso aparece, cómo se siente o si empezó después de un pozo, golpe o movimiento brusco. Preguntá sobre golpes solo cuando sea pertinente; nunca sugieras que ocurrió si el cliente no lo dijo. Procurá reunir sin interrogatorio: nombre, marca, modelo, año, kilometraje aproximado, síntomas, circunstancias y desde cuándo. Si no sabe año, modelo o kilometraje exacto, aceptá la aproximación. Después de que el cliente responda al menos una pregunta de seguimiento y ya tengas los datos esenciales, ofrecé preparar la consulta estructurada para WhatsApp. Si pide turno antes, seguí la conversación para obtener lo esencial y pedí el nombre si falta; no lo des por confirmado. Nunca pidas teléfono: WhatsApp ya identifica al remitente. No mandes al formulario general de la página. Cuando ya sea oportuno pasar a WhatsApp, decí que la persona puede tocar “Preparar solicitud” debajo del chat para revisar el borrador; no escribas el mensaje de WhatsApp dentro de tu respuesta, no inventes enlaces y no prometas respuesta inmediata del taller. Respondé en 2 a 4 frases breves, normalmente menos de 400 caracteres; no seas telegráfico ni escribas una biblia. No repitas “traelo al taller” ni ofrezcas reservar en cada respuesta. No asegures precios, presupuestos, repuestos ni disponibilidad. No afirmes que es seguro conducir sin una evaluación: si hay humo abundante, olor fuerte a combustible, falla de frenos, sobrecalentamiento, pérdida de dirección o daño tras un impacto, indicá detenerse en lugar seguro, no seguir conduciendo y pedir asistencia. No indiques abrir el sistema de refrigeración caliente. Para otros temas, explicá con amabilidad que el chat ayuda con consultas sobre vehículos y MOTORLOZ.`;
 const rateLimits = new Map();
+const CHAT_PROMPT = SYSTEM_PROMPT.replace('“Preparar solicitud” debajo del chat para revisar el borrador', '“Abrir WhatsApp” debajo del chat para revisar el mensaje allí');
 
 function json(res, status, data) {
   res.statusCode = status;
@@ -39,7 +40,7 @@ function cleanHistory(messages) {
     .filter(item => item.parts[0].text);
 }
 
-async function callGemini(contents, { maxOutputTokens = 768, systemInstruction = SYSTEM_PROMPT, models = [MODEL, 'gemini-3.8-flash', 'gemini-3.7-flash'] } = {}) {
+async function callGemini(contents, { maxOutputTokens = 768, systemInstruction = CHAT_PROMPT, models = [MODEL, 'gemini-3.8-flash', 'gemini-3.7-flash'] } = {}) {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw Object.assign(new Error('not_configured'), { status: 503 });
   models = [...new Set(models)];
@@ -108,7 +109,7 @@ async function requestSpeech(text, stream = false, model = SPEECH_MODEL) {
 
 async function generateSpeech(text) {
   let lastError;
-  for (const model of [...new Set([SPEECH_MODEL, 'gemini-3.8-flash-tts'])]) {
+  for (const model of [SPEECH_MODEL]) {
     const upstream = await requestSpeech(text, false, model);
     const result = await upstream.json().catch(() => ({}));
     if (!upstream.ok) {
@@ -128,7 +129,7 @@ async function generateSpeech(text) {
 
 async function streamSpeech(text, res) {
   let lastError;
-  for (const model of [...new Set([SPEECH_MODEL, 'gemini-3.8-flash-tts'])]) {
+  for (const model of [SPEECH_MODEL]) {
     const upstream = await requestSpeech(text, true, model);
     if (!upstream.ok) {
       const result = await upstream.json().catch(() => ({}));

@@ -82,24 +82,20 @@ test('streams fixed-voice audio chunks without waiting for the complete recordin
   }
 });
 
-test('retries a speech stream on a second model when the first voice hits its quota', async () => {
+test('keeps the one voice and model when speech reaches its quota', async () => {
   process.env.GEMINI_API_KEY = 'test-key';
   const previousFetch = global.fetch;
   const urls = [];
   global.fetch = async (url, options) => {
     urls.push(JSON.parse(options.body).model);
-    const event = urls.length === 1
-      ? 'event: error\ndata: {"event_type":"error","error":{"code":"rate_limit_exceeded"}}\n\n'
-      : 'event: step.delta\ndata: {"event_type":"step.delta","delta":{"type":"audio","data":"AAAA"}}\n\n';
+    const event = 'event: error\ndata: {"event_type":"error","error":{"code":"rate_limit_exceeded"}}\n\n';
     return { ok: true, body: ReadableStream.from([Buffer.from(event)]) };
   };
   try {
     const res = response();
     await handle({ method: 'POST', body: { text: 'Hola' }, headers: {}, socket: {} }, res, 'speech-stream');
-    assert.equal(res.statusCode, 200);
-    assert.match(Buffer.concat(res.chunks).toString(), /step.delta/);
-    assert.equal(urls[0], 'gemini-3.8-flash-lite-tts');
-    assert.equal(urls[1], 'gemini-3.8-flash-tts');
+    assert.equal(res.statusCode, 429);
+    assert.deepEqual(urls, ['gemini-3.8-flash-lite-tts']);
   } finally { global.fetch = previousFetch; }
 });
 
