@@ -365,6 +365,7 @@
       history = restored;
       for (const item of restored) bubble(item.content, item.role);
       lastSpokenText = restored.filter(item => item.role === 'assistant').at(-1)?.content || welcomeText;
+      maybeShowBooking();
     } catch {}
   }
 
