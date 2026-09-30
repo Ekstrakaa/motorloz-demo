@@ -16,6 +16,7 @@
   const bookingForm = document.querySelector('#assistant-booking-form');
   const resetDialog = document.querySelector('#assistant-reset-confirm');
   const recordingState = document.querySelector('#assistant-recording-state');
+  const muteButton = document.querySelector('#assistant-mute');
   const voicePlayer = new Audio();
   const AudioContextClass = window.AudioContext || window.webkitAudioContext;
   const speechCache = new Map();
@@ -44,6 +45,8 @@
   let voiceUrl = '';
   let speechAbort = null;
   let activeSpeechButton = null;
+  let muted = false;
+  let lastSpokenText = '';
   let audioContext = null;
   let audioSources = new Set();
   let nextAudioTime = 0;
@@ -66,7 +69,15 @@
     voicePlayer.load();
     if (voiceUrl) URL.revokeObjectURL(voiceUrl);
     voiceUrl = '';
-    panel.querySelectorAll('.assistant-speak.is-playing,.assistant-speak.is-loading').forEach(button => button.classList.remove('is-playing', 'is-loading'));
+    window.speechSynthesis?.cancel();
+    muteButton.classList.remove('is-speaking', 'is-loading');
+  }
+
+  function updateMuteButton() {
+    muteButton.classList.toggle('is-muted', muted);
+    muteButton.setAttribute('aria-pressed', String(muted));
+    muteButton.setAttribute('aria-label', muted ? 'Activar voz' : 'Silenciar voz');
+    muteButton.title = muted ? 'Activar voz' : 'Silenciar voz';
   }
 
   function unlockAudio() {
@@ -127,19 +138,26 @@
       audioSources.add(source);
       source.onended = () => {
         audioSources.delete(source);
-        if (streamFinished && !audioSources.size) button?.classList.remove('is-playing');
+        if (streamFinished && !audioSources.size && request === voiceRequest) {
+          muteButton.classList.remove('is-speaking');
+          activeSpeechButton = null;
+        }
       };
       received = true;
       clearTimeout(firstAudioTimeout);
-      button?.classList.remove('is-loading');
-      button?.classList.add('is-playing');
+      muteButton.classList.remove('is-loading');
+      muteButton.classList.add('is-speaking');
     };
     try {
       const response = await fetch('/api/assistant/speech-stream', {
         method:'POST', headers:{'Content-Type':'application/json'},
         body:JSON.stringify({text}), signal:controller.signal
       });
-      if (!response.ok || !response.body) throw new Error('speech_stream_unavailable');
+      if (!response.ok || !response.body) {
+        const error = new Error('speech_stream_unavailable');
+        error.status = response.status;
+        throw error;
+      }
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       while (true) {
@@ -153,7 +171,7 @@
       if (pending.trim()) handleBlock(pending);
       if (!received) throw new Error('speech_stream_empty');
       streamFinished = true;
-      if (!audioSources.size) button?.classList.remove('is-playing');
+      if (!audioSources.size) { muteButton.classList.remove('is-speaking'); activeSpeechButton = null; }
       return true;
     } catch (error) {
       if (received) { streamFinished = true; return true; }
@@ -188,17 +206,32 @@
     voicePlayer.currentTime = 0;
     await voicePlayer.play();
     if (request !== voiceRequest) return;
-    button?.classList.remove('is-loading');
-    button?.classList.add('is-playing');
+    muteButton.classList.remove('is-loading');
+    muteButton.classList.add('is-speaking');
+  }
+
+  function browserSpeech(text, request) {
+    if (!window.speechSynthesis || !window.SpeechSynthesisUtterance || request !== voiceRequest || muted) return false;
+    const utterance = new SpeechSynthesisUtterance(text);
+    const voices = window.speechSynthesis.getVoices();
+    utterance.voice = voices.find(voice => /^es[-_]UY/i.test(voice.lang)) || voices.find(voice => /^es[-_]AR/i.test(voice.lang)) || voices.find(voice => /^es/i.test(voice.lang)) || null;
+    utterance.lang = utterance.voice?.lang || 'es-UY';
+    utterance.rate = 1.02;
+    utterance.onstart = () => { if (request === voiceRequest) { muteButton.classList.remove('is-loading'); muteButton.classList.add('is-speaking'); } };
+    utterance.onend = utterance.onerror = () => { if (request === voiceRequest) { muteButton.classList.remove('is-speaking', 'is-loading'); activeSpeechButton = null; } };
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(utterance);
+    return true;
   }
 
   async function speakReply(text, button = null) {
-    if (!configured) return;
+    if (!configured || muted || !text) return;
     stopSpeech();
     unlockAudio();
     const request = voiceRequest;
-    activeSpeechButton = button;
-    button?.classList.add('is-loading');
+    activeSpeechButton = muteButton;
+    lastSpokenText = text;
+    muteButton.classList.add('is-loading');
     try {
       if (audioContext) {
         try {
@@ -206,29 +239,26 @@
             audioContext.resume().catch(() => {}),
             new Promise(resolve => setTimeout(resolve, 1800))
           ]);
-          await streamSpeech(text, button, request);
+          await streamSpeech(text, muteButton, request);
           return;
-        } catch {
+        } catch (error) {
           if (request !== voiceRequest) return;
           if (audioSources.size) { streamFinished = true; return; }
+          if (error.status === 429) { browserSpeech(text, request); return; }
         }
       }
       const controller = new AbortController();
       speechAbort = controller;
-      await playSpeechPart(text, button, request, controller);
+      await playSpeechPart(text, muteButton, request, controller);
     } catch (error) {
       if (request !== voiceRequest) return;
-      if (error.name === 'NotAllowedError') {
-        button?.setAttribute('aria-label', 'Tocá para escuchar esta respuesta');
-      } else {
-        button?.setAttribute('aria-label', 'Voz no disponible por ahora');
-      }
+      if (!browserSpeech(text, request)) activeSpeechButton = null;
     } finally {
-      button?.classList.remove('is-loading');
+      if (request === voiceRequest) muteButton.classList.remove('is-loading');
     }
   }
   voicePlayer.addEventListener('ended', () => {
-    activeSpeechButton?.classList.remove('is-playing');
+    muteButton.classList.remove('is-speaking');
     activeSpeechButton = null;
   });
   function bubble(text, role, extra = {}) {
@@ -237,16 +267,6 @@
     const copy = document.createElement('p');
     copy.textContent = text;
     row.append(copy);
-    if (role === 'assistant' && !extra.pending && configured) {
-      const speakButton = document.createElement('button');
-      speakButton.className = 'assistant-speak';
-      speakButton.type = 'button';
-      speakButton.setAttribute('aria-label', 'Escuchar respuesta');
-      speakButton.title = 'Escuchar respuesta';
-      speakButton.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5Z"></path><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"></path></svg>';
-      speakButton.addEventListener('click', () => speakReply(text, speakButton));
-      row.append(speakButton);
-    }
     if (extra.pending) row.classList.add('is-pending');
     messagesEl.append(row);
     messagesEl.scrollTop = messagesEl.scrollHeight;
@@ -258,6 +278,7 @@
     booking.hidden = true;
     reservationPrompt.hidden = true;
     history = [];
+    lastSpokenText = welcomeText;
     const greeting = bubble(welcomeText, 'assistant');
     if (statusChecked && !configured) bubble('La conexión con la inteligencia artificial todavía no está configurada. El formulario de consulta sigue disponible en la página.', 'assistant');
     messagesEl.scrollTop = 0;
@@ -280,7 +301,7 @@
       statusChecked = true;
       if (refreshGreeting && !history.length) {
         const greeting = welcome();
-        if (configured && panel.classList.contains('is-open')) speakReply(welcomeText, greeting.querySelector('.assistant-speak'));
+        if (configured && panel.classList.contains('is-open')) speakReply(welcomeText);
       }
     } catch {
       statusEl.textContent = 'Conexión no disponible';
@@ -325,8 +346,9 @@
       const replyText = String(result.reply || '').trim();
       if (!replyText) throw new Error('No pude responder en este momento.');
       history.push({ role: 'assistant', content: replyText });
-      const reply = bubble(replyText, 'assistant');
-      speakReply(replyText, reply.querySelector('.assistant-speak'));
+      bubble(replyText, 'assistant');
+      lastSpokenText = replyText;
+      speakReply(replyText);
       maybeShowBooking(userMessage);
     } catch (error) {
       pending.remove();
@@ -557,7 +579,14 @@
   document.querySelector('#assistant-close').addEventListener('click', close);
   document.querySelector('#assistant-new').addEventListener('click', () => { resetDialog.hidden = false; });
   document.querySelector('#assistant-reset-no').addEventListener('click', () => { resetDialog.hidden = true; });
-  document.querySelector('#assistant-reset-yes').addEventListener('click', () => { resetDialog.hidden = true; stopSpeech(); cancelDictation(); const greeting = welcome(); if (configured) speakReply(welcomeText, greeting.querySelector('.assistant-speak')); input.focus(); });
+  document.querySelector('#assistant-reset-yes').addEventListener('click', () => { resetDialog.hidden = true; stopSpeech(); cancelDictation(); welcome(); if (configured) speakReply(welcomeText); input.focus({preventScroll:true}); });
+  muteButton.addEventListener('click', () => {
+    muted = !muted;
+    updateMuteButton();
+    if (muted) stopSpeech();
+    else if (lastSpokenText) speakReply(lastSpokenText);
+    unlockAudio();
+  });
   document.querySelector('#assistant-stop-recording').addEventListener('click', finishDictation);
   document.querySelector('#assistant-mic').addEventListener('click', () => dictating ? finishDictation() : startDictation());
   document.querySelector('#assistant-privacy-link').addEventListener('click', event => { event.preventDefault(); close(); document.querySelector('#turno').scrollIntoView({ behavior: 'smooth' }); });
@@ -570,50 +599,53 @@
   window.visualViewport?.addEventListener('scroll', syncViewport);
   window.addEventListener?.('resize', syncViewport);
 
-  document.querySelector('#assistant-reserve-start').addEventListener('click', () => {
+  document.querySelector('#assistant-reserve-start').addEventListener('click', async () => {
     reservationPrompt.hidden = true;
     booking.hidden = false;
     booking.scrollTop = 0;
+    const userWords = history.filter(item => item.role === 'user').map(item => item.content).join(' ');
+    const vehicle = userWords.match(/\b(Subaru|Toyota|Honda|Hyundai|Volkswagen|VW|BMW|Mercedes(?:-Benz)?|Nissan|Mazda|Suzuki|Mitsubishi|Kia|Chevrolet|Peugeot|Audi|Renault|Ford|Jeep|Fiat|Volvo|Citro[eë]n|Dodge|Ferrari|Porsche|Alfa Romeo)\s+([\w-]+(?:\s+[\w-]+)?)/i);
+    if (vehicle) bookingForm.elements.vehicle.value = `${vehicle[1]} ${vehicle[2]}`.replace(/\s+(?:19|20)\d{2}$/, '').replace(/\s+(de|del|con|a|al|en)$/i, '');
+    const year = userWords.match(/\b(19[89]\d|20[0-3]\d)\b/);
+    if (year) bookingForm.elements.year.value = year[1];
+    const mileage = userWords.match(/\b(\d{2,3}(?:[.,]\d{3})?)\s*(?:km|kil[oó]metros)\b/i);
+    if (mileage) bookingForm.elements.mileage.value = `${mileage[1]} km`;
+    bookingForm.elements.issue.value = history.filter(item => item.role === 'user').slice(-3).map(item => item.content).join(' ').slice(0, 500);
     bookingForm.querySelector('[name="name"]').focus({ preventScroll: true });
-  });
-  document.querySelector('#assistant-reserve-later').addEventListener('click', () => {
-    reservationPrompt.hidden = true;
-  });
-  bookingForm.addEventListener('submit', async event => {
-    event.preventDefault();
-    const data = new FormData(bookingForm);
-    const values = Object.fromEntries(data.entries());
-    const submitButton = bookingForm.querySelector('.assistant-send-whatsapp');
-    const originalButtonText = submitButton.innerHTML;
-    submitButton.disabled = true;
-    submitButton.textContent = 'Ordenando la consulta…';
-    let issueSummary = '';
     try {
       const response = await fetch('/api/assistant/summary', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ messages: history })
       });
       const result = await response.json();
-      if (response.ok) issueSummary = String(result.summary || '').trim();
+      if (response.ok && !booking.hidden && !bookingForm.elements.issue.dataset.edited) bookingForm.elements.issue.value = String(result.summary || '').trim().slice(0, 600) || bookingForm.elements.issue.value;
     } catch {}
-    if (!issueSummary) {
-      issueSummary = history.filter(item => item.role === 'assistant').slice(-2).map(item => item.content).join(' ').slice(0, 420);
-    }
+  });
+  document.querySelector('#assistant-reserve-later').addEventListener('click', () => {
+    reservationPrompt.hidden = true;
+  });
+  bookingForm.elements.issue.addEventListener('input', () => { bookingForm.elements.issue.dataset.edited = 'true'; });
+  bookingForm.addEventListener('submit', event => {
+    event.preventDefault();
+    const data = new FormData(bookingForm);
+    const values = Object.fromEntries(data.entries());
     const lines = [
-      'Hola, quiero coordinar una revisión con MOTORLOZ.',
-      `Nombre: ${values.name}`,
-      `Teléfono: ${values.phone}`,
-      `Coordinación: ${values.priority}`,
-      values.availability ? `Disponibilidad: ${values.availability}` : '',
-      `Resumen para el mecánico: ${issueSummary.slice(0, 600)}`,
-      'Resumen inicial basado en lo relatado; no es un diagnóstico confirmado.'
+      '🔧 *Consulta desde el asistente MOTORLOZ*',
+      '',
+      `👤 *Contacto:* ${values.name.trim()} · ${values.phone.trim()}`,
+      `🚗 *Vehículo:* ${values.vehicle.trim()}${values.year ? ` (${values.year})` : ''}`,
+      values.mileage ? `🛣️ *Kilometraje:* ${values.mileage.trim()}` : '',
+      `📝 *Lo que noté:* ${values.issue.trim()}`,
+      `📅 *Coordinación:* ${values.priority}`,
+      values.availability ? `🕒 *Disponibilidad:* ${values.availability.trim()}` : '',
+      '',
+      '¿Podemos coordinar una revisión? Quedo atento/a a la confirmación del taller.'
     ].filter(Boolean);
     const url = `https://wa.me/${window.MOTORLOZ?.whatsapp || '59891888288'}?text=${encodeURIComponent(lines.join('\n'))}`;
     window.open(url, '_blank', 'noopener,noreferrer');
     booking.hidden = true;
     bookingForm.reset();
-    submitButton.disabled = false;
-    submitButton.innerHTML = originalButtonText;
+    delete bookingForm.elements.issue.dataset.edited;
   });
 
   welcome();

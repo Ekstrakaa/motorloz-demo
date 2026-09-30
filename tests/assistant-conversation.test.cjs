@@ -30,6 +30,7 @@ test('two successive replies speak their own text and a greeting does not trigge
     if (!nodes.has(selector)) nodes.set(selector, element());
     return nodes.get(selector);
   };
+  get('#assistant-booking-form').elements = { issue: element() };
   const spokenTexts = [];
   const chatHistories = [];
   const contexts = [];
@@ -104,7 +105,12 @@ test('two successive replies speak their own text and a greeting does not trigge
   assert.ok(contexts[0].resumes >= 2, 'the next user gesture resumes interrupted audio');
   assert.equal(get('#assistant-reservation-prompt').hidden, true);
 
+  get('#assistant-mute').listeners.click();
+  const beforeMuteReply = spokenTexts.length;
   await send('Quiero reservar un turno');
-  assert.equal(spokenTexts.at(-1), replies['Quiero reservar un turno']);
+  assert.equal(spokenTexts.length, beforeMuteReply, 'muting the header silences the next answer');
   assert.equal(get('#assistant-reservation-prompt').hidden, false);
+  get('#assistant-mute').listeners.click();
+  assert.equal(spokenTexts.at(-1), replies['Quiero reservar un turno'], 'unmuting reads the current answer');
+
 });

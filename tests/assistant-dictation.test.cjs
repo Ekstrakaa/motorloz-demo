@@ -25,6 +25,7 @@ test('dictation displays words while speaking and sends only text after stopping
     if (!nodes.has(selector)) nodes.set(selector, element());
     return nodes.get(selector);
   };
+  get('#assistant-booking-form').elements = { issue: element() };
   const requests = [];
   const recognizers = [];
   let audioPlays = 0;

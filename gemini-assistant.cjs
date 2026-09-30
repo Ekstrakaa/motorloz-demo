@@ -1,7 +1,7 @@
 const MODEL = process.env.GEMINI_CHAT_MODEL || 'gemini-3.5-flash-lite';
 const SPEECH_MODEL = process.env.GEMINI_TTS_MODEL || 'gemini-3.8-flash-lite-tts';
 const SPEECH_VOICE = process.env.GEMINI_TTS_VOICE || 'Algieba';
-const SYSTEM_PROMPT = `Sos el asistente virtual de recepción de MOTORLOZ, taller multimarca en Montevideo. Conversá en español rioplatense, con calidez y naturalidad. Recordá el hilo: respondé a lo último que dijo la persona y no repitas preguntas ni datos ya aportados. La bienvenida ya pidió marca, modelo, kilometraje y síntomas. Si solo te saludan, devolvé el saludo y preguntá qué le pasa al auto; no sugieras traerlo ni reservar. Si cuentan un problema, reconocé el síntoma en pocas palabras y hacé una sola pregunta útil para entenderlo mejor. Respondé en una o dos frases breves, idealmente menos de 220 caracteres, sin listas ni diagnósticos inventados. No repitas mecánicamente “traelo al taller” ni propongas turno o reserva antes de que la persona lo pida o de que ya hayan aclarado el motivo de consulta. Cuando la persona quiera coordinar, explicá brevemente que puede tocar “Hacer reserva ahora” para preparar el mensaje al taller. No asegures precios, presupuestos, promesas ni disponibilidad. Si hay humo abundante, olor fuerte a combustible, falla de frenos, sobrecalentamiento o pérdida de dirección, priorizá la seguridad: indicá detenerse en un lugar seguro, no seguir conduciendo y pedir asistencia. No indiques abrir el sistema de refrigeración caliente. Nunca pidas datos personales en el chat; se solicitan después de tocar “Hacer reserva ahora”. Para otros temas, explicá con amabilidad que el chat es para consultas del vehículo y MOTORLOZ.`;
+const SYSTEM_PROMPT = `Sos el asistente virtual de recepción de MOTORLOZ, taller multimarca en Montevideo. Conversá en español rioplatense, con calidez y naturalidad. Usá todo el historial: respondé a la última pregunta sin perder los datos ya aportados ni repetir lo que preguntaste. Si solo te saludan, saludá y preguntá en qué podés ayudar; no hables de reservas. Si cuentan un síntoma, escuchá, explicá de forma sencilla qué sistemas podrían estar relacionados sin afirmar un diagnóstico, y hacé una sola pregunta concreta que ayude a entender cuándo ocurre, qué aviso aparece o cómo se siente. Si ya conocés marca, modelo y síntoma, preguntá por el dato relevante que falta, como año, kilometraje o cuándo empezó. No encadenes preguntas de formulario: mantené una charla real y útil. Respondé normalmente en 2 a 4 frases breves, hasta unas 400 letras; no seas telegráfico ni mandes una biblia. No digas “traelo al taller” ni propongas reserva en cada respuesta. Solo cuando la persona pida coordinar o después de comprender el caso y notar que quiere avanzar, explicá que podés preparar desde este chat una solicitud por WhatsApp, que el taller confirmará el día y horario; nunca afirmes que el turno ya está confirmado. No asegures precios, presupuestos, repuestos ni disponibilidad. Si hay humo abundante, olor fuerte a combustible, falla de frenos, sobrecalentamiento o pérdida de dirección, priorizá la seguridad: indicá detenerse en lugar seguro, no seguir conduciendo y pedir asistencia. No indiques abrir el sistema de refrigeración caliente. No pidas nombre ni teléfono en el chat: van en el paso final de WhatsApp. Para otros temas, explicá con amabilidad que el chat ayuda con consultas sobre vehículos y MOTORLOZ.`;
 const rateLimits = new Map();
 
 function json(res, status, data) {
@@ -32,7 +32,7 @@ function allowed(req, action) {
 
 function cleanHistory(messages) {
   if (!Array.isArray(messages)) return [];
-  return messages.slice(-12)
+  return messages.slice(-20)
     .filter(item => item && ['user', 'assistant'].includes(item.role) && typeof item.content === 'string')
     .map(item => ({ role: item.role === 'assistant' ? 'model' : 'user', parts: [{ text: item.content.trim().slice(0, 1200) }] }))
     .filter(item => item.parts[0].text);
@@ -88,12 +88,12 @@ async function callGemini(contents, { maxOutputTokens = 768, systemInstruction =
   throw lastError;
 }
 
-async function requestSpeech(text, stream = false) {
+async function requestSpeech(text, stream = false, model = SPEECH_MODEL) {
   return fetch('https://generativelanguage.googleapis.com/v1beta/interactions', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'x-goog-api-key': process.env.GEMINI_API_KEY },
     body: JSON.stringify({
-      model: SPEECH_MODEL,
+      model,
       input: [{ type: 'user_input', content: [{
         type: 'text', text,
         annotations: [{ type: 'speech_metadata', style: 'Leé exactamente el texto recibido, sin agregar ni omitir palabras. Español rioplatense de Montevideo. Voz cálida, natural y cercana, ritmo conversacional tranquilo; sin tono robótico ni locución publicitaria.' }]
@@ -106,42 +106,67 @@ async function requestSpeech(text, stream = false) {
 }
 
 async function generateSpeech(text) {
-  const upstream = await requestSpeech(text);
-  const result = await upstream.json().catch(() => ({}));
-  if (!upstream.ok) {
-    const error = new Error('gemini_speech_failed');
-    error.upstreamStatus = upstream.status;
-    error.upstreamCode = result.error?.status || result.error?.code || 'unknown';
-    throw error;
+  let lastError;
+  for (const model of [...new Set([SPEECH_MODEL, 'gemini-3.8-flash-tts'])]) {
+    const upstream = await requestSpeech(text, false, model);
+    const result = await upstream.json().catch(() => ({}));
+    if (!upstream.ok) {
+      lastError = new Error('gemini_speech_failed');
+      lastError.upstreamStatus = upstream.status;
+      lastError.upstreamCode = result.error?.status || result.error?.code || 'unknown';
+      if ([429, 500, 502, 503, 504].includes(upstream.status)) continue;
+      throw lastError;
+    }
+    const audio = (result.steps || []).flatMap(step => step.content || []).filter(part => part.type === 'audio' && part.data).at(-1);
+    const wav = audio && Buffer.from(audio.data, 'base64');
+    if (wav && wav.subarray(0, 4).toString() === 'RIFF') return wav;
+    lastError = new Error('gemini_speech_empty');
   }
-  const audio = (result.steps || []).flatMap(step => step.content || []).filter(part => part.type === 'audio' && part.data).at(-1);
-  const wav = audio && Buffer.from(audio.data, 'base64');
-  if (!wav || wav.subarray(0, 4).toString() !== 'RIFF') throw new Error('gemini_speech_empty');
-  return wav;
+  throw lastError;
 }
 
 async function streamSpeech(text, res) {
-  const upstream = await requestSpeech(text, true);
-  if (!upstream.ok) {
-    const result = await upstream.json().catch(() => ({}));
-    const error = new Error('gemini_speech_failed');
-    error.upstreamStatus = upstream.status;
-    error.upstreamCode = result.error?.status || result.error?.code || 'unknown';
-    throw error;
+  let lastError;
+  for (const model of [...new Set([SPEECH_MODEL, 'gemini-3.8-flash-tts'])]) {
+    const upstream = await requestSpeech(text, true, model);
+    if (!upstream.ok) {
+      const result = await upstream.json().catch(() => ({}));
+      lastError = new Error('gemini_speech_failed');
+      lastError.upstreamStatus = upstream.status;
+      lastError.upstreamCode = result.error?.status || result.error?.code || 'unknown';
+      if ([429, 500, 502, 503, 504].includes(upstream.status)) continue;
+      throw lastError;
+    }
+    if (!upstream.body) { lastError = new Error('gemini_speech_stream_empty'); continue; }
+    let buffered = '';
+    let started = false;
+    try {
+      for await (const chunk of upstream.body) {
+        if (!started) {
+          buffered += Buffer.from(chunk).toString('utf8');
+          if (/"event_type":"error"/.test(buffered)) {
+            lastError = new Error('gemini_speech_stream_error');
+            if (/"code":"rate_limit_exceeded"/.test(buffered)) lastError.upstreamStatus = 429;
+            break;
+          }
+          if (!/"event_type":"step.delta"/.test(buffered)) continue;
+          res.statusCode = 200;
+          res.setHeader('Content-Type', 'text/event-stream; charset=utf-8');
+          res.setHeader('Cache-Control', 'no-store, no-transform');
+          res.setHeader('X-Content-Type-Options', 'nosniff');
+          res.write(buffered);
+          buffered = '';
+          started = true;
+        } else res.write(chunk);
+      }
+      if (started) { res.end(); return; }
+    } catch (error) {
+      if (started) { res.end(); return; }
+      lastError = error;
+    }
+    lastError ||= new Error('gemini_speech_stream_empty');
   }
-  if (!upstream.body) throw new Error('gemini_speech_stream_empty');
-  res.statusCode = 200;
-  res.setHeader('Content-Type', 'text/event-stream; charset=utf-8');
-  res.setHeader('Cache-Control', 'no-store, no-transform');
-  res.setHeader('X-Content-Type-Options', 'nosniff');
-  res.flushHeaders?.();
-  try {
-    for await (const chunk of upstream.body) res.write(chunk);
-    res.end();
-  } catch (error) {
-    console.error('Gemini speech stream error:', error.message || 'unknown');
-    res.end();
-  }
+  throw lastError;
 }
 
 function userMessage(message) {
