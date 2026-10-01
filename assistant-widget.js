@@ -65,7 +65,7 @@
   const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   const dictationTerms = window.MOTORLOZ_DICTATION || { normalize: text => text, choose: result => result?.[0]?.transcript?.trim() || '' };
   micButton.title = Recognition ? 'Dictar y enviar como texto' : 'Dictado no disponible en este navegador';
-  hintEl.textContent = Recognition ? 'Dictado a texto · voz generada por IA' : 'Escribí tu consulta · voz generada por IA';
+  hintEl.textContent = Recognition ? 'Tocá el micrófono para dictar · se enviará solo texto' : 'Escribí o usá el dictado del teclado';
 
   function stopSpeech() {
     voiceRequest += 1;
