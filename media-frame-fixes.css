@@ -1,0 +1,63 @@
+/* Full-bleed photo stages: no decorative matte or letterbox around real workshop images. */
+.subaru-section .subaru-photo-carousel,
+.subaru-section .subaru-carousel-stage,
+.diagnostic-feature-carousel,
+.diagnostic-feature-stage,
+.location .arrival-slide-figure,
+.location .arrival-story,
+.location .arrival-story .slide-stage,
+.location .arrival-story .slide-frame {
+  border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;
+}
+.subaru-carousel-stage { aspect-ratio:1.06!important; }
+.diagnostic-feature-stage { aspect-ratio:1.04!important; }
+.subaru-carousel-stage img,
+.diagnostic-feature-stage img {
+  width:100%!important;height:100%!important;max-height:none!important;padding:0!important;
+  object-fit:cover!important;object-position:center!important;background:transparent!important;
+}
+
+/* The map and workshop photo share exactly the same desktop footprint. */
+.location .arrival-grid {
+  align-items:stretch!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;gap:18px!important;
+}
+.location .map-panel,
+.location .arrival-story .slide-stage {
+  width:100%!important;height:auto!important;min-height:0!important;max-height:none!important;aspect-ratio:1.78!important;
+}
+.location .arrival-photos,
+.location .arrival-slide-figure,
+.location .arrival-story { width:100%!important;height:100%!important;margin:0!important;padding:0!important; }
+.location .arrival-story .slide-frame,
+.location .arrival-story .slide-frame.clean-photo { inset:0!important;background:none!important; }
+.location .arrival-story .slide-frame img,
+.location .arrival-story .slide-frame.clean-photo img {
+  position:absolute!important;inset:0!important;display:block!important;width:100%!important;height:100%!important;max-width:none!important;
+  padding:0!important;transform:none!important;object-fit:cover!important;object-position:center!important;background:transparent!important;
+}
+.location .arrival-story .slide-toolbar,
+.location .arrival-slide-figure>figcaption { display:none!important; }
+
+@media(max-width:1050px) {
+  .location .arrival-grid { grid-template-columns:minmax(0,1fr)!important;gap:0!important; }
+  .location .map-panel,.location .arrival-story .slide-stage { aspect-ratio:1.78!important; }
+}
+
+@media(max-width:760px) {
+  .location.section { padding-bottom:34px!important; }
+  .subaru-carousel-stage,.diagnostic-feature-stage { width:100vw!important;aspect-ratio:1.02!important; }
+  .location .arrival-grid { width:100vw!important;margin-inline:calc(50% - 50vw)!important; }
+  .location .map-panel,
+  .location .arrival-photos,
+  .location .arrival-slide-figure,
+  .location .arrival-story,
+  .location .arrival-story .slide-stage {
+    width:100vw!important;max-width:none!important;margin:0!important;border-radius:0!important;
+  }
+  .location .map-panel,.location .arrival-story .slide-stage { height:auto!important;min-height:0!important;max-height:none!important;aspect-ratio:1.78!important; }
+  .location .arrival-story .slide-frame img,
+  .location .arrival-story .slide-frame.clean-photo img { object-fit:cover!important; }
+  .location .arrival-photos,
+  .location .arrival-slide-figure,
+  .location .arrival-story { height:auto!important;align-self:start!important; }
+}

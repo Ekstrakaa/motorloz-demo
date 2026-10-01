@@ -827,12 +827,24 @@
     const viewport = window.visualViewport;
     const visibleHeight = viewport?.height || window.innerHeight;
     if (!visibleHeight) return;
+    const distanceFromBottom = messagesEl.scrollHeight - messagesEl.scrollTop - (messagesEl.clientHeight || 0);
+    const keepComposerVisible = document.activeElement === input || !Number.isFinite(distanceFromBottom) || distanceFromBottom < 96;
     const coveredHeight = viewport ? Math.max(0, (window.innerHeight || visibleHeight) - viewport.height - viewport.offsetTop) : 0;
     panel.style.setProperty?.('--assistant-visible-height', `${visibleHeight}px`);
-    panel.style.setProperty?.('--assistant-keyboard-offset', `${coveredHeight}px`);
+    panel.style.setProperty?.('--assistant-keyboard-offset', '0px');
     panel.style.setProperty?.('--assistant-visible-width', `${viewport?.width || window.innerWidth}px`);
     panel.style.setProperty?.('--assistant-viewport-top', `${viewport?.offsetTop || 0}px`);
     panel.style.setProperty?.('--assistant-viewport-left', `${viewport?.offsetLeft || 0}px`);
+    panel.classList.toggle('is-keyboard-open', coveredHeight > 80 && document.activeElement === input);
+    requestAnimationFrame(() => {
+      if (keepComposerVisible) messagesEl.scrollTop = messagesEl.scrollHeight;
+    });
+  }
+
+  function settleMobileViewport() {
+    syncViewport();
+    window.setTimeout(syncViewport, 90);
+    window.setTimeout(syncViewport, 260);
   }
 
   function open() {
@@ -904,6 +916,8 @@
   });
   form.addEventListener('submit', event => { event.preventDefault(); if (dictating) finishDictation(); else sendText(input.value); });
   input.addEventListener('input', () => { input.style.height = 'auto'; input.style.height = `${Math.min(input.scrollHeight, 112)}px`; syncSendState(); });
+  input.addEventListener('focus', settleMobileViewport);
+  input.addEventListener('blur', settleMobileViewport);
   input.addEventListener('keydown', event => { if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); form.requestSubmit(); } });
   document.addEventListener('keydown', event => { if (event.key === 'Escape' && !panel.hidden) close(); });
   window.visualViewport?.addEventListener('resize', syncViewport);

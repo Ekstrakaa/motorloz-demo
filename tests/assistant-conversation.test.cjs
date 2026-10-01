@@ -11,7 +11,7 @@ function element() {
   return {
     hidden: true, disabled: false, value: '', children: [], listeners, focusCount: 0, dataset: {},
     style: { setProperty: (key, value) => styleValues.set(key, value), getPropertyValue: key => styleValues.get(key) },
-    classList: { add: name => classes.add(name), remove: name => classes.delete(name), contains: name => classes.has(name), toggle: () => {} },
+    classList: { add: name => classes.add(name), remove: name => classes.delete(name), contains: name => classes.has(name), toggle: (name, force) => force === undefined ? (classes.has(name) ? classes.delete(name) : classes.add(name)) : force ? classes.add(name) : classes.delete(name) },
     addEventListener: (name, listener) => { listeners[name] = listener; },
     setAttribute() {}, removeAttribute() {},
     focus() { this.focusCount += 1; },
@@ -100,7 +100,12 @@ test('the first greeting and successive replies speak in the same voice flow wit
   assert.equal(spokenTexts.length, 1, 'opening the chat speaks the visible greeting');
   assert.match(spokenTexts[0], /^Hola, soy tu asistente de MOTORLOZ\. Contame qué notaste en el auto/);
   assert.equal(get('#assistant-input').focusCount, 0, 'mobile opening leaves the keyboard closed');
-  assert.equal(get('#assistant-window').style.getPropertyValue('--assistant-keyboard-offset'), '300px');
+  assert.equal(get('#assistant-window').style.getPropertyValue('--assistant-keyboard-offset'), '0px', 'the keyboard is handled by the visual viewport without a second bottom offset');
+  context.document.activeElement = get('#assistant-input');
+  get('#assistant-input').listeners.focus();
+  await new Promise(resolve => setTimeout(resolve, 70));
+  assert.equal(get('#assistant-window').classList.contains('is-keyboard-open'), true, 'focused input enables the compact keyboard-safe layout');
+  context.document.activeElement = null;
 
   const send = async message => {
     get('#assistant-input').value = message;

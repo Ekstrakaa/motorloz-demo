@@ -1,0 +1,39 @@
+/* Keep the mobile chat inside the visual viewport while the on-screen keyboard animates. */
+@media(max-width:600px) {
+  .assistant-window {
+    position:fixed!important;
+    left:calc(var(--assistant-viewport-left,0px) + 7px)!important;
+    right:auto!important;
+    top:calc(var(--assistant-viewport-top,0px) + 7px)!important;
+    bottom:auto!important;
+    width:calc(var(--assistant-visible-width,100vw) - 14px)!important;
+    height:calc(var(--assistant-visible-height,100dvh) - 14px)!important;
+    min-height:0!important;
+    max-height:calc(var(--assistant-visible-height,100dvh) - 14px)!important;
+    transform-origin:center bottom!important;
+  }
+  .assistant-window.is-keyboard-open {
+    top:calc(var(--assistant-viewport-top,0px) + 4px)!important;
+    height:calc(var(--assistant-visible-height,100dvh) - 8px)!important;
+    max-height:calc(var(--assistant-visible-height,100dvh) - 8px)!important;
+    border-radius:20px!important;
+  }
+  .assistant-window.is-keyboard-open .assistant-header {
+    min-height:52px!important;padding:6px 9px!important;border-radius:19px 19px 0 0!important;
+  }
+  .assistant-window.is-keyboard-open .assistant-header-logo { width:68px!important;height:27px!important; }
+  .assistant-window.is-keyboard-open .assistant-subtitle { display:none!important; }
+  .assistant-window.is-keyboard-open .assistant-identity>div { width:auto!important; }
+  .assistant-window.is-keyboard-open .assistant-identity p { margin-top:0!important;font-size:8px!important; }
+  .assistant-window.is-keyboard-open .assistant-header-actions button,
+  .assistant-window.is-keyboard-open .assistant-header-actions #assistant-mute { width:31px!important;height:31px!important; }
+  .assistant-window.is-keyboard-open .assistant-disclosure { display:none!important; }
+  .assistant-window.is-keyboard-open .assistant-messages { min-height:0!important;padding:10px 12px 12px!important; }
+  .assistant-window.is-keyboard-open .assistant-composer {
+    position:relative!important;z-index:3!important;flex:none!important;padding:6px 7px max(5px,env(safe-area-inset-bottom))!important;
+    background:rgba(247,251,249,.98)!important;box-shadow:0 -8px 24px rgba(6,39,43,.09)!important;
+  }
+  .assistant-window.is-keyboard-open .assistant-composer-row { min-height:44px!important; }
+  .assistant-window.is-keyboard-open .assistant-composer-meta { min-height:11px!important;padding-top:3px!important;font-size:7px!important; }
+  .assistant-window.is-keyboard-open #assistant-composer-hint { white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+}
