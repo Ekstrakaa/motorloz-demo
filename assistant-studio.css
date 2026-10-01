@@ -43,11 +43,11 @@
   display: grid;
   place-items: center;
   flex: none;
-  width: 62px;
-  height: 50px;
+  width: 108px;
+  height: 44px;
 }
 .assistant-header-logo img { display: block; width: 100%; height: auto; object-fit: contain; }
-.assistant-identity h2 { margin: 0; color: #fff; font-size: 20px; font-weight: 820; letter-spacing: -.045em; line-height: 1; }
+.assistant-identity h2 { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .assistant-subtitle { display: block; margin-top: 5px; color: rgba(240, 251, 250, .78); font-size: 12px; line-height: 1; }
 .assistant-identity p { margin-top: 9px; color: rgba(255, 255, 255, .9); font-size: 11px; letter-spacing: 0; }
 .assistant-identity p i { width: 8px; height: 8px; background: #53e7ae; box-shadow: 0 0 10px rgba(83, 231, 174, .72); }
@@ -113,8 +113,9 @@
   min-height: 0;
   padding: 20px 18px 22px;
   background:
-    radial-gradient(circle at 50% 18%, rgba(219, 237, 234, .65), transparent 38%),
-    linear-gradient(180deg, #f9fbfa, #eff5f3);
+    radial-gradient(circle at 50% 18%, rgba(219, 237, 234, .58), transparent 38%),
+    linear-gradient(rgba(249, 252, 251, .84), rgba(237, 246, 243, .86)),
+    url("assets/assistant-mechanical-pattern.svg") 0 0 / 168px 168px repeat;
   color: var(--assistant-ink);
   scroll-behavior: smooth;
   scrollbar-color: rgba(28, 105, 106, .34) transparent;
@@ -161,7 +162,7 @@
   height: 31px;
   border: 1px solid rgba(42, 115, 117, .25);
   border-radius: 50%;
-  background: #0a3a42 url("assets/motorloz-ml-interlock.svg") center / 22px auto no-repeat;
+  background: #0a3a42 url("assets/motorloz-logo.png") left center / 300% auto no-repeat;
   box-shadow: 0 6px 15px rgba(8, 47, 51, .16);
   content: "";
 }
@@ -205,7 +206,7 @@
   height: 31px;
   border: 1px solid rgba(42, 115, 117, .25);
   border-radius: 50%;
-  background: #0a3a42 url("assets/motorloz-ml-interlock.svg") center / 22px auto no-repeat;
+  background: #0a3a42 url("assets/motorloz-logo.png") left center / 300% auto no-repeat;
   content: "";
 }
 .assistant-welcome-kicker { display: none; }
@@ -305,12 +306,17 @@
   border-radius: 50%;
   cursor: pointer;
 }
-.assistant-mic { background: #e2f1ef; color: #075c62; }
+.assistant-mic {
+  background: linear-gradient(145deg, #e9675d, #c94039);
+  color: #fff;
+  box-shadow: 0 7px 16px rgba(173, 48, 43, .26), inset 0 1px rgba(255, 255, 255, .28);
+}
 .assistant-submit { background: linear-gradient(140deg, #087174, #079092); color: #fff; box-shadow: 0 7px 15px rgba(3, 101, 104, .22); }
 .assistant-mic svg,
 .assistant-submit svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .assistant-mic:is(:hover, :focus-visible), .assistant-submit:is(:hover, :focus-visible) { transform: translateY(-1px); }
-.assistant-mic.is-recording { border: 0; background: #f6dcd8; color: #aa3f35; box-shadow: 0 0 0 4px rgba(198, 77, 64, .1); }
+.assistant-mic:focus-visible { outline: 3px solid rgba(214, 73, 64, .25); outline-offset: 2px; }
+.assistant-mic.is-recording { border: 0; background: #a82520; color: #fff; box-shadow: 0 0 0 5px rgba(198, 57, 49, .18), 0 8px 18px rgba(134, 31, 27, .3); }
 .assistant-submit:disabled, .assistant-mic:disabled { cursor: not-allowed; opacity: .42; transform: none; }
 .assistant-composer-meta { display: flex; justify-content: center; min-height: 17px; padding-top: 6px; color: #6b7c81; font-size: 9px; }
 .assistant-composer-meta #assistant-recording { color: #9b3f38; }
@@ -340,7 +346,8 @@
   box-shadow: 0 14px 36px rgba(0, 18, 22, .34), inset 0 1px rgba(255, 255, 255, .12) !important;
 }
 .assistant-launcher-avatar { width: 50px !important; height: 40px !important; border: 0 !important; border-radius: 0 !important; background: none !important; }
-.assistant-launcher-avatar img { width: 100% !important; height: auto !important; object-fit: contain !important; }
+.assistant-launcher-avatar { background: url("assets/motorloz-logo.png") left center / 300% auto no-repeat !important; }
+.assistant-launcher-avatar img { display: none !important; }
 .assistant-launcher-avatar > span { right: 0 !important; bottom: 2px !important; width: 9px !important; height: 9px !important; }
 .assistant-launcher-copy, .assistant-launcher-arrow { display: none !important; }
 
@@ -359,9 +366,8 @@
     border-radius: 25px;
   }
   .assistant-header { min-height: 88px; padding: 15px 14px 13px; }
-  .assistant-header-logo { width: 51px; height: 42px; }
+  .assistant-header-logo { width: 96px; height: 39px; }
   .assistant-identity { gap: 9px; }
-  .assistant-identity h2 { font-size: 17px; }
   .assistant-subtitle { margin-top: 4px; font-size: 10px; }
   .assistant-identity p { margin-top: 7px; font-size: 9px; }
   .assistant-header-actions { gap: 5px; }
@@ -390,8 +396,7 @@
 
 @media (max-width: 365px) {
   .assistant-header { padding-inline: 11px; }
-  .assistant-header-logo { width: 45px; }
-  .assistant-identity h2 { font-size: 15px; }
+  .assistant-header-logo { width: 84px; }
   .assistant-header-actions button,
   .assistant-header-actions #assistant-mute { width: 38px; height: 38px; }
   .assistant-disclosure { grid-template-columns: 22px minmax(0, 1fr); }
