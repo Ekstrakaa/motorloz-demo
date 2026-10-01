@@ -20,14 +20,15 @@ test('voice samples use fixed text, voice and human Spanish direction', async ()
   };
   try {
     const res = response();
-    await voiceSample({ method: 'GET', query: { sample: '2' }, url: '/api/voice-sample?sample=2' }, res);
+    await voiceSample({ method: 'GET', query: { sample: '2a' }, url: '/api/voice-sample?sample=2a' }, res);
     assert.equal(res.statusCode, 200);
     assert.equal(res.headers['Content-Type'], 'audio/mpeg');
     assert.equal(request.model, 'gpt-4o-mini-tts');
     assert.equal(request.voice, 'echo');
+    assert.equal(request.speed, 0.96);
     assert.equal(request.input, voiceSample.SAMPLE_TEXT);
     assert.match(request.instructions, /español rioplatense natural de Montevideo/);
-    assert.match(request.instructions, /comprendés la preocupación/);
+    assert.match(request.instructions, /empatía auténtica/);
   } finally {
     delete process.env.OPENAI_API_KEY;
     global.fetch = previousFetch;

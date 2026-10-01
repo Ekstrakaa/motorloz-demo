@@ -1,12 +1,24 @@
-const SAMPLE_TEXT = 'Bien, entiendo la preocupación. Si el Subaru Impreza empezó con un golpeteo después de agarrar un pozo, conviene revisarlo. No significa necesariamente que sea algo grave. ¿El ruido aparece al doblar, al frenar o cuando pasás por una calle irregular?';
+const SAMPLE_TEXT = 'Bien, entiendo la preocupación.\n\nSi el Subaru Impreza empezó con un golpeteo después de agarrar un pozo, conviene revisarlo. No significa necesariamente que sea algo grave.\n\n¿El ruido aparece al doblar, al frenar o cuando pasás por una calle irregular?';
 
 const SAMPLES = Object.freeze({
-  1: { voice: 'ash' },
-  2: { voice: 'echo' },
-  3: { voice: 'verse' }
+  '1a': {
+    voice: 'ash',
+    speed: 0.97,
+    direction: 'Decilo como una charla cara a cara. La cadencia no debe ser perfectamente regular: tomá aire antes de explicar, bajá apenas la voz al tranquilizar y dejá que la pregunta final nazca de una preocupación real.'
+  },
+  '1b': {
+    voice: 'ash',
+    speed: 0.93,
+    direction: 'Interpretalo como un mecánico experimentado que primero piensa y después responde. Usá silencios cortos, una voz más íntima y una leve duda reflexiva antes de decir que no necesariamente es algo grave.'
+  },
+  '2a': {
+    voice: 'echo',
+    speed: 0.96,
+    direction: 'Hablale a una persona que está preocupada por su auto. Mostrá empatía auténtica al comienzo, seguridad tranquila durante la explicación y curiosidad sincera en la pregunta final. Evitá una melodía repetitiva.'
+  }
 });
 
-const INSTRUCTIONS = 'Leé exactamente el texto recibido. Usá una voz masculina adulta y hablá siempre en español rioplatense natural de Montevideo. Soná como un asesor humano de un taller: cálido, sereno, atento y profesional. En la primera frase transmití que comprendés la preocupación sin dramatizar. Hacé pausas breves y naturales, variá sutilmente la entonación y formulá la pregunta final con interés auténtico. Evitá el tono robótico, plano, publicitario, de locutor o de central telefónica. No exageres el acento y no agregues palabras.';
+const INSTRUCTIONS = 'Conservá las palabras del texto, pero no lo leas como un guion: decilo como una respuesta espontánea. Usá una voz masculina adulta y español rioplatense natural de Montevideo. Soná cálido, sereno, atento y profesional. Permití micro pausas, respiraciones discretas y variaciones sutiles de ritmo y volumen. Evitá el tono robótico, plano, publicitario, de locutor o de central telefónica. No exageres el acento, no cantes y no agregues palabras.';
 
 module.exports = async function voiceSample(req, res) {
   if (req.method !== 'GET') {
@@ -37,7 +49,8 @@ module.exports = async function voiceSample(req, res) {
         model: process.env.OPENAI_SPEECH_MODEL || 'gpt-4o-mini-tts',
         voice: sample.voice,
         input: SAMPLE_TEXT,
-        instructions: INSTRUCTIONS,
+        instructions: `${INSTRUCTIONS} ${sample.direction}`,
+        speed: sample.speed,
         response_format: 'mp3'
       })
     });
