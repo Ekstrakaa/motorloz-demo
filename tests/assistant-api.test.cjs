@@ -41,6 +41,33 @@ test('retries a token-truncated Gemini response and returns the complete reply',
   }
 });
 
+test('answers a simple first vehicle message immediately without waiting for Gemini', async () => {
+  process.env.GEMINI_API_KEY = 'test-key';
+  const previousFetch = global.fetch;
+  let upstreamCalls = 0;
+  global.fetch = async () => { upstreamCalls += 1; throw new Error('Gemini should not be called'); };
+  try {
+    const res = response();
+    await handle({ method:'POST', body:{ messages:[{ role:'user', content:'Tengo un Subaru Impreza' }] }, headers:{}, socket:{} }, res, 'chat');
+    assert.equal(res.statusCode, 200);
+    assert.equal(upstreamCalls, 0);
+    assert.equal(JSON.parse(res.body).source, 'instant');
+    assert.match(JSON.parse(res.body).reply, /Subaru Impreza/);
+  } finally { global.fetch = previousFetch; }
+});
+
+test('answers a generic breakdown immediately and asks one useful question', async () => {
+  process.env.GEMINI_API_KEY = 'test-key';
+  const previousFetch = global.fetch;
+  global.fetch = async () => { throw new Error('Gemini should not be called'); };
+  try {
+    const res = response();
+    await handle({ method:'POST', body:{ messages:[{ role:'user', content:'Se me rompió el auto' }] }, headers:{}, socket:{} }, res, 'chat');
+    assert.equal(res.statusCode, 200);
+    assert.match(JSON.parse(res.body).reply, /¿Qué notaste exactamente/);
+  } finally { global.fetch = previousFetch; }
+});
+
 test('serves the fixed Gemini voice as WAV audio', async () => {
   process.env.GEMINI_API_KEY = 'test-key';
   const previousFetch = global.fetch;

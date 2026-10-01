@@ -22,7 +22,7 @@
   border-radius: var(--assistant-radius-lg);
   background: var(--assistant-paper);
   color: var(--assistant-ink);
-  box-shadow: var(--assistant-shadow), inset 0 1px rgba(255, 255, 255, .7);
+  box-shadow: 0 0 0 100vmax rgba(2, 12, 14, .48), var(--assistant-shadow), inset 0 1px rgba(255, 255, 255, .7);
   font-family: Inter, "Segoe UI", system-ui, -apple-system, sans-serif;
   isolation: isolate;
 }
@@ -162,7 +162,7 @@
   height: 31px;
   border: 1px solid rgba(42, 115, 117, .25);
   border-radius: 50%;
-  background: #0a3a42 url("assets/motorloz-logo.png") left center / 300% auto no-repeat;
+  background: #0a3a42 url("assets/motorloz-logo.png") left center / 94px auto no-repeat;
   box-shadow: 0 6px 15px rgba(8, 47, 51, .16);
   content: "";
 }
@@ -206,7 +206,7 @@
   height: 31px;
   border: 1px solid rgba(42, 115, 117, .25);
   border-radius: 50%;
-  background: #0a3a42 url("assets/motorloz-logo.png") left center / 300% auto no-repeat;
+  background: #0a3a42 url("assets/motorloz-logo.png") left center / 94px auto no-repeat;
   content: "";
 }
 .assistant-welcome-kicker { display: none; }
@@ -320,7 +320,32 @@
 .assistant-submit:disabled, .assistant-mic:disabled { cursor: not-allowed; opacity: .42; transform: none; }
 .assistant-composer-meta { display: flex; justify-content: center; min-height: 17px; padding-top: 6px; color: #6b7c81; font-size: 9px; }
 .assistant-composer-meta #assistant-recording { color: #9b3f38; }
-.assistant-composer-meta #assistant-recording button { border-color: rgba(166, 65, 55, .28); background: #fff2ef; color: #8c3028; }
+.assistant-composer-meta #assistant-recording:not([hidden]) {
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  align-items: center;
+  gap: 7px;
+  width: 100%;
+  padding: 7px 7px 7px 10px;
+  border: 1px solid rgba(166, 65, 55, .2);
+  border-radius: 13px;
+  background: #fff3f0;
+}
+.assistant-composer-meta #assistant-recording > i { width: 8px; height: 8px; border-radius: 50%; background: #d7483f; box-shadow: 0 0 0 4px rgba(215, 72, 63, .13); animation: assistant-record-dot 1s ease-in-out infinite alternate; }
+.assistant-composer-meta #assistant-recording b { font-variant-numeric: tabular-nums; }
+.assistant-composer-meta #assistant-recording button {
+  justify-self: end;
+  min-height: 34px;
+  padding: 0 13px;
+  border: 0;
+  border-radius: 10px;
+  background: #ad302a;
+  color: #fff;
+  font: inherit;
+  font-weight: 760;
+  text-decoration: none;
+  box-shadow: 0 5px 13px rgba(141, 42, 36, .2);
+}
 #assistant-working { color: #246a6d; font-weight: 650; }
 
 .assistant-reset-confirm {
@@ -355,15 +380,18 @@
   from { opacity: 0; transform: translateY(7px); }
   to { opacity: 1; transform: none; }
 }
+@keyframes assistant-record-dot { to { opacity: .35; transform: scale(.8); } }
 
 @media (max-width: 600px) {
   .assistant-window {
-    left: calc(var(--assistant-viewport-left, 0px) + 5px);
-    top: calc(var(--assistant-viewport-top, 0px) + 5px);
-    width: calc(var(--assistant-visible-width, 100vw) - 10px);
-    height: calc(var(--assistant-visible-height, 100dvh) - 10px);
-    max-height: calc(var(--assistant-visible-height, 100dvh) - 10px);
-    border-radius: 25px;
+    left: calc(var(--assistant-viewport-left, 0px) + 10px);
+    top: calc(var(--assistant-viewport-top, 0px) + 10px);
+    width: calc(var(--assistant-visible-width, 100vw) - 20px);
+    height: calc(var(--assistant-visible-height, 100dvh) - 20px);
+    max-height: calc(var(--assistant-visible-height, 100dvh) - 20px);
+    border: 1px solid rgba(148, 218, 217, .62);
+    border-radius: 30px;
+    box-shadow: 0 0 0 100vmax rgba(3, 13, 15, .5), 0 18px 56px rgba(0, 20, 23, .42), inset 0 1px rgba(255, 255, 255, .78);
   }
   .assistant-header { min-height: 88px; padding: 15px 14px 13px; }
   .assistant-header-logo { width: 96px; height: 39px; }
@@ -380,7 +408,7 @@
   .assistant-message { max-width: 88%; }
   .assistant-message-assistant, .assistant-message-welcome { margin-left: 37px; }
   .assistant-message-assistant:not(.assistant-message-welcome)::before,
-  .assistant-message-welcome::before { left: -37px; width: 29px; height: 29px; background-size: 20px auto; }
+  .assistant-message-welcome::before { left: -37px; width: 29px; height: 29px; background-size: 88px auto; }
   .assistant-message > p { padding: 11px 13px 17px; font-size: 12px; }
   .assistant-message-welcome { max-width: calc(100% - 37px); padding: 12px 13px; }
   .assistant-message-welcome .assistant-welcome-heading { font-size: 13px; }
@@ -391,6 +419,9 @@
   .assistant-composer { padding: 9px 9px max(8px, env(safe-area-inset-bottom)); }
   .assistant-composer-row { grid-template-columns: 40px minmax(0, 1fr) 40px; min-height: 46px; border-radius: 20px; }
   .assistant-mic, .assistant-submit { width: 40px; height: 40px; }
+  .assistant-composer-meta:has(#assistant-recording:not([hidden])) { padding-top: 8px; }
+  .assistant-composer-meta #assistant-recording:not([hidden]) { grid-template-columns: auto auto minmax(0, 1fr); font-size: 10px; }
+  .assistant-composer-meta #assistant-recording button { width: 100%; min-width: 132px; padding-inline: 10px; }
   .assistant-launcher { right: max(12px, env(safe-area-inset-right)) !important; bottom: calc(74px + env(safe-area-inset-bottom)) !important; width: 58px !important; height: 58px !important; border-radius: 18px !important; }
 }
 

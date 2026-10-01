@@ -11,7 +11,7 @@ const CHAT_PROMPT = SYSTEM_PROMPT
   .replace('Después de que el cliente responda al menos una pregunta de seguimiento y ya tengas los datos esenciales, ofrecé preparar la consulta estructurada para WhatsApp.', 'No ofrezcas WhatsApp por haber reunido datos: primero respondé la inquietud y profundizá lo necesario. Solo mencioná preparar la consulta cuando la persona pida coordinar o cuando, después de conversar sobre el caso, demuestre querer pasar al taller.')
   .replace('“Preparar solicitud” debajo del chat para revisar el borrador', '“Abrir WhatsApp” debajo del chat para revisar el mensaje allí');
 const DICTATION_GUIDANCE = ' El dictado puede confundir nombres de vehículos. Si una marca o un modelo nuevos contradicen lo que dijo antes el cliente (por ejemplo Subaru frente a Hyundai), preguntá cuál es el correcto antes de darlo por confirmado o preparar WhatsApp. Impreza, Hawkeye y Wagon pueden aparecer al hablar de un Subaru; no sustituyas esos términos por palabras comunes ni inventes un modelo a partir de una transcripción dudosa.';
-const DIALOGUE_GUIDANCE = ' Tu prioridad en cada turno es responder lo que la persona acaba de decir o preguntar. Si describe un golpeteo o ruido, explicá en lenguaje simple que puede venir de distintas zonas y preguntá una cosa concreta para ubicarlo (por ejemplo si aparece al acelerar, frenar o pasar por irregularidades); si comenzó después de un pozo, tené en cuenta ese dato sin afirmar una causa. Si pide información general sobre un auto, servicio o mantenimiento, contestá de forma útil aunque todavía no quiera reservar. No repitas saludos, el nombre MOTORLOZ ni los nombres Pablo y Bruno en respuestas consecutivas. Evitá frases de venta y preguntas de formulario; mantené una conversación natural de una pregunta útil por vez.';
+const DIALOGUE_GUIDANCE = ' Tu prioridad en cada turno es responder lo que la persona acaba de decir o preguntar. Si describe un golpeteo o ruido, explicá en lenguaje simple que puede venir de distintas zonas y preguntá una cosa concreta para ubicarlo (por ejemplo si aparece al acelerar, frenar o pasar por irregularidades); si comenzó después de un pozo, tené en cuenta ese dato sin afirmar una causa. Si pide información general sobre un auto, servicio o mantenimiento, contestá de forma útil aunque todavía no quiera reservar. Guiá la conversación de a un dato por vez y recordá lo ya contestado. Antes de ofrecer WhatsApp necesitás: nombre, marca y modelo, kilometraje aproximado (o que diga que no lo sabe), qué necesita o qué síntoma nota, desde cuándo o en qué situación ocurre, y si precisa atención urgente o puede esperar una fecha. Si falta algo y la persona quiere coordinar con el taller, pedí solamente el dato más útil que falte. La urgencia expresa la necesidad del cliente y no reemplaza una evaluación de seguridad. No conviertas una consulta informativa en una reserva: si la persona solo busca entender un síntoma, una pieza o un mantenimiento, respondé y seguí ayudando sin ofrecer WhatsApp. Cuando estén todos los datos y la persona pida turno, quiera llevar el auto o muestre intención clara de coordinar, respondé la inquietud pendiente y preguntá naturalmente si quiere revisar la consulta en WhatsApp; el botón aparecerá debajo. No repitas saludos, el nombre MOTORLOZ ni los nombres Pablo y Bruno en respuestas consecutivas. Evitá frases de venta y preguntas de formulario; mantené una conversación natural de una pregunta útil por vez.';
 const SPEECH_STYLE = 'Leé exactamente el texto recibido, sin agregar ni omitir palabras. Español rioplatense de Montevideo. Voz cálida, natural y cercana, ritmo conversacional tranquilo; sin tono robótico ni locución publicitaria. El nombre del taller se pronuncia Motor Los, dos palabras; nunca Motorola.';
 
 function spokenTranscript(text) {
@@ -58,17 +58,61 @@ function cleanHistory(messages) {
     .filter(item => item.parts[0].text);
 }
 
+function normalized(text) {
+  return String(text || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
+}
+
+function quickFirstReply(messages) {
+  if (!Array.isArray(messages)) return '';
+  const usable = messages.filter(item => item && ['user', 'assistant'].includes(item.role) && typeof item.content === 'string' && item.content.trim());
+  if (usable.length !== 1 || usable[0].role !== 'user') return '';
+  const original = usable[0].content.trim().slice(0, 180);
+  const text = normalized(original);
+  const words = text.split(' ').filter(Boolean);
+
+  if (words.length <= 4 && /^(hola|buenas|buen dia|buenos dias|buenas tardes|buenas noches)[!.? ]*$/.test(text)) {
+    return 'Contame, ¿en qué te puedo ayudar con tu auto?';
+  }
+  if (/\b(se me rompio|se rompio|rompi el auto|auto roto|no arranca|no enciende)\b/.test(text) && words.length <= 16) {
+    return 'Entiendo. ¿Qué notaste exactamente: no arranca, hace un ruido, vibra, perdió fuerza o apareció una luz en el tablero?';
+  }
+  const vehicleOnly = /^(?:tengo|es|mi auto es|mi coche es|mi camioneta es)\s+(?:un[ao]?\s+)?(.+)$/i.exec(original);
+  const symptomWords = /\b(ruido|golpe|golpeteo|vibra|falla|humo|luz|pierde|perdio|calienta|arranca|enciende|frena|tironea|consume|rompio|roto|anda mal)\b/;
+  if (vehicleOnly && words.length <= 12 && !symptomWords.test(text)) {
+    const vehicle = vehicleOnly[1].replace(/[.!?]+$/, '').trim();
+    return `Perfecto, anoté ${vehicle}. ¿Qué notaste en el auto y desde cuándo?`;
+  }
+  if (words.length <= 10 && /\b(cambio de aceite|service|mantenimiento|alineacion|balanceo)\b/.test(text)) {
+    return 'Claro. ¿Para qué vehículo sería y qué kilometraje aproximado tiene?';
+  }
+  return '';
+}
+
+function unavailableReply(text) {
+  const normalizedText = normalized(text);
+  if (/\b(humo abundante|olor (?:fuerte )?a combustible|sin frenos|no frena|sobrecalent|sin direccion)\b/.test(normalizedText)) {
+    return 'Por seguridad, detené el auto en un lugar seguro y no sigas circulando. Pedí asistencia y contame qué aviso apareció para dejar la consulta clara.';
+  }
+  return 'Te leí. Para orientarte sin adivinar, ¿eso aparece al acelerar, frenar, doblar o al pasar por una irregularidad?';
+}
+
 async function callGemini(contents, { maxOutputTokens = 768, systemInstruction = CHAT_PROMPT + DICTATION_GUIDANCE + DIALOGUE_GUIDANCE, models = [MODEL, 'gemini-3.8-flash', 'gemini-3.7-flash'] } = {}) {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw Object.assign(new Error('not_configured'), { status: 503 });
   models = [...new Set(models)];
+  const deadline = Date.now() + 8500;
   let lastError = new Error('gemini_output_truncated');
   for (const model of models) {
     for (const tokenLimit of [maxOutputTokens, maxOutputTokens * 2]) {
+      const remaining = deadline - Date.now();
+      if (remaining < 250) throw Object.assign(new Error('gemini_deadline_exceeded'), { upstreamCode: 'TIMEOUT' });
       let upstream;
+      const controller = new AbortController();
+      const attemptTimeout = setTimeout(() => controller.abort(), Math.min(3800, remaining));
       try {
         upstream = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
           method: 'POST',
+          signal: controller.signal,
           headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
           body: JSON.stringify({
             systemInstruction: { parts: [{ text: systemInstruction }] },
@@ -80,8 +124,12 @@ async function callGemini(contents, { maxOutputTokens = 768, systemInstruction =
           })
         });
       } catch (error) {
-        lastError = error;
+        lastError = controller.signal.aborted
+          ? Object.assign(new Error('gemini_deadline_exceeded'), { upstreamCode: 'TIMEOUT' })
+          : error;
         break;
+      } finally {
+        clearTimeout(attemptTimeout);
       }
       const result = await upstream.json().catch(() => ({}));
       if (!upstream.ok) {
@@ -224,6 +272,7 @@ async function handle(req, res, action) {
     return;
   }
 
+  let latestUserText = '';
   try {
     const body = req.body && typeof req.body === 'object' ? req.body : {};
     if (action === 'speech' || action === 'speech-stream') {
@@ -263,6 +312,12 @@ async function handle(req, res, action) {
         json(res, 400, { error: 'mensaje_invalido', message: 'Escribí una consulta para continuar.' });
         return;
       }
+      latestUserText = history[history.length - 1].parts[0].text;
+      const immediateReply = quickFirstReply(body.messages);
+      if (immediateReply) {
+        json(res, 200, { reply: immediateReply, source: 'instant' });
+        return;
+      }
       contents = history;
     } else {
       json(res, 404, { error: 'no_encontrado' });
@@ -281,6 +336,8 @@ async function handle(req, res, action) {
       json(res, 503, { error: 'asistente_no_configurado', message: 'La IA todavía no está conectada. Podés usar el formulario de contacto.' });
     } else if (error.upstreamStatus === 429) {
       json(res, 429, { error: 'cuota_gemini_alcanzada', message: 'El asistente alcanzó su límite gratuito por ahora. Probá de nuevo más tarde.' });
+    } else if (action === 'chat' && (error.message === 'gemini_deadline_exceeded' || ['TIMEOUT', 'UNAVAILABLE'].includes(error.upstreamCode) || [500, 502, 503, 504].includes(error.upstreamStatus))) {
+      json(res, 200, { reply: unavailableReply(latestUserText), source: 'fallback' });
     } else {
       console.error('Gemini assistant error:', error.upstreamStatus || 'unknown', error.upstreamCode || error.message || 'unknown');
       json(res, 502, { error: 'respuesta_no_disponible', message: 'No pude responder ahora. Intentá de nuevo o usá el formulario del taller.', reason: error.upstreamCode || error.message || 'unknown' });

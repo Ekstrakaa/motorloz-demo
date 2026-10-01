@@ -58,6 +58,7 @@ test('the first greeting and successive replies speak in the same voice flow wit
     'Quiero reservar un turno': 'Claro, podemos preparar una consulta para coordinarlo.',
     'Me llamo Ana': 'Gracias, Ana. Contame un poco más de la falla.',
     'Desde que pasé un pozo vibra la caja y se enciende la luz del motor al acelerar': 'Entiendo. Esa combinación merece revisión; Pablo o Bruno pueden evaluar el auto. ¿Querés que preparemos la consulta para WhatsApp?',
+    'Puede esperar una fecha, no es urgente': 'Perfecto, lo dejo como una consulta que puede esperar una fecha coordinada.',
     'Prepará la consulta para WhatsApp': 'Claro, podés revisar el mensaje antes de enviarlo.',
     '¿Y si falla la voz?': 'Te sigo respondiendo por escrito.',
     'Probá otra vez la voz': 'Ahora sí, te escucho.',
@@ -97,7 +98,7 @@ test('the first greeting and successive replies speak in the same voice flow wit
   get('#assistant-launcher').listeners.click();
   await new Promise(resolve => setTimeout(resolve, 120));
   assert.equal(spokenTexts.length, 1, 'opening the chat speaks the visible greeting');
-  assert.match(spokenTexts[0], /^Hola, soy tu asistente MOTORLOZ\. Contame qué notaste en tu auto/);
+  assert.match(spokenTexts[0], /^Hola, soy tu asistente de MOTORLOZ\. Contame qué notaste en el auto/);
   assert.equal(get('#assistant-input').focusCount, 0, 'mobile opening leaves the keyboard closed');
   assert.equal(get('#assistant-window').style.getPropertyValue('--assistant-keyboard-offset'), '300px');
 
@@ -138,6 +139,8 @@ test('the first greeting and successive replies speak in the same voice flow wit
   assert.equal(get('#assistant-reservation-prompt').hidden, true);
   await send('Desde que pasé un pozo vibra la caja y se enciende la luz del motor al acelerar');
   assert.equal(get('#assistant-reservation-prompt').hidden, true, 'symptom details alone do not push the customer toward WhatsApp');
+  await send('Puede esperar una fecha, no es urgente');
+  assert.equal(get('#assistant-reservation-prompt').hidden, true, 'priority alone does not open WhatsApp before the customer asks to coordinate');
   await send('Prepará la consulta para WhatsApp');
   assert.equal(get('#assistant-reservation-prompt').hidden, false, 'the WhatsApp option appears when the customer asks for it');
   const summaryCards = get('#assistant-messages').children.filter(item => item.className === 'assistant-summary-card');
@@ -153,33 +156,37 @@ test('the first greeting and successive replies speak in the same voice flow wit
   assert.match(draft, /- Nombre: Ana/);
   assert.match(draft, /\n\n\*02 · VEHÍCULO\*\n- Marca y modelo: Subaru\n- Kilometraje: 200\.000 km aprox\./);
   assert.match(draft, /\n\n\*03 · QUÉ NECESITA\*\nLa luz del tablero se encendió y el cliente quiere revisar el auto\./);
-  assert.match(draft, /\n\n\*04 · COORDINACIÓN\*/);
+  assert.match(draft, /\n\n\*04 · PRIORIDAD\*\n- Puede esperar una fecha coordinada/);
+  assert.match(draft, /\n\n\*05 · COORDINACIÓN\*/);
   assert.doesNotMatch(draft, /�/);
   assert.equal(get('#assistant-wa-retry').href, popup.location.href);
   assert.equal(get('#assistant-reservation-prompt').hidden, false, 'the conversation stays available while WhatsApp opens');
 
   failSpeech = true;
+  const deviceVoicesBeforeFailure = deviceVoiceCalls;
   await send('¿Y si falla la voz?');
-  assert.equal(deviceVoiceCalls, 0, 'a quota failure never switches to the phone voice');
+  assert.equal(deviceVoiceCalls, deviceVoicesBeforeFailure + 1, 'a quota failure immediately switches to the phone voice');
   assert.equal(wavCalls, 0, 'a quota failure does not make another request for the same model');
-  assert.equal(get('#assistant-status').textContent, 'Voz ocupada · reintentando');
+  assert.equal(get('#assistant-status').textContent, 'Disponible para conversar');
   const attemptsBeforeRecovery = speechAttempts;
   failSpeech = false;
   await new Promise(resolve => setTimeout(resolve, 80));
-  assert.ok(speechAttempts > attemptsBeforeRecovery, 'the voice retries after a temporary quota error');
-  assert.equal(spokenTexts.at(-1), replies['¿Y si falla la voz?']);
+  assert.equal(speechAttempts, attemptsBeforeRecovery, 'the device fallback avoids another delayed quota request');
   assert.equal(get('#assistant-status').textContent, 'Disponible para conversar');
 
   transientSpeechFailures = 1;
+  const deviceVoicesBeforeTransient = deviceVoiceCalls;
   await send('Probá otra vez la voz');
   await new Promise(resolve => setTimeout(resolve, 80));
-  assert.equal(spokenTexts.at(-1), replies['Probá otra vez la voz'], 'a transient voice failure retries automatically');
+  assert.equal(deviceVoiceCalls, deviceVoicesBeforeTransient + 1, 'a transient voice failure keeps narrating with the phone voice');
   assert.equal(get('#assistant-status').textContent, 'Disponible para conversar');
 
   failSpeech = true;
   speechFailureReason = 'limite_temporal';
+  const deviceVoicesBeforeSiteLimit = deviceVoiceCalls;
   await send('¿Qué pasó con el cupo?');
-  assert.equal(get('#assistant-status').textContent, 'Límite de voz del sitio alcanzado · intentá más tarde');
+  assert.equal(deviceVoiceCalls, deviceVoicesBeforeSiteLimit + 1, 'the site voice limit also falls back without going silent');
+  assert.equal(get('#assistant-status').textContent, 'Disponible para conversar');
   const attemptsAtSiteLimit = speechAttempts;
   await new Promise(resolve => setTimeout(resolve, 80));
   assert.equal(speechAttempts, attemptsAtSiteLimit, 'a site limit does not trigger futile short retries');

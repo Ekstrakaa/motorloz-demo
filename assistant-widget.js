@@ -20,7 +20,7 @@
   const voicePlayer = new Audio();
   const AudioContextClass = window.AudioContext || window.webkitAudioContext;
   const speechCache = new Map();
-  const welcomeText = 'Hola, soy tu asistente MOTORLOZ. Contame qué notaste en tu auto o qué mantenimiento o servicio buscás. Si sabés la marca, el modelo y el kilometraje, decímelos también. Podés escribir o tocar el micrófono; al terminar, tocá Terminar y enviar.';
+  const welcomeText = 'Hola, soy tu asistente de MOTORLOZ. Contame qué notaste en el auto para poder ayudarte y guiarte de la mejor manera, o qué mantenimiento o servicio estás buscando. Si podés, decime la marca, el modelo y el kilometraje para entender mejor de qué estamos hablando. Podés escribir o tocar el micrófono; al terminar, tocá Terminar y enviar.';
   const conversationKey = 'motorloz-assistant-conversation-v1';
   let history = [];
   let bookingDismissed = false;
@@ -81,9 +81,40 @@
     voicePlayer.pause();
     voicePlayer.removeAttribute('src');
     voicePlayer.load();
+    window.speechSynthesis?.cancel?.();
     if (voiceUrl) URL.revokeObjectURL(voiceUrl);
     voiceUrl = '';
     muteButton.classList.remove('is-speaking', 'is-loading');
+  }
+
+  function speakWithDeviceVoice(text, request) {
+    if (!window.speechSynthesis || typeof window.SpeechSynthesisUtterance !== 'function' || request !== voiceRequest || muted || panel.hidden) return false;
+    try {
+      const utterance = new window.SpeechSynthesisUtterance(text.replace(/\bMOTORLOZ\b/gi, 'Motor Los'));
+      const voices = window.speechSynthesis.getVoices?.() || [];
+      utterance.voice = voices.find(voice => /^es-(?:UY|AR)$/i.test(voice.lang)) || voices.find(voice => /^es\b/i.test(voice.lang)) || null;
+      utterance.lang = utterance.voice?.lang || 'es-UY';
+      utterance.rate = .98;
+      utterance.pitch = .96;
+      utterance.onstart = () => {
+        if (request !== voiceRequest) return;
+        statusEl.textContent = 'Disponible para conversar';
+        muteButton.classList.remove('is-loading');
+        muteButton.classList.add('is-speaking');
+        if (text === welcomeText) welcomePlayed = true;
+      };
+      utterance.onend = utterance.onerror = () => {
+        if (request !== voiceRequest) return;
+        muteButton.classList.remove('is-loading', 'is-speaking');
+        activeSpeechButton = null;
+      };
+      window.speechSynthesis.cancel();
+      statusEl.textContent = 'Disponible para conversar';
+      muteButton.classList.remove('is-loading');
+      muteButton.classList.add('is-speaking');
+      window.speechSynthesis.speak(utterance);
+      return true;
+    } catch { return false; }
   }
 
   function updateMuteButton() {
@@ -130,7 +161,7 @@
     let received = false;
     let oddByte = null;
     let pending = '';
-    const firstAudioTimeout = setTimeout(() => { if (!received) controller.abort(); }, 5500);
+    const firstAudioTimeout = setTimeout(() => { if (!received) controller.abort(); }, 3200);
     const handleBlock = block => {
       const data = block.split(/\r?\n/).filter(line => line.startsWith('data:')).map(line => line.slice(5).trimStart()).join('\n');
       if (!data || data === '[DONE]') return;
@@ -266,24 +297,15 @@
       if (request !== voiceRequest) return;
       activeSpeechButton = null;
       muteButton.classList.remove('is-speaking');
-      if (error.status === 429 && error.reason === 'limite_temporal') {
-        statusEl.textContent = 'Límite de voz del sitio alcanzado · intentá más tarde';
-      } else if (error.status === 429 && retryCount < 1 && !muted && !panel.hidden) {
-        statusEl.textContent = 'Voz ocupada · reintentando';
-        retryScheduled = true;
-        speechRetryTimer = setTimeout(() => {
-          speechRetryTimer = null;
-          if (request === voiceRequest && !muted && !panel.hidden) speakReply(text, button, retryCount + 1);
-        }, 1200);
-      } else if (error.status === 429) {
-        statusEl.textContent = 'Proveedor de voz sin cupo · intentá más tarde';
-      } else if (retryCount < 2 && !muted && !panel.hidden) {
+      if (speakWithDeviceVoice(text, request)) {
+        statusEl.textContent = 'Disponible para conversar';
+      } else if (retryCount < 1 && !muted && !panel.hidden) {
         statusEl.textContent = 'Reconectando la voz…';
         retryScheduled = true;
         speechRetryTimer = setTimeout(() => {
           speechRetryTimer = null;
           if (request === voiceRequest && !muted && !panel.hidden) speakReply(text, button, retryCount + 1);
-        }, [700, 1800][retryCount]);
+        }, 700);
       } else {
         statusEl.textContent = 'No pude reproducir la voz · tocá el parlante para reintentar';
       }
@@ -312,13 +334,13 @@
       kicker.textContent = 'RECEPCIÓN DIGITAL  /  MOTORLOZ';
       const heading = document.createElement('p');
       heading.className = 'assistant-welcome-heading';
-      heading.append(document.createTextNode('Hola, soy tu asistente '));
+      heading.append(document.createTextNode('Hola, soy tu asistente de '));
       const brand = document.createElement('strong');
       brand.textContent = 'MOTORLOZ.';
       heading.append(brand);
       const description = document.createElement('p');
       description.className = 'assistant-welcome-description';
-      description.textContent = 'Contame qué notaste en tu auto o qué mantenimiento o servicio buscás. Si sabés la marca, el modelo y el kilometraje, decímelos también.';
+      description.textContent = 'Contame qué notaste en el auto para poder ayudarte y guiarte de la mejor manera, o qué mantenimiento o servicio estás buscando. Si podés, decime la marca, el modelo y el kilometraje para entender mejor de qué estamos hablando.';
       const voiceTip = document.createElement('div');
       voiceTip.className = 'assistant-welcome-voice';
       voiceTip.textContent = '⌁  Podés escribir o tocar el micrófono. Al terminar, tocá “Terminar y enviar”.';
@@ -345,7 +367,8 @@
     const paths = {
       vehicle: '<path d="M3 15V9l2-4h14l2 4v6M5 15v3M19 15v3M3 11h18M7 14h.01M17 14h.01"/>',
       mileage: '<circle cx="12" cy="12" r="8"/><path d="m12 12 4-3M7 8l1 1M17 8l-1 1M12 6V4"/>',
-      service: '<path d="m14 6 4-4 4 4-4 4M14 6 4 16l4 4 10-10"/>'
+      service: '<path d="m14 6 4-4 4 4-4 4M14 6 4 16l4 4 10-10"/>',
+      urgency: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'
     };
     return `<svg viewBox="0 0 24 24" aria-hidden="true">${paths[kind]}</svg>`;
   }
@@ -354,7 +377,8 @@
     const fields = [
       details.vehicle ? { kind:'vehicle', value:[details.vehicle, details.year].filter(Boolean).join(' · ') } : null,
       details.mileage ? { kind:'mileage', value:details.mileage } : null,
-      details.issue ? { kind:'service', value:details.issue } : null
+      details.issue ? { kind:'service', value:details.issue } : null,
+      details.urgency ? { kind:'urgency', value:details.urgency } : null
     ].filter(Boolean);
     if (!fields.length) return;
     const distanceFromBottom = messagesEl.scrollHeight - messagesEl.scrollTop - (messagesEl.clientHeight || 0);
@@ -471,7 +495,9 @@
       || /\b(?:reservame|agendame)\b/i.test(latestUser);
     const acceptedOffer = /^(?:s[ií]|dale|ok|perfecto|hacelo|preparalo|vamos)(?:[.!\s]|$)/i.test(latestUser)
       && /(?:whatsapp|preparar (?:la |una )?consulta|coordinar)/i.test(earlierAssistant);
-    if (!explicitHandoff && !acceptedOffer) return;
+    const latestAssistant = history.filter(item => item.role === 'assistant').at(-1)?.content || '';
+    const assistantOfferedHandoff = /(?:quer[eé]s|pod[eé]s).{0,55}(?:revisar|preparar|abrir).{0,45}(?:consulta|whatsapp)/i.test(latestAssistant);
+    if (!explicitHandoff && !acceptedOffer && !assistantOfferedHandoff) return;
     const issueTurns = customerTurns.filter(item => {
       const words = item.content.trim();
       return words.length >= 22 && !/^(?:hola|buen(?:os|as)|me llamo|mi nombre es)\b/i.test(words) && !/^(?:(?:quiero|necesito) (?:(?:un )?turno|(?:reservar|agendar|coordinar)(?: (?:un )?turno)?)|reservame|agendame)[.!?\s]*$/i.test(words);
@@ -479,8 +505,8 @@
     const customerText = customerTurns.map(item => item.content).join(' ');
     const hasVehicle = /\b(?:Subaru|Toyota|Honda|Hyundai|Volkswagen|VW|BMW|Mercedes|Nissan|Mazda|Suzuki|Mitsubishi|Kia|Chevrolet|Peugeot|Audi|Renault|Ford|Jeep|Fiat|Volvo|Citro[eë]n|Dodge|Ferrari|Porsche|Alfa Romeo|auto|coche|camioneta|veh[ií]culo)\b/i.test(customerText);
     const discussedProblem = issueTurns.some(item => /\b(?:ruido|vibra|luz|humo|frena|freno|arranca|motor|caja|pierde|calienta|golpe|pozo|mantenimiento|service|aceite|pastillas|alineaci[oó]n|filtros|cambio|revisi[oó]n)\b/i.test(item.content));
-    if (hasVehicle && discussedProblem && customerTurns.length >= 2 && customerName()) {
-      const details = handoffDetails();
+    const details = handoffDetails();
+    if (hasVehicle && discussedProblem && customerTurns.length >= 2 && details.name && details.mileage && details.urgency) {
       renderSummaryCard(details);
       reservationPrompt.hidden = false;
       if (!handoffSummaryPromise) {
@@ -527,6 +553,10 @@
     const year = words.match(/\b(19[89]\d|20[0-3]\d)\b/)?.[1] || '';
     const thousands = words.match(/\b(\d{1,3})\s*mil\s*(?:km|kil[oó]metros)?\b/i);
     const mileage = words.match(/\b(\d{2,3}(?:[.,]\d{3})?)\s*(?:km|kil[oó]metros)\b/i);
+    const mileageUnknown = /\b(?:no s[eé]|ni idea|desconozco)\b.{0,24}\b(?:kilometraje|kil[oó]metros|km)\b|\b(?:kilometraje|kil[oó]metros|km)\b.{0,24}\b(?:no s[eé]|ni idea|desconozco)\b/i.test(words);
+    let urgency = '';
+    if (/\b(?:puede esperar|puedo esperar|sin apuro|no hay apuro|cuando puedan|cuando haya lugar|coordinar (?:una )?fecha|no es urgente)\b/i.test(words)) urgency = 'Puede esperar una fecha coordinada';
+    else if (/\b(?:urgente|urgencia|cuanto antes|lo antes posible|hoy|no puedo usar(?:lo|la)?|qued[eé] tirado|me dej[oó] tirado)\b/i.test(words)) urgency = 'Necesita atención lo antes posible';
     const issueFallback = customerTurns
       .filter(text => !/^(?:hola|buen(?:as|os)\s+(?:d[ií]as|tardes|noches))[!.,\s]*$/i.test(text))
       .filter(text => !/^(?:me llamo|mi nombre es|soy)\s+[\p{L}\s.]+$/iu.test(text))
@@ -537,8 +567,9 @@
       name: customerName(),
       vehicle: vehicle ? `${vehicle[1]}${model}` : '',
       year,
-      mileage: thousands ? `${thousands[1]}.000 km aprox.` : mileage ? `${mileage[1]} km` : '',
-      issue: simpleServiceSummary(words) || issueFallback
+      mileage: thousands ? `${thousands[1]}.000 km aprox.` : mileage ? `${mileage[1]} km` : mileageUnknown ? 'Kilometraje no informado' : '',
+      issue: simpleServiceSummary(words) || issueFallback,
+      urgency
     };
   }
 
@@ -564,7 +595,8 @@
       `*01 · CLIENTE*\n- Nombre: ${details.name}`,
       ['*02 · VEHÍCULO*', `- Marca y modelo: ${details.vehicle}`, details.year ? `- Año: ${details.year}` : '', details.mileage ? `- Kilometraje: ${details.mileage}` : ''].filter(Boolean).join('\n'),
       `*03 · QUÉ NECESITA*\n${details.issue}`,
-      '*04 · COORDINACIÓN*\n- Día y horario: a confirmar por el taller',
+      `*04 · PRIORIDAD*\n- ${details.urgency}`,
+      '*05 · COORDINACIÓN*\n- Día y horario: a confirmar por el taller',
       '¿Podemos coordinar una revisión? Quedo atento/a a la confirmación.'
     ];
     return `https://wa.me/${window.MOTORLOZ?.whatsapp || '59891888288'}?text=${encodeURIComponent(sections.join('\n\n'))}`;
@@ -573,10 +605,10 @@
   async function requestReply(userMessage) {
     if (!configured || busy) return;
     history.push({ role: 'user', content: userMessage });
-    const pending = bubble('Dame un momento, ya te leo…', 'assistant', { pending: true });
+    const pending = bubble('Ya te respondo…', 'assistant', { pending: true });
     setBusy(true);
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 22_000);
+    const timeout = setTimeout(() => controller.abort(), 11_000);
     try {
       const response = await fetch('/api/assistant/chat', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -899,7 +931,7 @@
   reserveButton.addEventListener('click', async () => {
     if (reserveButton.disabled) return;
     const details = handoffDetails();
-    if (!details.name || !details.vehicle || !details.issue) return;
+    if (!details.name || !details.vehicle || !details.mileage || !details.issue || !details.urgency) return;
     reserveButton.disabled = true;
     reserveButton.textContent = 'Preparando mensaje…';
     retryLink.hidden = true;
