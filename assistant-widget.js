@@ -168,6 +168,7 @@
       received = true;
       clearTimeout(firstAudioTimeout);
       statusEl.textContent = 'Disponible';
+      statusEl.removeAttribute('title');
       muteButton.classList.remove('is-loading');
       muteButton.classList.add('is-speaking');
     };
@@ -231,6 +232,7 @@
     if (text === welcomeText) welcomePlayed = true;
     if (request !== voiceRequest) return;
     statusEl.textContent = 'Disponible';
+    statusEl.removeAttribute('title');
     muteButton.classList.remove('is-loading');
     muteButton.classList.add('is-speaking');
   }
@@ -267,25 +269,30 @@
       activeSpeechButton = null;
       muteButton.classList.remove('is-speaking');
       if (error.status === 429 && error.reason === 'limite_temporal') {
-        statusEl.textContent = 'Límite de voz del sitio alcanzado · intentá más tarde';
+        statusEl.textContent = 'Voz sin cupo';
+        statusEl.title = 'El cupo temporal de voz está agotado. Intentá más tarde.';
       } else if (error.status === 429 && retryCount < 1 && !muted && !panel.hidden) {
-        statusEl.textContent = 'Voz ocupada · reintentando';
+        statusEl.textContent = 'Reconectando voz…';
+        statusEl.title = 'La voz está ocupada. Reintentando automáticamente.';
         retryScheduled = true;
         speechRetryTimer = setTimeout(() => {
           speechRetryTimer = null;
           if (request === voiceRequest && !muted && !panel.hidden) speakReply(text, button, retryCount + 1);
         }, 1200);
       } else if (error.status === 429) {
-        statusEl.textContent = 'Proveedor de voz sin cupo · intentá más tarde';
+        statusEl.textContent = 'Voz sin cupo';
+        statusEl.title = 'El proveedor de voz no tiene cupo disponible. Intentá más tarde.';
       } else if (retryCount < 2 && !muted && !panel.hidden) {
-        statusEl.textContent = 'Reconectando la voz…';
+        statusEl.textContent = 'Reconectando voz…';
+        statusEl.title = 'Reconectando la voz automáticamente.';
         retryScheduled = true;
         speechRetryTimer = setTimeout(() => {
           speechRetryTimer = null;
           if (request === voiceRequest && !muted && !panel.hidden) speakReply(text, button, retryCount + 1);
         }, [700, 1800][retryCount]);
       } else {
-        statusEl.textContent = 'No pude reproducir la voz · tocá el parlante para reintentar';
+        statusEl.textContent = 'Voz no disponible';
+        statusEl.title = 'No se pudo reproducir la voz. Tocá el parlante para reintentar.';
       }
       if (text === welcomeText && !retryScheduled) welcomeSpoken = welcomePlayed;
     } finally {
@@ -410,6 +417,7 @@
       const wasConfigured = configured;
       configured = Boolean(status.configured);
       statusEl.textContent = configured ? 'Disponible' : 'Sin conexión';
+      statusEl.removeAttribute('title');
       panel.classList.toggle('is-offline', !configured);
       input.disabled = !configured;
       micButton.disabled = !configured;
@@ -422,6 +430,7 @@
       }
     } catch {
       statusEl.textContent = 'Conexión no disponible';
+      statusEl.removeAttribute('title');
       configured = false;
       statusChecked = true;
       input.disabled = true;

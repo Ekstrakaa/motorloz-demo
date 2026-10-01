@@ -1,5 +1,9 @@
 /* Keep the mobile chat inside the visual viewport while the on-screen keyboard animates. */
 @media(max-width:600px) {
+  .assistant-identity>div { min-width:0!important; }
+  .assistant-identity p { min-width:0!important;max-width:100%!important; }
+  #assistant-status { display:block;min-width:0;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+  .assistant-identity p i { flex:0 0 auto; }
   .assistant-window {
     position:fixed!important;
     left:calc(var(--assistant-viewport-left,0px) + 7px)!important;

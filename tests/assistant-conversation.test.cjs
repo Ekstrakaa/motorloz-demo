@@ -171,7 +171,7 @@ test('the first greeting and successive replies speak in the same voice flow wit
   await send('¿Y si falla la voz?');
   assert.equal(deviceVoiceCalls, 0, 'a quota failure never switches to a different phone voice');
   assert.equal(wavCalls, 0, 'a quota failure does not make another request for the same model');
-  assert.equal(get('#assistant-status').textContent, 'Voz ocupada · reintentando');
+  assert.equal(get('#assistant-status').textContent, 'Reconectando voz…');
   const attemptsBeforeRecovery = speechAttempts;
   failSpeech = false;
   await new Promise(resolve => setTimeout(resolve, 80));
@@ -188,7 +188,7 @@ test('the first greeting and successive replies speak in the same voice flow wit
   failSpeech = true;
   speechFailureReason = 'limite_temporal';
   await send('¿Qué pasó con el cupo?');
-  assert.equal(get('#assistant-status').textContent, 'Límite de voz del sitio alcanzado · intentá más tarde');
+  assert.equal(get('#assistant-status').textContent, 'Voz sin cupo');
   const attemptsAtSiteLimit = speechAttempts;
   await new Promise(resolve => setTimeout(resolve, 80));
   assert.equal(speechAttempts, attemptsAtSiteLimit, 'a site limit does not trigger futile short retries');
