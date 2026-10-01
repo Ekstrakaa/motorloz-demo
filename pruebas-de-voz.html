@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="es-UY">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Pruebas de voz · MOTORLOZ</title>
+  <style>
+    :root{color-scheme:dark;--ink:#f5fbfb;--muted:#a8babb;--cyan:#46d4dc;--panel:#102a2d;--line:rgba(119,225,227,.22)}
+    *{box-sizing:border-box}body{margin:0;min-height:100svh;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(circle at 90% 5%,rgba(37,170,177,.22),transparent 34%),#071416;color:var(--ink);padding:28px 18px 40px}
+    main{width:min(680px,100%);margin:auto}.brand{display:flex;align-items:center;gap:14px;margin-bottom:34px}.brand img{width:132px;height:auto}.brand span{color:var(--muted);font-size:13px;letter-spacing:.12em;text-transform:uppercase}
+    .eyebrow{color:var(--cyan);font-size:11px;font-weight:800;letter-spacing:.18em;text-transform:uppercase}h1{font-size:clamp(30px,8vw,52px);line-height:.98;margin:12px 0 14px;letter-spacing:-.045em}p{color:var(--muted);font-size:16px;line-height:1.55;margin:0 0 28px}
+    .samples{display:grid;gap:14px}.sample{position:relative;overflow:hidden;border:1px solid var(--line);border-radius:22px;background:linear-gradient(145deg,rgba(23,62,65,.94),rgba(9,28,31,.96));padding:20px;box-shadow:0 18px 50px rgba(0,0,0,.24)}.sample::before{content:"";position:absolute;inset:0 auto 0 0;width:3px;background:var(--cyan)}
+    .sample header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}.sample strong{font-size:20px}.sample small{color:var(--cyan);font-weight:750;letter-spacing:.1em;text-transform:uppercase}audio{display:block;width:100%;height:46px;accent-color:var(--cyan)}
+    .note{margin-top:25px;padding:16px 18px;border-radius:16px;background:rgba(255,255,255,.045);font-size:14px;color:var(--muted);line-height:1.5}.note b{color:var(--ink)}
+  </style>
+</head>
+<body>
+  <main>
+    <div class="brand"><img src="assets/motorloz-logo.png" alt="MOTORLOZ"><span>Laboratorio de voz</span></div>
+    <span class="eyebrow">Comparación en español rioplatense</span>
+    <h1>Elegí cómo habla MOTORLOZ.</h1>
+    <p>Las tres voces dicen exactamente lo mismo y reciben la misma dirección emocional. Escuchalas con auriculares o con el volumen normal del teléfono.</p>
+    <div class="samples">
+      <article class="sample"><header><strong>Prueba 1</strong><small>Escuchar</small></header><audio controls preload="none" src="/api/voice-sample?sample=1">Tu navegador no puede reproducir esta muestra.</audio></article>
+      <article class="sample"><header><strong>Prueba 2</strong><small>Escuchar</small></header><audio controls preload="none" src="/api/voice-sample?sample=2">Tu navegador no puede reproducir esta muestra.</audio></article>
+      <article class="sample"><header><strong>Prueba 3</strong><small>Escuchar</small></header><audio controls preload="none" src="/api/voice-sample?sample=3">Tu navegador no puede reproducir esta muestra.</audio></article>
+    </div>
+    <div class="note"><b>Después decime solamente “1”, “2” o “3”.</b> La elegida se usará para narrar las respuestas de Gemini en el chat.</div>
+  </main>
+</body>
+</html>
