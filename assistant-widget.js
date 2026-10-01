@@ -81,40 +81,9 @@
     voicePlayer.pause();
     voicePlayer.removeAttribute('src');
     voicePlayer.load();
-    window.speechSynthesis?.cancel?.();
     if (voiceUrl) URL.revokeObjectURL(voiceUrl);
     voiceUrl = '';
     muteButton.classList.remove('is-speaking', 'is-loading');
-  }
-
-  function speakWithDeviceVoice(text, request) {
-    if (!window.speechSynthesis || typeof window.SpeechSynthesisUtterance !== 'function' || request !== voiceRequest || muted || panel.hidden) return false;
-    try {
-      const utterance = new window.SpeechSynthesisUtterance(text.replace(/\bMOTORLOZ\b/gi, 'Motor Los'));
-      const voices = window.speechSynthesis.getVoices?.() || [];
-      utterance.voice = voices.find(voice => /^es-(?:UY|AR)$/i.test(voice.lang)) || voices.find(voice => /^es\b/i.test(voice.lang)) || null;
-      utterance.lang = utterance.voice?.lang || 'es-UY';
-      utterance.rate = .98;
-      utterance.pitch = .96;
-      utterance.onstart = () => {
-        if (request !== voiceRequest) return;
-        statusEl.textContent = 'Disponible para conversar';
-        muteButton.classList.remove('is-loading');
-        muteButton.classList.add('is-speaking');
-        if (text === welcomeText) welcomePlayed = true;
-      };
-      utterance.onend = utterance.onerror = () => {
-        if (request !== voiceRequest) return;
-        muteButton.classList.remove('is-loading', 'is-speaking');
-        activeSpeechButton = null;
-      };
-      window.speechSynthesis.cancel();
-      statusEl.textContent = 'Disponible para conversar';
-      muteButton.classList.remove('is-loading');
-      muteButton.classList.add('is-speaking');
-      window.speechSynthesis.speak(utterance);
-      return true;
-    } catch { return false; }
   }
 
   function updateMuteButton() {
@@ -161,7 +130,7 @@
     let received = false;
     let oddByte = null;
     let pending = '';
-    const firstAudioTimeout = setTimeout(() => { if (!received) controller.abort(); }, 3200);
+    const firstAudioTimeout = setTimeout(() => { if (!received) controller.abort(); }, 5500);
     const handleBlock = block => {
       const data = block.split(/\r?\n/).filter(line => line.startsWith('data:')).map(line => line.slice(5).trimStart()).join('\n');
       if (!data || data === '[DONE]') return;
@@ -266,7 +235,7 @@
     muteButton.classList.add('is-speaking');
   }
 
-  async function speakReply(text, button = null, retryCount = 0, preferDevice = false) {
+  async function speakReply(text, button = null, retryCount = 0) {
     if (!configured || muted || !text) return;
     stopSpeech();
     unlockAudio();
@@ -276,7 +245,6 @@
     muteButton.classList.add('is-loading');
     let retryScheduled = false;
     try {
-      if (preferDevice && speakWithDeviceVoice(text, request)) return;
       if (audioContext) {
         try {
           if (audioContext.state !== 'running') await Promise.race([
@@ -298,15 +266,24 @@
       if (request !== voiceRequest) return;
       activeSpeechButton = null;
       muteButton.classList.remove('is-speaking');
-      if (speakWithDeviceVoice(text, request)) {
-        statusEl.textContent = 'Disponible para conversar';
-      } else if (retryCount < 1 && !muted && !panel.hidden) {
+      if (error.status === 429 && error.reason === 'limite_temporal') {
+        statusEl.textContent = 'Límite de voz del sitio alcanzado · intentá más tarde';
+      } else if (error.status === 429 && retryCount < 1 && !muted && !panel.hidden) {
+        statusEl.textContent = 'Voz ocupada · reintentando';
+        retryScheduled = true;
+        speechRetryTimer = setTimeout(() => {
+          speechRetryTimer = null;
+          if (request === voiceRequest && !muted && !panel.hidden) speakReply(text, button, retryCount + 1);
+        }, 1200);
+      } else if (error.status === 429) {
+        statusEl.textContent = 'Proveedor de voz sin cupo · intentá más tarde';
+      } else if (retryCount < 2 && !muted && !panel.hidden) {
         statusEl.textContent = 'Reconectando la voz…';
         retryScheduled = true;
         speechRetryTimer = setTimeout(() => {
           speechRetryTimer = null;
           if (request === voiceRequest && !muted && !panel.hidden) speakReply(text, button, retryCount + 1);
-        }, 700);
+        }, [700, 1800][retryCount]);
       } else {
         statusEl.textContent = 'No pude reproducir la voz · tocá el parlante para reintentar';
       }
@@ -624,7 +601,7 @@
       saveConversation();
       bubble(replyText, 'assistant');
       lastSpokenText = replyText;
-      speakReply(replyText, null, 0, result.source === 'instant');
+      speakReply(replyText);
       maybeShowBooking();
     } catch (error) {
       pending.remove();

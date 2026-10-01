@@ -163,30 +163,27 @@ test('the first greeting and successive replies speak in the same voice flow wit
   assert.equal(get('#assistant-reservation-prompt').hidden, false, 'the conversation stays available while WhatsApp opens');
 
   failSpeech = true;
-  const deviceVoicesBeforeFailure = deviceVoiceCalls;
   await send('¿Y si falla la voz?');
-  assert.equal(deviceVoiceCalls, deviceVoicesBeforeFailure + 1, 'a quota failure immediately switches to the phone voice');
+  assert.equal(deviceVoiceCalls, 0, 'a quota failure never switches to a different phone voice');
   assert.equal(wavCalls, 0, 'a quota failure does not make another request for the same model');
-  assert.equal(get('#assistant-status').textContent, 'Disponible para conversar');
+  assert.equal(get('#assistant-status').textContent, 'Voz ocupada · reintentando');
   const attemptsBeforeRecovery = speechAttempts;
   failSpeech = false;
   await new Promise(resolve => setTimeout(resolve, 80));
-  assert.equal(speechAttempts, attemptsBeforeRecovery, 'the device fallback avoids another delayed quota request');
+  assert.ok(speechAttempts > attemptsBeforeRecovery, 'the same Gemini voice retries after a temporary quota error');
+  assert.equal(spokenTexts.at(-1), replies['¿Y si falla la voz?']);
   assert.equal(get('#assistant-status').textContent, 'Disponible para conversar');
 
   transientSpeechFailures = 1;
-  const deviceVoicesBeforeTransient = deviceVoiceCalls;
   await send('Probá otra vez la voz');
   await new Promise(resolve => setTimeout(resolve, 80));
-  assert.equal(deviceVoiceCalls, deviceVoicesBeforeTransient + 1, 'a transient voice failure keeps narrating with the phone voice');
+  assert.equal(spokenTexts.at(-1), replies['Probá otra vez la voz'], 'a transient voice failure retries the same Gemini voice');
   assert.equal(get('#assistant-status').textContent, 'Disponible para conversar');
 
   failSpeech = true;
   speechFailureReason = 'limite_temporal';
-  const deviceVoicesBeforeSiteLimit = deviceVoiceCalls;
   await send('¿Qué pasó con el cupo?');
-  assert.equal(deviceVoiceCalls, deviceVoicesBeforeSiteLimit + 1, 'the site voice limit also falls back without going silent');
-  assert.equal(get('#assistant-status').textContent, 'Disponible para conversar');
+  assert.equal(get('#assistant-status').textContent, 'Límite de voz del sitio alcanzado · intentá más tarde');
   const attemptsAtSiteLimit = speechAttempts;
   await new Promise(resolve => setTimeout(resolve, 80));
   assert.equal(speechAttempts, attemptsAtSiteLimit, 'a site limit does not trigger futile short retries');
