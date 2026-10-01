@@ -296,6 +296,7 @@ async function handle(req, res, action) {
     }
     const history = cleanHistory(body.messages);
     let contents;
+    let chatSystemInstruction = '';
     let maxOutputTokens = action === 'summary' ? 512 : 768;
 
     if (action === 'summary') {
@@ -319,12 +320,19 @@ async function handle(req, res, action) {
         return;
       }
       contents = history;
+      const intake = body.intake && typeof body.intake === 'object' ? body.intake : {};
+      const required = ['name', 'vehicle', 'mileage', 'issue', 'urgency'];
+      const missing = required.filter(field => intake[field] !== true);
+      const interfaceState = missing.length
+        ? ` Estado real de la interfaz: todavía faltan ${missing.join(', ')}. No digas que el botón de WhatsApp apareció ni que está debajo del chat. Si la persona quiere coordinar, pedí de forma natural solo el dato faltante más útil.`
+        : ' Estado real de la interfaz: los datos necesarios están completos. Si la persona quiere coordinar o aceptó hacerlo, podés preguntarle si quiere revisar la consulta en WhatsApp; el botón se mostrará con tu respuesta.';
+      chatSystemInstruction = CHAT_PROMPT + DICTATION_GUIDANCE + DIALOGUE_GUIDANCE + interfaceState;
     } else {
       json(res, 404, { error: 'no_encontrado' });
       return;
     }
 
-    const reply = await callGemini(contents, { maxOutputTokens, ...(action === 'summary' ? { models: [SUMMARY_MODEL, MODEL, 'gemini-3.5-flash'] } : {}) });
+    const reply = await callGemini(contents, { maxOutputTokens, ...(action === 'summary' ? { models: [SUMMARY_MODEL, MODEL, 'gemini-3.5-flash'] } : { systemInstruction: chatSystemInstruction }) });
     if (!reply) {
       json(res, 502, { error: 'respuesta_vacia', message: 'No pude armar una respuesta ahora. Intentá de nuevo.' });
       return;

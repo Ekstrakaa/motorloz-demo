@@ -167,7 +167,7 @@
       };
       received = true;
       clearTimeout(firstAudioTimeout);
-      statusEl.textContent = 'Disponible para conversar';
+      statusEl.textContent = 'Disponible';
       muteButton.classList.remove('is-loading');
       muteButton.classList.add('is-speaking');
     };
@@ -230,7 +230,7 @@
     await voicePlayer.play();
     if (text === welcomeText) welcomePlayed = true;
     if (request !== voiceRequest) return;
-    statusEl.textContent = 'Disponible para conversar';
+    statusEl.textContent = 'Disponible';
     muteButton.classList.remove('is-loading');
     muteButton.classList.add('is-speaking');
   }
@@ -409,7 +409,7 @@
       const status = await response.json();
       const wasConfigured = configured;
       configured = Boolean(status.configured);
-      statusEl.textContent = configured ? 'Disponible para conversar' : 'Falta conectar la IA';
+      statusEl.textContent = configured ? 'Disponible' : 'Sin conexión';
       panel.classList.toggle('is-offline', !configured);
       input.disabled = !configured;
       micButton.disabled = !configured;
@@ -590,7 +590,16 @@
     try {
       const response = await fetch('/api/assistant/chat', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: history }), signal:controller.signal
+        body: JSON.stringify({
+          messages: history,
+          intake: (() => {
+            const details = handoffDetails();
+            return {
+              name: Boolean(details.name), vehicle: Boolean(details.vehicle), mileage: Boolean(details.mileage),
+              issue: Boolean(details.issue), urgency: Boolean(details.urgency)
+            };
+          })()
+        }), signal:controller.signal
       });
       const result = await response.json();
       pending.remove();

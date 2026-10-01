@@ -172,13 +172,13 @@ test('the first greeting and successive replies speak in the same voice flow wit
   await new Promise(resolve => setTimeout(resolve, 80));
   assert.ok(speechAttempts > attemptsBeforeRecovery, 'the same Gemini voice retries after a temporary quota error');
   assert.equal(spokenTexts.at(-1), replies['¿Y si falla la voz?']);
-  assert.equal(get('#assistant-status').textContent, 'Disponible para conversar');
+  assert.equal(get('#assistant-status').textContent, 'Disponible');
 
   transientSpeechFailures = 1;
   await send('Probá otra vez la voz');
   await new Promise(resolve => setTimeout(resolve, 80));
   assert.equal(spokenTexts.at(-1), replies['Probá otra vez la voz'], 'a transient voice failure retries the same Gemini voice');
-  assert.equal(get('#assistant-status').textContent, 'Disponible para conversar');
+  assert.equal(get('#assistant-status').textContent, 'Disponible');
 
   failSpeech = true;
   speechFailureReason = 'limite_temporal';

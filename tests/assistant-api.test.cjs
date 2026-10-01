@@ -36,6 +36,8 @@ test('retries a token-truncated Gemini response and returns the complete reply',
     assert.ok(requests[0].generationConfig.maxOutputTokens > 260);
     assert.match(requests[0].systemInstruction.parts[0].text, /No ofrezcas WhatsApp por haber reunido datos/);
     assert.match(requests[0].systemInstruction.parts[0].text, /Si describe un golpeteo o ruido/);
+    assert.match(requests[0].systemInstruction.parts[0].text, /todavía faltan name, vehicle, mileage, issue, urgency/);
+    assert.match(requests[0].systemInstruction.parts[0].text, /No digas que el botón de WhatsApp apareció/);
   } finally {
     global.fetch = previousFetch;
   }

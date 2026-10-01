@@ -214,13 +214,111 @@
   .location .map-panel iframe { opacity:1!important; }
   .location .arrival-photos { width:100%!important;margin:0!important;padding:0!important; }
   .location .arrival-slide-figure { margin-top:0!important; }
-  .location .arrival-story .slide-stage { width:100vw!important;height:auto!important;aspect-ratio:1.77!important;background:transparent!important; }
+  .location .arrival-story .slide-stage { width:100vw!important;height:auto!important;aspect-ratio:1187/797!important;background:transparent!important; }
   .location .arrival-story .slide-frame,.location .arrival-story .slide-frame.clean-photo { background:#111a1d!important; }
   .location .arrival-story .slide-frame img,.location .arrival-story .slide-frame.clean-photo img {
     width:100%!important;height:100%!important;max-width:none!important;left:50%!important;top:50%!important;
     transform:translate(-50%,-50%)!important;object-fit:contain!important;object-position:center!important;padding:0!important;background:transparent!important;
   }
 .intro-proof-row>article { min-height:88px!important;padding:13px 17px!important; }
+}
+
+/* The customer photos are present immediately; only the horizontal track moves. */
+.customer-gallery-lane,
+.customer-gallery-group,
+.customer-gallery-photo,
+.customer-gallery-photo img {
+  opacity:1!important;
+  clip-path:none!important;
+  transition:none!important;
+}
+.customer-gallery-photo,
+.customer-gallery-photo img { transform:none!important;animation:none!important; }
+
+/* Richer service cards: layered paper, technical detail and restrained motion. */
+.services .service-card {
+  isolation:isolate!important;
+  border-color:rgba(20,92,99,.2)!important;
+  background:
+    radial-gradient(circle at 88% 8%,rgba(51,190,199,.12),transparent 29%),
+    linear-gradient(145deg,rgba(255,255,255,.99),rgba(246,250,248,.98) 58%,rgba(226,239,236,.96))!important;
+  box-shadow:0 18px 38px rgba(12,42,46,.15),0 3px 8px rgba(12,42,46,.07),inset 0 1px 0 #fff!important;
+}
+.services .service-card::after {
+  content:"";position:absolute;z-index:0;inset:auto -34px -48px auto;width:132px;height:132px;
+  border:1px solid rgba(28,151,160,.09);border-radius:50%;pointer-events:none;
+  box-shadow:0 0 0 18px rgba(28,151,160,.025),0 0 0 38px rgba(28,151,160,.018);
+}
+.services .service-card>img,.services .service-card-copy { position:relative;z-index:1; }
+.services .service-card-copy { background:linear-gradient(150deg,rgba(255,255,255,.7),rgba(226,242,239,.36))!important; }
+.services .service-card-copy>span { color:#55777b!important;font-weight:650!important; }
+.services .service-title-row {
+  position:relative!important;padding:5px 8px 5px 2px!important;border-radius:16px!important;
+  background:linear-gradient(100deg,rgba(223,244,242,.64),rgba(255,255,255,0) 78%)!important;
+}
+.services .service-title-row::after {
+  content:"";position:absolute;left:3px;right:18%;bottom:0;height:1px;
+  background:linear-gradient(90deg,rgba(37,174,184,.36),transparent);
+}
+.services .service-title-row .service-icon {
+  transform-origin:center!important;
+  animation:service-icon-breathe 4.8s ease-in-out infinite!important;
+}
+.services .service-card:nth-child(3n+2) .service-icon { animation-delay:-1.6s!important; }
+.services .service-card:nth-child(3n) .service-icon { animation-delay:-3.2s!important; }
+.services .service-card-copy>a[data-service] {
+  min-height:42px!important;padding:0 17px!important;border:1px solid rgba(60,190,199,.5)!important;
+  border-radius:999px!important;background:linear-gradient(135deg,rgba(255,255,255,.9),rgba(120,218,222,.66) 52%,rgba(232,253,251,.84))!important;
+  color:#083b42!important;font-weight:750!important;letter-spacing:-.01em!important;
+  box-shadow:inset 0 1px 0 #fff,inset 0 -1px 0 rgba(10,106,113,.14),0 8px 20px rgba(14,112,121,.18)!important;
+}
+.services .service-card-copy>a[data-service]::before {
+  content:"";width:6px;height:6px;margin-right:9px;border-radius:50%;background:#159ca8;
+  box-shadow:0 0 0 4px rgba(21,156,168,.11);
+}
+.services .service-card-copy>a[data-service]:is(:hover,:focus-visible) {
+  background:linear-gradient(135deg,#fff,rgba(91,210,218,.8) 55%,#ecfffd)!important;
+  border-color:rgba(27,161,172,.68)!important;
+}
+
+/* Editorial social card with a clear, compact action. */
+.people .instagram-stories {
+  position:relative!important;isolation:isolate!important;overflow:hidden!important;
+  padding:23px 21px!important;border:1px solid rgba(98,218,222,.32)!important;border-radius:20px!important;
+  background:
+    linear-gradient(125deg,rgba(43,188,197,.14),transparent 48%),
+    radial-gradient(circle at 82% 12%,rgba(57,210,214,.13),transparent 30%),#0d2024!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 18px 42px rgba(0,8,10,.25)!important;
+}
+.people .instagram-stories::before {
+  content:"";position:absolute;z-index:-1;inset:0;pointer-events:none;opacity:.34;
+  background:repeating-linear-gradient(135deg,transparent 0 18px,rgba(100,222,225,.035) 18px 19px);
+}
+.people .instagram-stories .instagram-mark {
+  width:42px!important;height:42px!important;border:1px solid rgba(120,226,229,.38)!important;border-radius:14px!important;
+  background:rgba(255,255,255,.055)!important;box-shadow:inset 0 1px rgba(255,255,255,.1),0 8px 18px rgba(0,0,0,.2)!important;
+}
+.people .instagram-stories>div>a {
+  display:inline-flex!important;align-items:center!important;justify-content:center!important;width:auto!important;min-height:36px!important;
+  margin-top:8px!important;padding:0 15px!important;border:1px solid rgba(101,220,225,.35)!important;border-radius:999px!important;
+  background:rgba(37,176,185,.1)!important;color:#8fe4e6!important;box-shadow:inset 0 1px rgba(255,255,255,.06)!important;
+}
+.people .instagram-stories>div>a::after { box-shadow:0 0 0 4px rgba(118,210,215,.1)!important; }
+
+@keyframes service-icon-breathe {
+  0%,100% { transform:translateY(0) scale(1);filter:drop-shadow(0 7px 8px rgba(8,38,42,.15)); }
+  50% { transform:translateY(-2px) scale(1.035);filter:drop-shadow(0 10px 11px rgba(8,92,100,.22)); }
+}
+
+@media(max-width:760px) {
+  .services .service-card-copy { padding:19px 17px 18px!important; }
+  .services .service-title-row { margin:7px 0 14px!important;padding-right:5px!important; }
+  .services .service-card-copy>a[data-service] { min-height:41px!important;padding-inline:14px!important; }
+  .people .instagram-stories { padding:19px 17px!important; }
+}
+
+@media(prefers-reduced-motion:reduce) {
+  .services .service-title-row .service-icon { animation:none!important; }
 }
 
 /* Center the customer gallery title and its supporting line on every screen. */
