@@ -1,4 +1,6 @@
 const MODEL = process.env.GEMINI_CHAT_MODEL || 'gemini-3.5-flash-lite';
+const OPENAI_SPEECH_MODEL = process.env.OPENAI_SPEECH_MODEL || 'gpt-4o-mini-tts';
+const OPENAI_SPEECH_VOICE = process.env.OPENAI_SPEECH_VOICE || 'cedar';
 const SPEECH_MODEL = process.env.GEMINI_SPEECH_MODEL || 'gemini-3.8-flash-tts';
 const SPEECH_FALLBACK_MODEL = process.env.GEMINI_SPEECH_FALLBACK_MODEL || 'gemini-3.8-flash-lite-tts';
 const SPEECH_MODELS = [...new Set([SPEECH_MODEL, SPEECH_FALLBACK_MODEL])];
@@ -13,6 +15,7 @@ const CHAT_PROMPT = SYSTEM_PROMPT
 const DICTATION_GUIDANCE = ' El dictado puede confundir nombres de vehículos. Si una marca o un modelo nuevos contradicen lo que dijo antes el cliente (por ejemplo Subaru frente a Hyundai), preguntá cuál es el correcto antes de darlo por confirmado o preparar WhatsApp. Impreza, Hawkeye y Wagon pueden aparecer al hablar de un Subaru; no sustituyas esos términos por palabras comunes ni inventes un modelo a partir de una transcripción dudosa.';
 const DIALOGUE_GUIDANCE = ' Tu prioridad en cada turno es responder lo que la persona acaba de decir o preguntar. Si describe un golpeteo o ruido, explicá en lenguaje simple que puede venir de distintas zonas y preguntá una cosa concreta para ubicarlo (por ejemplo si aparece al acelerar, frenar o pasar por irregularidades); si comenzó después de un pozo, tené en cuenta ese dato sin afirmar una causa. Si pide información general sobre un auto, servicio o mantenimiento, contestá de forma útil aunque todavía no quiera reservar. Guiá la conversación de a un dato por vez y recordá lo ya contestado. Antes de ofrecer WhatsApp necesitás: nombre, marca y modelo, kilometraje aproximado (o que diga que no lo sabe), qué necesita o qué síntoma nota, desde cuándo o en qué situación ocurre, y si precisa atención urgente o puede esperar una fecha. Si falta algo y la persona quiere coordinar con el taller, pedí solamente el dato más útil que falte. La urgencia expresa la necesidad del cliente y no reemplaza una evaluación de seguridad. No conviertas una consulta informativa en una reserva: si la persona solo busca entender un síntoma, una pieza o un mantenimiento, respondé y seguí ayudando sin ofrecer WhatsApp. Cuando estén todos los datos y la persona pida turno, quiera llevar el auto o muestre intención clara de coordinar, respondé la inquietud pendiente y preguntá naturalmente si quiere revisar la consulta en WhatsApp; el botón aparecerá debajo. No repitas saludos, el nombre MOTORLOZ ni los nombres Pablo y Bruno en respuestas consecutivas. Evitá frases de venta y preguntas de formulario; mantené una conversación natural de una pregunta útil por vez.';
 const SPEECH_STYLE = 'Leé exactamente el texto recibido, sin agregar ni omitir palabras. Español rioplatense de Montevideo. Voz cálida, natural y cercana, ritmo conversacional tranquilo; sin tono robótico ni locución publicitaria. El nombre del taller se pronuncia Motor Los, dos palabras; nunca Motorola.';
+const OPENAI_SPEECH_STYLE = `${SPEECH_STYLE} Usá siempre una voz masculina adulta, serena y consistente.`;
 
 function spokenTranscript(text) {
   // Display and WhatsApp keep the real brand; only the sound gets a phonetic hint.
@@ -174,8 +177,37 @@ async function requestSpeech(text, stream = false, model = SPEECH_MODEL, signal)
   });
 }
 
+async function requestOpenAISpeech(text, stream = false, signal) {
+  return fetch('https://api.openai.com/v1/audio/speech', {
+    method: 'POST',
+    signal,
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${process.env.OPENAI_API_KEY}` },
+    body: JSON.stringify({
+      model: OPENAI_SPEECH_MODEL,
+      voice: OPENAI_SPEECH_VOICE,
+      input: spokenTranscript(text),
+      instructions: OPENAI_SPEECH_STYLE,
+      response_format: stream ? 'pcm' : 'wav'
+    })
+  });
+}
+
 async function generateSpeech(text) {
   let lastError;
+  if (process.env.OPENAI_API_KEY) {
+    const upstream = await requestOpenAISpeech(text);
+    if (upstream.ok) {
+      const wav = Buffer.from(await upstream.arrayBuffer());
+      if (wav.subarray(0, 4).toString() === 'RIFF') return wav;
+      lastError = new Error('openai_speech_empty');
+    } else {
+      const result = await upstream.json().catch(() => ({}));
+      lastError = new Error('openai_speech_failed');
+      lastError.upstreamStatus = upstream.status;
+      lastError.upstreamCode = result.error?.code || result.error?.type || 'unknown';
+    }
+    throw lastError;
+  }
   for (const model of SPEECH_MODELS) {
     const upstream = await requestSpeech(text, false, model);
     const result = await upstream.json().catch(() => ({}));
@@ -201,6 +233,31 @@ async function streamSpeech(text, req, res) {
   res.on?.('close', onDisconnect);
   let lastError;
   try {
+   if (process.env.OPENAI_API_KEY) {
+    let upstream;
+    try { upstream = await requestOpenAISpeech(text, true, controller.signal); }
+    catch (error) { if (controller.signal.aborted) return; upstream = null; lastError = error; }
+    if (upstream?.ok && upstream.body) {
+      res.statusCode = 200;
+      res.setHeader('Content-Type', 'text/event-stream; charset=utf-8');
+      res.setHeader('Cache-Control', 'no-store, no-transform');
+      res.setHeader('X-Content-Type-Options', 'nosniff');
+      for await (const chunk of upstream.body) {
+        if (controller.signal.aborted) return;
+        const data = Buffer.from(chunk).toString('base64');
+        if (data) res.write(`data: ${JSON.stringify({ event_type: 'step.delta', delta: { type: 'audio', data } })}\n\n`);
+      }
+      if (!res.destroyed) res.end();
+      return;
+    }
+    if (upstream && !upstream.ok) {
+      const result = await upstream.json().catch(() => ({}));
+      lastError = new Error('openai_speech_failed');
+      lastError.upstreamStatus = upstream.status;
+      lastError.upstreamCode = result.error?.code || result.error?.type || 'unknown';
+    }
+    throw lastError || new Error('openai_speech_stream_empty');
+   }
    for (const model of SPEECH_MODELS) {
     let upstream;
     try { upstream = await requestSpeech(text, true, model, controller.signal); }
@@ -260,7 +317,12 @@ async function handle(req, res, action) {
     return;
   }
   if (action === 'status') {
-    json(res, 200, { configured: Boolean(process.env.GEMINI_API_KEY), model: MODEL });
+    json(res, 200, {
+      configured: Boolean(process.env.GEMINI_API_KEY),
+      chatProvider: process.env.GEMINI_API_KEY ? 'gemini' : null,
+      voiceProvider: process.env.OPENAI_API_KEY ? 'openai' : process.env.GEMINI_API_KEY ? 'gemini' : null,
+      model: MODEL
+    });
     return;
   }
   if (!process.env.GEMINI_API_KEY) {
@@ -334,7 +396,9 @@ async function handle(req, res, action) {
       return;
     }
 
-    const reply = await callGemini(contents, { maxOutputTokens, ...(action === 'summary' ? { models: [SUMMARY_MODEL, MODEL, 'gemini-3.5-flash'] } : { systemInstruction: chatSystemInstruction }) });
+    const reply = await callGemini(contents, { maxOutputTokens, ...(action === 'summary'
+      ? { models: [SUMMARY_MODEL, MODEL, 'gemini-3.5-flash'] }
+      : { systemInstruction: chatSystemInstruction }) });
     if (!reply) {
       json(res, 502, { error: 'respuesta_vacia', message: 'No pude armar una respuesta ahora. Intentá de nuevo.' });
       return;
@@ -360,11 +424,13 @@ async function handle(req, res, action) {
     if (error.status === 503) {
       json(res, 503, { error: 'asistente_no_configurado', message: 'La IA todavía no está conectada. Podés usar el formulario de contacto.' });
     } else if (error.upstreamStatus === 429) {
-      json(res, 429, { error: 'cuota_gemini_alcanzada', message: 'El asistente alcanzó su límite gratuito por ahora. Probá de nuevo más tarde.' });
+      json(res, 429, action.startsWith('speech')
+        ? { error: 'cuota_voz_alcanzada', message: 'La voz alcanzó su límite temporal. Probá de nuevo más tarde.' }
+        : { error: 'cuota_gemini_alcanzada', message: 'El chat alcanzó su límite temporal. Probá de nuevo más tarde.' });
     } else if (action === 'chat' && (error.message === 'gemini_deadline_exceeded' || ['TIMEOUT', 'UNAVAILABLE'].includes(error.upstreamCode) || [500, 502, 503, 504].includes(error.upstreamStatus))) {
       json(res, 200, { reply: unavailableReply(latestUserText), source: 'fallback' });
     } else {
-      console.error('Gemini assistant error:', error.upstreamStatus || 'unknown', error.upstreamCode || error.message || 'unknown');
+      console.error('Assistant provider error:', error.upstreamStatus || 'unknown', error.upstreamCode || error.message || 'unknown');
       json(res, 502, { error: 'respuesta_no_disponible', message: 'No pude responder ahora. Intentá de nuevo o usá el formulario del taller.', reason: error.upstreamCode || error.message || 'unknown' });
     }
   }
