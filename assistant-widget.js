@@ -26,6 +26,7 @@
   let bookingDismissed = false;
   let handoffHistoryKey = '';
   let handoffSummaryPromise = null;
+  let summaryCard = null;
   let configured = false;
   let statusChecked = false;
   let busy = false;
@@ -296,9 +297,15 @@
     activeSpeechButton = null;
   });
   function bubble(text, role, extra = {}) {
+    const distanceFromBottom = messagesEl.scrollHeight - messagesEl.scrollTop - (messagesEl.clientHeight || 0);
+    const keepFollowing = role === 'user' || !Number.isFinite(distanceFromBottom) || distanceFromBottom < 96;
     const row = document.createElement('div');
     row.className = `assistant-message assistant-message-${role}`;
     if (extra.welcome) {
+      const divider = document.createElement('div');
+      divider.className = 'assistant-conversation-label';
+      divider.textContent = 'Conversemos';
+      messagesEl.append(divider);
       row.classList.add('assistant-message-welcome');
       const kicker = document.createElement('span');
       kicker.className = 'assistant-welcome-kicker';
@@ -317,16 +324,65 @@
       voiceTip.textContent = '⌁  Podés escribir o tocar el micrófono. Al terminar, tocá “Terminar y enviar”.';
       row.append(kicker, heading, description, voiceTip);
       messagesEl.append(row);
-      messagesEl.scrollTop = messagesEl.scrollHeight;
+      if (keepFollowing) messagesEl.scrollTop = messagesEl.scrollHeight;
       return row;
     }
     const copy = document.createElement('p');
     copy.textContent = text;
-    row.append(copy);
+    const time = document.createElement('time');
+    time.className = 'assistant-message-time';
+    time.dateTime = new Date().toISOString();
+    time.textContent = new Intl.DateTimeFormat('es-UY', { hour:'2-digit', minute:'2-digit' }).format(new Date());
+    row.append(copy, time);
     if (extra.pending) row.classList.add('is-pending');
+    if (extra.error) row.classList.add('is-error');
     messagesEl.append(row);
-    messagesEl.scrollTop = messagesEl.scrollHeight;
+    if (keepFollowing) messagesEl.scrollTop = messagesEl.scrollHeight;
     return row;
+  }
+
+  function summaryIcon(kind) {
+    const paths = {
+      vehicle: '<path d="M3 15V9l2-4h14l2 4v6M5 15v3M19 15v3M3 11h18M7 14h.01M17 14h.01"/>',
+      mileage: '<circle cx="12" cy="12" r="8"/><path d="m12 12 4-3M7 8l1 1M17 8l-1 1M12 6V4"/>',
+      service: '<path d="m14 6 4-4 4 4-4 4M14 6 4 16l4 4 10-10"/>'
+    };
+    return `<svg viewBox="0 0 24 24" aria-hidden="true">${paths[kind]}</svg>`;
+  }
+
+  function renderSummaryCard(details) {
+    const fields = [
+      details.vehicle ? { kind:'vehicle', value:[details.vehicle, details.year].filter(Boolean).join(' · ') } : null,
+      details.mileage ? { kind:'mileage', value:details.mileage } : null,
+      details.issue ? { kind:'service', value:details.issue } : null
+    ].filter(Boolean);
+    if (!fields.length) return;
+    const distanceFromBottom = messagesEl.scrollHeight - messagesEl.scrollTop - (messagesEl.clientHeight || 0);
+    const keepFollowing = !Number.isFinite(distanceFromBottom) || distanceFromBottom < 96;
+    summaryCard?.remove();
+    const card = document.createElement('section');
+    card.className = 'assistant-summary-card';
+    card.setAttribute('aria-label', 'Resumen de tu consulta');
+    const head = document.createElement('div');
+    head.className = 'assistant-summary-head';
+    head.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h8l4 4v14H7z"/><path d="M15 3v5h5M10 12h6M10 16h6"/></svg><strong>Resumen de tu consulta</strong>';
+    const list = document.createElement('div');
+    list.className = 'assistant-summary-list';
+    for (const field of fields) {
+      const row = document.createElement('div');
+      row.className = 'assistant-summary-row';
+      const icon = document.createElement('span');
+      icon.className = 'assistant-summary-icon';
+      icon.innerHTML = summaryIcon(field.kind);
+      const value = document.createElement('span');
+      value.textContent = field.value;
+      row.append(icon, value);
+      list.append(row);
+    }
+    card.append(head, list);
+    messagesEl.append(card);
+    summaryCard = card;
+    if (keepFollowing) messagesEl.scrollTop = messagesEl.scrollHeight;
   }
 
   function welcome() {
@@ -337,6 +393,7 @@
     bookingDismissed = false;
     handoffHistoryKey = '';
     handoffSummaryPromise = null;
+    summaryCard = null;
     lastSpokenText = welcomeText;
     const greeting = bubble(welcomeText, 'assistant', { welcome:true });
     if (statusChecked && !configured) bubble('La conexión con la inteligencia artificial todavía no está configurada. El formulario de consulta sigue disponible en la página.', 'assistant');
@@ -353,8 +410,8 @@
       statusEl.textContent = configured ? 'Disponible para conversar' : 'Falta conectar la IA';
       panel.classList.toggle('is-offline', !configured);
       input.disabled = !configured;
-      sendButton.disabled = !configured;
       micButton.disabled = !configured;
+      syncSendState();
       if (!configured) hintEl.textContent = 'El asistente se activa al configurar la conexión privada.';
       const refreshGreeting = !statusChecked || (!wasConfigured && configured && !history.length);
       statusChecked = true;
@@ -366,8 +423,8 @@
       configured = false;
       statusChecked = true;
       input.disabled = true;
-      sendButton.disabled = true;
       micButton.disabled = true;
+      syncSendState();
       if (!history.length) welcome();
     }
   }
@@ -375,9 +432,13 @@
   function setBusy(value) {
     busy = value;
     workingEl.hidden = !value;
-    sendButton.disabled = value || !configured;
     micButton.disabled = value || !configured;
+    syncSendState();
     form.setAttribute('aria-busy', String(value));
+  }
+
+  function syncSendState() {
+    sendButton.disabled = busy || !configured || !input.value.trim();
   }
 
   function saveConversation() {
@@ -419,10 +480,15 @@
     const hasVehicle = /\b(?:Subaru|Toyota|Honda|Hyundai|Volkswagen|VW|BMW|Mercedes|Nissan|Mazda|Suzuki|Mitsubishi|Kia|Chevrolet|Peugeot|Audi|Renault|Ford|Jeep|Fiat|Volvo|Citro[eë]n|Dodge|Ferrari|Porsche|Alfa Romeo|auto|coche|camioneta|veh[ií]culo)\b/i.test(customerText);
     const discussedProblem = issueTurns.some(item => /\b(?:ruido|vibra|luz|humo|frena|freno|arranca|motor|caja|pierde|calienta|golpe|pozo|mantenimiento|service|aceite|pastillas|alineaci[oó]n|filtros|cambio|revisi[oó]n)\b/i.test(item.content));
     if (hasVehicle && discussedProblem && customerTurns.length >= 2 && customerName()) {
+      const details = handoffDetails();
+      renderSummaryCard(details);
       reservationPrompt.hidden = false;
       if (!handoffSummaryPromise) {
         handoffHistoryKey = customerText;
-        handoffSummaryPromise = handoffSummary(handoffDetails().issue);
+        handoffSummaryPromise = handoffSummary(details.issue);
+        handoffSummaryPromise.then(issue => {
+          if (handoffHistoryKey === customerText && issue) renderSummaryCard({ ...handoffDetails(), issue });
+        });
       }
     }
   }
@@ -530,7 +596,7 @@
     } catch (error) {
       pending.remove();
       history.pop();
-      bubble(error.name === 'AbortError' ? 'La respuesta demoró demasiado. Probá de nuevo o escribinos por el formulario.' : error.message || 'No pude responder ahora. Probá de nuevo o escribinos por el formulario.', 'assistant');
+      bubble(error.name === 'AbortError' ? 'La respuesta demoró demasiado. Probá de nuevo o escribinos por el formulario.' : error.message || 'No pude responder ahora. Probá de nuevo o escribinos por el formulario.', 'assistant', { error:true });
     } finally {
       clearTimeout(timeout);
       setBusy(false);
@@ -545,6 +611,7 @@
     bubble(text, 'user');
     input.value = '';
     input.style.height = 'auto';
+    syncSendState();
     requestReply(text);
   }
 
@@ -558,6 +625,7 @@
     input.value = dictatedText();
     input.style.height = 'auto';
     input.style.height = `${Math.min(input.scrollHeight, 112)}px`;
+    syncSendState();
   }
 
   function clearDictationUi() {
@@ -811,9 +879,17 @@
   });
   document.querySelector('#assistant-stop-recording').addEventListener('click', finishDictation);
   document.querySelector('#assistant-mic').addEventListener('click', () => dictating ? finishDictation() : startDictation());
-  document.querySelector('#assistant-privacy-link').addEventListener('click', event => { event.preventDefault(); close(); document.querySelector('#turno').scrollIntoView({ behavior: 'smooth' }); });
+  document.querySelector('#assistant-privacy-link').addEventListener('click', event => {
+    event.preventDefault();
+    const button = event.currentTarget || document.querySelector('#assistant-privacy-link');
+    const details = document.querySelector('#assistant-privacy-details');
+    const expanded = button.getAttribute?.('aria-expanded') === 'true';
+    button.setAttribute('aria-expanded', String(!expanded));
+    button.textContent = expanded ? 'Ver detalles' : 'Ocultar detalles';
+    details.hidden = expanded;
+  });
   form.addEventListener('submit', event => { event.preventDefault(); if (dictating) finishDictation(); else sendText(input.value); });
-  input.addEventListener('input', () => { input.style.height = 'auto'; input.style.height = `${Math.min(input.scrollHeight, 112)}px`; });
+  input.addEventListener('input', () => { input.style.height = 'auto'; input.style.height = `${Math.min(input.scrollHeight, 112)}px`; syncSendState(); });
   input.addEventListener('keydown', event => { if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); form.requestSubmit(); } });
   document.addEventListener('keydown', event => { if (event.key === 'Escape' && !panel.hidden) close(); });
   window.visualViewport?.addEventListener('resize', syncViewport);
@@ -847,6 +923,7 @@
   });
 
   welcome();
+  syncSendState();
   restoreConversation();
   if (new URLSearchParams(location.search).get('asistente') === '1') open();
 })();

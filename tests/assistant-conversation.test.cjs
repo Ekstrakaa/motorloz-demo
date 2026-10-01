@@ -140,6 +140,11 @@ test('the first greeting and successive replies speak in the same voice flow wit
   assert.equal(get('#assistant-reservation-prompt').hidden, true, 'symptom details alone do not push the customer toward WhatsApp');
   await send('Prepará la consulta para WhatsApp');
   assert.equal(get('#assistant-reservation-prompt').hidden, false, 'the WhatsApp option appears when the customer asks for it');
+  const summaryCards = get('#assistant-messages').children.filter(item => item.className === 'assistant-summary-card');
+  assert.ok(summaryCards.length, 'the conversation renders a real-data consultation summary before WhatsApp');
+  const summaryValues = summaryCards.at(-1).children[1].children.map(row => row.children[1].textContent);
+  assert.ok(summaryValues.some(value => /Subaru/.test(value)), 'the summary includes the discussed vehicle');
+  assert.ok(summaryValues.some(value => /200\.000 km/.test(value)), 'the summary includes the discussed mileage');
 
   await get('#assistant-reserve-start').listeners.click();
   const draft = new URL(popup.location.href).searchParams.get('text');
