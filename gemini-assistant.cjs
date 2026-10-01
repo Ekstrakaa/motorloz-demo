@@ -1,6 +1,6 @@
 const MODEL = process.env.GEMINI_CHAT_MODEL || 'gemini-3.5-flash-lite';
-const SPEECH_MODEL = process.env.GEMINI_SPEECH_MODEL || 'gemini-3.8-flash-lite-tts';
-const SPEECH_FALLBACK_MODEL = process.env.GEMINI_SPEECH_FALLBACK_MODEL || 'gemini-3.8-flash-tts';
+const SPEECH_MODEL = process.env.GEMINI_SPEECH_MODEL || 'gemini-3.8-flash-tts';
+const SPEECH_FALLBACK_MODEL = process.env.GEMINI_SPEECH_FALLBACK_MODEL || 'gemini-3.8-flash-lite-tts';
 const SPEECH_MODELS = [...new Set([SPEECH_MODEL, SPEECH_FALLBACK_MODEL])];
 const SPEECH_VOICE = 'Algieba';
 const SUMMARY_MODEL = process.env.GEMINI_SUMMARY_MODEL || 'gemini-3.5-flash-lite';

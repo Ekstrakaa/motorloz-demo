@@ -57,7 +57,7 @@ test('serves the fixed Gemini voice as WAV audio', async () => {
     assert.equal(res.headers['Content-Type'], 'audio/wav');
     assert.equal(Buffer.compare(res.body, wav), 0);
     assert.equal(request.generation_config.speech_config[0].voice, 'Algieba');
-    assert.equal(request.model, 'gemini-3.8-flash-lite-tts');
+    assert.equal(request.model, 'gemini-3.8-flash-tts');
     assert.equal(request.input[0].content[0].text, 'Hola, soy Motor Los, Pablo Lozano.');
     assert.match(request.input[0].content[0].annotations[0].style, /nunca Motorola/);
   } finally {
@@ -119,7 +119,7 @@ test('keeps the one voice while trying both Gemini TTS models at quota', async (
     const res = response();
     await handle({ method: 'POST', body: { text: 'Hola' }, headers: {}, socket: {} }, res, 'speech-stream');
     assert.equal(res.statusCode, 429);
-    assert.deepEqual(requests.map(request => request.model), ['gemini-3.8-flash-lite-tts', 'gemini-3.8-flash-tts']);
+    assert.deepEqual(requests.map(request => request.model), ['gemini-3.8-flash-tts', 'gemini-3.8-flash-lite-tts']);
     assert.deepEqual(requests.map(request => request.generation_config.speech_config[0].voice), ['Algieba', 'Algieba']);
   } finally { global.fetch = previousFetch; }
 });
