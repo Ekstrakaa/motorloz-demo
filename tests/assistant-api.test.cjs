@@ -128,11 +128,10 @@ test('uses the fixed OpenAI voice only for narration', async () => {
     assert.equal(res.statusCode, 200);
     assert.equal(requestedUrl, 'https://api.openai.com/v1/audio/speech');
     assert.equal(request.model, 'gpt-4o-mini-tts');
-    assert.equal(request.voice, 'onyx');
+    assert.equal(request.voice, 'cedar');
     assert.equal(request.response_format, 'pcm');
     assert.equal(request.input, 'Hola, soy Motor Los.');
-    assert.match(request.instructions, /interpretalo como una conversación real/);
-    assert.match(request.instructions, /pausas breves/);
+    assert.match(request.instructions, /voz masculina adulta/);
     assert.match(Buffer.concat(res.chunks).toString(), new RegExp(pcm.toString('base64')));
   } finally {
     delete process.env.OPENAI_API_KEY;
