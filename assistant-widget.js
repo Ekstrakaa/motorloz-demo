@@ -266,7 +266,7 @@
     muteButton.classList.add('is-speaking');
   }
 
-  async function speakReply(text, button = null, retryCount = 0) {
+  async function speakReply(text, button = null, retryCount = 0, preferDevice = false) {
     if (!configured || muted || !text) return;
     stopSpeech();
     unlockAudio();
@@ -276,6 +276,7 @@
     muteButton.classList.add('is-loading');
     let retryScheduled = false;
     try {
+      if (preferDevice && speakWithDeviceVoice(text, request)) return;
       if (audioContext) {
         try {
           if (audioContext.state !== 'running') await Promise.race([
@@ -623,7 +624,7 @@
       saveConversation();
       bubble(replyText, 'assistant');
       lastSpokenText = replyText;
-      speakReply(replyText);
+      speakReply(replyText, null, 0, result.source === 'instant');
       maybeShowBooking();
     } catch (error) {
       pending.remove();
