@@ -106,12 +106,12 @@ test('stops generating voice when the visitor interrupts playback', async () => 
   } finally { global.fetch = previousFetch; }
 });
 
-test('keeps the one voice and model when speech reaches its quota', async () => {
+test('keeps the one voice while trying both Gemini TTS models at quota', async () => {
   process.env.GEMINI_API_KEY = 'test-key';
   const previousFetch = global.fetch;
-  const urls = [];
+  const requests = [];
   global.fetch = async (url, options) => {
-    urls.push(JSON.parse(options.body).model);
+    requests.push(JSON.parse(options.body));
     const event = 'event: error\ndata: {"event_type":"error","error":{"code":"rate_limit_exceeded"}}\n\n';
     return { ok: true, body: ReadableStream.from([Buffer.from(event)]) };
   };
@@ -119,7 +119,8 @@ test('keeps the one voice and model when speech reaches its quota', async () => 
     const res = response();
     await handle({ method: 'POST', body: { text: 'Hola' }, headers: {}, socket: {} }, res, 'speech-stream');
     assert.equal(res.statusCode, 429);
-    assert.deepEqual(urls, ['gemini-3.8-flash-lite-tts']);
+    assert.deepEqual(requests.map(request => request.model), ['gemini-3.8-flash-lite-tts', 'gemini-3.8-flash-tts']);
+    assert.deepEqual(requests.map(request => request.generation_config.speech_config[0].voice), ['Algieba', 'Algieba']);
   } finally { global.fetch = previousFetch; }
 });
 

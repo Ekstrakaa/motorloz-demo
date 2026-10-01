@@ -130,7 +130,7 @@
     let received = false;
     let oddByte = null;
     let pending = '';
-    const firstAudioTimeout = setTimeout(() => { if (!received) controller.abort(); }, 9500);
+    const firstAudioTimeout = setTimeout(() => { if (!received) controller.abort(); }, 5500);
     const handleBlock = block => {
       const data = block.split(/\r?\n/).filter(line => line.startsWith('data:')).map(line => line.slice(5).trimStart()).join('\n');
       if (!data || data === '[DONE]') return;
@@ -268,13 +268,13 @@
       muteButton.classList.remove('is-speaking');
       if (error.status === 429 && error.reason === 'limite_temporal') {
         statusEl.textContent = 'Límite de voz del sitio alcanzado · intentá más tarde';
-      } else if (error.status === 429 && retryCount < 3 && !muted && !panel.hidden) {
+      } else if (error.status === 429 && retryCount < 1 && !muted && !panel.hidden) {
         statusEl.textContent = 'Voz ocupada · reintentando';
         retryScheduled = true;
         speechRetryTimer = setTimeout(() => {
           speechRetryTimer = null;
           if (request === voiceRequest && !muted && !panel.hidden) speakReply(text, button, retryCount + 1);
-        }, [2500, 7000, 15000][retryCount]);
+        }, 1200);
       } else if (error.status === 429) {
         statusEl.textContent = 'Proveedor de voz sin cupo · intentá más tarde';
       } else if (retryCount < 2 && !muted && !panel.hidden) {
