@@ -460,33 +460,28 @@
     } catch {}
   }
 
-  function maybeShowBooking() {
+  function maybeShowBooking(force = false) {
     if (bookingDismissed) {
       if (!/\b(?:turno|reservar|agendar|coordinar)\b/i.test(history.at(-2)?.content || '')) return;
       bookingDismissed = false;
     }
     const customerTurns = history.filter(item => item.role === 'user');
     const latestUser = customerTurns.at(-1)?.content?.trim() || '';
+    const customerText = customerTurns.map(item => item.content).join(' ');
     const earlierAssistant = history.slice(0, -1).filter(item => item.role === 'assistant').at(-1)?.content || '';
-    const explicitHandoff = /\b(?:quiero|necesito|pod[eé]s|podemos|me gustar[ií]a|hagamos|haceme)\b.{0,60}\b(?:turno|reserv\w*|agend\w*|coordin\w*|consult\w*|whatsapp)\b/i.test(latestUser)
-      || /(?:abrir|abr[ií]|preparar|prepar[aá]|mandar|mand[aá]|enviar|envi[aá]|pasemos)\s.{0,45}\b(?:whatsapp|consulta|solicitud|turno)\b/i.test(latestUser)
-      || /\b(?:reservame|agendame)\b/i.test(latestUser);
+    const explicitHandoff = /\b(?:quiero|necesito|pod[eé]s|podemos|me gustar[ií]a|hagamos|haceme)\b.{0,60}\b(?:turno|reserv\w*|agend\w*|coordin\w*|consult\w*|whatsapp)\b/i.test(customerText)
+      || /(?:abrir|abr[ií]|preparar|prepar[aá]|mandar|mand[aá]|enviar|envi[aá]|pasemos)\s.{0,45}\b(?:whatsapp|consulta|solicitud|turno)\b/i.test(customerText)
+      || /\b(?:reservame|agendame)\b/i.test(customerText);
     const acceptedOffer = /^(?:s[ií]|dale|ok|perfecto|hacelo|preparalo|vamos)(?:[.!\s]|$)/i.test(latestUser)
       && /(?:whatsapp|preparar (?:la |una )?consulta|coordinar)/i.test(earlierAssistant);
     const latestAssistant = history.filter(item => item.role === 'assistant').at(-1)?.content || '';
     const assistantOfferedHandoff = /(?:quer[eé]s|pod[eé]s).{0,55}(?:revisar|preparar|abrir).{0,45}(?:consulta|whatsapp)/i.test(latestAssistant);
-    if (!explicitHandoff && !acceptedOffer && !assistantOfferedHandoff) return;
-    const issueTurns = customerTurns.filter(item => {
-      const words = item.content.trim();
-      return words.length >= 22 && !/^(?:hola|buen(?:os|as)|me llamo|mi nombre es)\b/i.test(words) && !/^(?:(?:quiero|necesito) (?:(?:un )?turno|(?:reservar|agendar|coordinar)(?: (?:un )?turno)?)|reservame|agendame)[.!?\s]*$/i.test(words);
-    });
-    const customerText = customerTurns.map(item => item.content).join(' ');
-    const hasVehicle = /\b(?:Subaru|Toyota|Honda|Hyundai|Volkswagen|VW|BMW|Mercedes|Nissan|Mazda|Suzuki|Mitsubishi|Kia|Chevrolet|Peugeot|Audi|Renault|Ford|Jeep|Fiat|Volvo|Citro[eë]n|Dodge|Ferrari|Porsche|Alfa Romeo|auto|coche|camioneta|veh[ií]culo)\b/i.test(customerText);
-    const discussedProblem = issueTurns.some(item => /\b(?:ruido|vibra|luz|humo|frena|freno|arranca|motor|caja|pierde|calienta|golpe|pozo|mantenimiento|service|aceite|pastillas|alineaci[oó]n|filtros|cambio|revisi[oó]n)\b/i.test(item.content));
+    if (!force && !explicitHandoff && !acceptedOffer && !assistantOfferedHandoff) return;
     const details = handoffDetails();
-    if (hasVehicle && discussedProblem && customerTurns.length >= 2 && details.name && details.mileage && details.urgency) {
+    if (details.name && details.vehicle && details.mileage && details.issue && details.urgency) {
       renderSummaryCard(details);
       reservationPrompt.hidden = false;
+      reservationPrompt.removeAttribute('aria-hidden');
       if (!handoffSummaryPromise) {
         handoffHistoryKey = customerText;
         handoffSummaryPromise = handoffSummary(details.issue);
@@ -611,7 +606,7 @@
       bubble(replyText, 'assistant');
       lastSpokenText = replyText;
       speakReply(replyText);
-      maybeShowBooking();
+      maybeShowBooking(Boolean(result.handoffReady));
     } catch (error) {
       pending.remove();
       history.pop();

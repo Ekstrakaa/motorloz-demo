@@ -140,7 +140,7 @@ test('the first greeting and successive replies speak in the same voice flow wit
   await send('Desde que pasé un pozo vibra la caja y se enciende la luz del motor al acelerar');
   assert.equal(get('#assistant-reservation-prompt').hidden, true, 'symptom details alone do not push the customer toward WhatsApp');
   await send('Puede esperar una fecha, no es urgente');
-  assert.equal(get('#assistant-reservation-prompt').hidden, true, 'priority alone does not open WhatsApp before the customer asks to coordinate');
+  assert.equal(get('#assistant-reservation-prompt').hidden, false, 'the WhatsApp option appears as soon as the last missing detail arrives after a turn request');
   await send('Prepará la consulta para WhatsApp');
   assert.equal(get('#assistant-reservation-prompt').hidden, false, 'the WhatsApp option appears when the customer asks for it');
   const summaryCards = get('#assistant-messages').children.filter(item => item.className === 'assistant-summary-card');

@@ -297,6 +297,7 @@ async function handle(req, res, action) {
     const history = cleanHistory(body.messages);
     let contents;
     let chatSystemInstruction = '';
+    let chatMissingFields = [];
     let maxOutputTokens = action === 'summary' ? 512 : 768;
 
     if (action === 'summary') {
@@ -323,6 +324,7 @@ async function handle(req, res, action) {
       const intake = body.intake && typeof body.intake === 'object' ? body.intake : {};
       const required = ['name', 'vehicle', 'mileage', 'issue', 'urgency'];
       const missing = required.filter(field => intake[field] !== true);
+      chatMissingFields = missing;
       const interfaceState = missing.length
         ? ` Estado real de la interfaz: todavía faltan ${missing.join(', ')}. No digas que el botón de WhatsApp apareció ni que está debajo del chat. Si la persona quiere coordinar, pedí de forma natural solo el dato faltante más útil.`
         : ' Estado real de la interfaz: los datos necesarios están completos. Si la persona quiere coordinar o aceptó hacerlo, podés preguntarle si quiere revisar la consulta en WhatsApp; el botón se mostrará con tu respuesta.';
@@ -338,7 +340,22 @@ async function handle(req, res, action) {
       return;
     }
     if (action === 'summary') json(res, 200, { summary: reply.slice(0, 550) });
-    else json(res, 200, { reply: withoutRepeatedGreeting(reply) });
+    else {
+      let safeReply = withoutRepeatedGreeting(reply);
+      const claimsWhatsAppControl = /(?:abrir|bot[oó]n|debajo|toc[aá]|revisar|preparar).{0,90}whatsapp|whatsapp.{0,90}(?:abrir|bot[oó]n|debajo|toc[aá]|revisar|preparar)/i.test(safeReply);
+      if (chatMissingFields.length && claimsWhatsAppControl) {
+        const missingQuestion = {
+          name: 'Antes de preparar la consulta, ¿cómo te llamás?',
+          vehicle: 'Antes de preparar la consulta, ¿qué marca y modelo es tu vehículo?',
+          mileage: 'Antes de preparar la consulta, ¿qué kilometraje aproximado tiene? Si no lo sabés, decímelo.',
+          issue: 'Antes de preparar la consulta, contame brevemente qué necesitás revisar o qué notaste en el auto.',
+          urgency: 'Antes de preparar la consulta, decime una cosa: ¿necesitás atención urgente o puede esperar una fecha coordinada?'
+        };
+        safeReply = missingQuestion[chatMissingFields[0]];
+      }
+      const handoffReady = chatMissingFields.length === 0 && /whatsapp/i.test(safeReply);
+      json(res, 200, { reply: safeReply, handoffReady });
+    }
   } catch (error) {
     if (error.status === 503) {
       json(res, 503, { error: 'asistente_no_configurado', message: 'La IA todavía no está conectada. Podés usar el formulario de contacto.' });

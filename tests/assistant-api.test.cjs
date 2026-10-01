@@ -70,6 +70,26 @@ test('answers a generic breakdown immediately and asks one useful question', asy
   } finally { global.fetch = previousFetch; }
 });
 
+test('never claims the WhatsApp control is visible while required intake data is missing', async () => {
+  process.env.GEMINI_API_KEY = 'test-key';
+  const previousFetch = global.fetch;
+  global.fetch = async () => ({
+    ok: true,
+    json: async () => ({ candidates: [{ finishReason:'STOP', content:{ parts:[{ text:'Podés tocar “Abrir WhatsApp” debajo del chat.' }] } }] })
+  });
+  try {
+    const res = response();
+    await handle({ method:'POST', body:{
+      messages:[{ role:'user', content:'Quiero coordinar para mi Subaru Impreza de 200 mil kilómetros.' }],
+      intake:{ name:true, vehicle:true, mileage:true, issue:true, urgency:false }
+    }, headers:{}, socket:{} }, res, 'chat');
+    const body = JSON.parse(res.body);
+    assert.equal(body.handoffReady, false);
+    assert.doesNotMatch(body.reply, /debajo del chat|Abrir WhatsApp/i);
+    assert.match(body.reply, /urgente|fecha coordinada/i);
+  } finally { global.fetch = previousFetch; }
+});
+
 test('serves the fixed Gemini voice as WAV audio', async () => {
   process.env.GEMINI_API_KEY = 'test-key';
   const previousFetch = global.fetch;
