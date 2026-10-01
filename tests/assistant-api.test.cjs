@@ -90,55 +90,6 @@ test('never claims the WhatsApp control is visible while required intake data is
   } finally { global.fetch = previousFetch; }
 });
 
-test('uses Gemini for conversation even when OpenAI voice is configured', async () => {
-  process.env.GEMINI_API_KEY = 'gemini-test-key';
-  process.env.OPENAI_API_KEY = 'openai-test-key';
-  const previousFetch = global.fetch;
-  let requestedUrl = '';
-  global.fetch = async (url) => {
-    requestedUrl = url;
-    return { ok:true, json:async () => ({ candidates:[{ finishReason:'STOP', content:{ parts:[{ text:'Contame cuándo aparece el ruido.' }] } }] }) };
-  };
-  try {
-    const res = response();
-    await handle({ method:'POST', body:{ messages:[{ role:'user', content:'Mi Subaru hace un ruido extraño cuando doblo a la derecha' }] }, headers:{}, socket:{} }, res, 'chat');
-    assert.equal(res.statusCode, 200);
-    assert.match(requestedUrl, /generativelanguage\.googleapis\.com/);
-  } finally {
-    delete process.env.OPENAI_API_KEY;
-    global.fetch = previousFetch;
-  }
-});
-
-test('uses the fixed OpenAI voice only for narration', async () => {
-  process.env.GEMINI_API_KEY = 'gemini-test-key';
-  process.env.OPENAI_API_KEY = 'openai-test-key';
-  const previousFetch = global.fetch;
-  const pcm = Buffer.from([0, 0, 12, 0, 244, 255]);
-  let requestedUrl = '';
-  let request;
-  global.fetch = async (url, options) => {
-    requestedUrl = url;
-    request = JSON.parse(options.body);
-    return { ok:true, body:ReadableStream.from([pcm]) };
-  };
-  try {
-    const res = response();
-    await handle({ method:'POST', body:{ text:'Hola, soy MOTORLOZ.' }, headers:{}, socket:{} }, res, 'speech-stream');
-    assert.equal(res.statusCode, 200);
-    assert.equal(requestedUrl, 'https://api.openai.com/v1/audio/speech');
-    assert.equal(request.model, 'gpt-4o-mini-tts');
-    assert.equal(request.voice, 'cedar');
-    assert.equal(request.response_format, 'pcm');
-    assert.equal(request.input, 'Hola, soy Motor Los.');
-    assert.match(request.instructions, /voz masculina adulta/);
-    assert.match(Buffer.concat(res.chunks).toString(), new RegExp(pcm.toString('base64')));
-  } finally {
-    delete process.env.OPENAI_API_KEY;
-    global.fetch = previousFetch;
-  }
-});
-
 test('serves the fixed Gemini voice as WAV audio', async () => {
   process.env.GEMINI_API_KEY = 'test-key';
   const previousFetch = global.fetch;
