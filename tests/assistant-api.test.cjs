@@ -80,6 +80,25 @@ test('consultation alone never creates a handoff, even when all data is known',a
   assert.equal(body.handoffReady,false);
 });
 
+test('known mileage is never requested again when the provider tries to reconfirm it',async()=>{
+  const {body,request}=await chat([{role:'user',content:'Me llamo Manuel, Subaru Impreza de 200 mil km, ruido al acelerar desde ayer, puede esperar. Quiero llevarlo.'}],{
+    facts:facts({name:'Manuel',vehicle:'Subaru Impreza',mileage:'200 mil',issue:'Golpeteo',circumstances:'Al acelerar desde ayer',urgency:'Puede esperar'}),
+    offerWhatsApp:true,reply:'Perfecto, Manuel. Para preparar todo bien, me confirmás porfa el año de tu Subaru Impreza y los kilómetros aproximados? Así tenemos todo listo para cuando quieras traerlo.'
+  });
+  assert.deepEqual(Object.keys(request.text.format.schema.properties),['facts','offerWhatsApp','reply']);
+  assert.equal(body.handoffReady,true);
+  assert.doesNotMatch(body.reply,/confirmás|kilómetros aproximados/);
+  assert.match(body.reply,/botón de WhatsApp/);
+});
+
+test('the condition and start already answered cannot be requested a second time',async()=>{
+  const {body}=await chat([{role:'assistant',content:'¿En qué situación lo notás?'},{role:'user',content:'Al acelerar, empezó ayer.'}],{
+    facts:facts({vehicle:'Subaru Impreza',issue:'Golpeteo al acelerar',circumstances:'Desde ayer'}),offerWhatsApp:false,
+    reply:'Lo anoté. ¿En qué situación lo notás? ¿Desde cuándo empezó?'
+  });
+  assert.equal(body.reply,'Lo anoté.');
+});
+
 test('serves the selected Cedar voice without requiring Gemini for narration', async () => {
   process.env.OPENAI_API_KEY = 'test-key';
   const geminiKey = process.env.GEMINI_API_KEY;
