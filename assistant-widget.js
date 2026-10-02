@@ -458,9 +458,10 @@
       statusEl.removeAttribute('title');
       panel.classList.toggle('is-offline', !configured);
       input.disabled = !configured;
-      micButton.disabled = !configured;
+      // Dictation can still work when the chat API is offline; the transcript stays as a draft.
+      micButton.disabled = busy;
       syncSendState();
-      if (!configured) hintEl.textContent = 'El asistente se activa al configurar la conexión privada.';
+      if (!configured) hintEl.textContent = 'El dictado puede dejar el texto listo; el chat requiere conexión.';
       const refreshGreeting = !statusChecked || (!wasConfigured && configured && !history.length);
       statusChecked = true;
       if (refreshGreeting && !history.length) {
@@ -472,7 +473,7 @@
       configured = false;
       statusChecked = true;
       input.disabled = true;
-      micButton.disabled = true;
+      micButton.disabled = busy;
       syncSendState();
       if (!history.length) welcome();
     }
@@ -481,7 +482,7 @@
   function setBusy(value) {
     busy = value;
     workingEl.hidden = !value;
-    micButton.disabled = value || !configured;
+    micButton.disabled = value;
     syncSendState();
     form.setAttribute('aria-busy', String(value));
   }
@@ -762,7 +763,13 @@
     dictationSegments = [];
     recognitionFinal = '';
     recognitionInterim = '';
-    if (text) sendText(text);
+    if (text && configured) sendText(text);
+    else if (text) {
+      input.value = text;
+      input.style.height = 'auto';
+      input.style.height = `${Math.min(input.scrollHeight, 112)}px`;
+      hintEl.textContent = 'Dictado listo. El chat está sin conexión y el texto quedó en el campo.';
+    }
     else { input.value = ''; hintEl.textContent = 'No se detectó voz. Probá otra vez o escribí tu consulta.'; }
   }
 
