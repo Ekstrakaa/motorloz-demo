@@ -47,7 +47,7 @@
     },
     {
       type: 'image',
-      src: 'assets/hero-subaru-azul.webp',
+      src: 'assets/hero-subaru-azul.webp?v=privacy1',
       focus: '50% 52%',
       zoomStart: 1.015,
       zoomEnd: 1.055,

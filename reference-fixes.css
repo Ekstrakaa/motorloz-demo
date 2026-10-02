@@ -9,7 +9,7 @@
 .hero-counter{display:flex;align-items:center;gap:9px;color:#59686b;font:9px var(--mono)}
 .hero-counter i{width:18px;height:1px;background:#31b8c8}
 .hero-counter>span{font-size:8px}
-.hero-cinema:after{background-image:url('assets/hero-subaru-azul.webp')}
+.hero-cinema:after{background-image:url('assets/hero-subaru-azul.webp?v=privacy1')}
 .hero-cinema:before{background-image:url('assets/mecanica-subaru-optimized.webp')}
 .diagnostic-story-image{display:none}
 
