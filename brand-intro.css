@@ -15,7 +15,7 @@ html.brand-intro-active { scrollbar-color:#070d10 #070d10; }
 }
 .brand-intro-atmosphere::after {
   content:"";position:absolute;inset:0;
-  background:radial-gradient(ellipse at 50% 48%,rgba(5,11,13,.32) 0%,rgba(5,11,13,.2) 30%,transparent 66%),
+  background:radial-gradient(ellipse at 50% 48%,rgba(5,11,13,.38) 0%,rgba(5,11,13,.24) 30%,transparent 66%),
     radial-gradient(ellipse at 50% 44%,rgba(45,165,180,.1),transparent 60%);
 }
 .brand-intro-studio { position:relative;width:min(680px,85vw); }
