@@ -129,6 +129,8 @@
   padding: 8px 0 !important;
   text-align: left !important;
 }
+.hyundai-signature .hyundai-copy::before,
+.hyundai-signature .hyundai-copy::after { display: none !important; content: none !important; }
 .hyundai-signature .hyundai-copy>.eyebrow {
   display: block !important;
   margin: 0 0 16px !important;
