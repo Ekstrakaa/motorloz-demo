@@ -1,3 +1,3 @@
-const assistant = require('../../gemini-assistant.cjs');
+const assistant = require('../../openai-assistant.cjs');
 
 module.exports = (req, res) => assistant.handle(req, res, 'summary');

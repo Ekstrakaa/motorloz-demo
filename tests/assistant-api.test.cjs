@@ -1,7 +1,7 @@
 const assert = require('node:assert/strict');
 const test = require('node:test');
 const { EventEmitter } = require('node:events');
-const { handle } = require('../gemini-assistant.cjs');
+const { handle } = require('../openai-assistant.cjs');
 
 function response() {
   return {
@@ -13,81 +13,71 @@ function response() {
   };
 }
 
-test('retries a token-truncated Gemini response and returns the complete reply', async () => {
-  process.env.GEMINI_API_KEY = 'test-key';
-  const previousFetch = global.fetch;
-  const requests = [];
-  global.fetch = async (_url, options) => {
-    requests.push(JSON.parse(options.body));
-    return {
-      ok: true,
-      json: async () => requests.length === 1
-        ? { candidates: [{ finishReason: 'MAX_TOKENS', content: { parts: [{ text: 'Hola, entiendo que' }] } }] }
-        : { candidates: [{ finishReason: 'STOP', content: { parts: [{ text: '¡Hola! Revisemos ese ruido al frenar con el taller.' }] } }] }
-    };
+
+const facts = overrides => ({name:'',vehicle:'',year:'',mileage:'',issue:'',circumstances:'',urgency:'',...overrides});
+const output = answer => ({status:'completed',output:[{type:'message',content:[{type:'output_text',text:typeof answer === 'string' ? answer : JSON.stringify(answer)}]}]});
+async function chat(messages, answer, intake) {
+  process.env.OPENAI_API_KEY = 'test-key';
+  const old = global.fetch;
+  let request;
+  global.fetch = async (url, options) => {
+    assert.equal(url, 'https://api.openai.com/v1/responses');
+    request = JSON.parse(options.body);
+    return {ok:true,json:async()=>output(answer)};
   };
   try {
     const res = response();
-    await handle({ method: 'POST', body: { messages: [{ role: 'user', content: 'Ruido al frenar' }] }, headers: {}, socket: {} }, res, 'chat');
-    assert.equal(res.statusCode, 200);
-    assert.equal(JSON.parse(res.body).reply, 'Revisemos ese ruido al frenar con el taller.');
-    assert.equal(requests.length, 2);
-    assert.equal(requests[0].generationConfig.thinkingConfig.thinkingLevel, 'minimal');
-    assert.ok(requests[0].generationConfig.maxOutputTokens > 260);
-    assert.match(requests[0].systemInstruction.parts[0].text, /No ofrezcas WhatsApp por haber reunido datos/);
-    assert.match(requests[0].systemInstruction.parts[0].text, /Si describe un golpeteo o ruido/);
-    assert.match(requests[0].systemInstruction.parts[0].text, /todavía faltan name, vehicle, mileage, issue, urgency/);
-    assert.match(requests[0].systemInstruction.parts[0].text, /No digas que el botón de WhatsApp apareció/);
-  } finally {
-    global.fetch = previousFetch;
-  }
+    await handle({method:'POST',body:{messages,intake},headers:{'x-forwarded-for':Math.random().toString()},socket:{}},res,'chat');
+    assert.equal(res.statusCode,200);
+    return {body:JSON.parse(res.body),request};
+  } finally {global.fetch=old;delete process.env.OPENAI_API_KEY;}
+}
+
+test('OpenAI receives real user and assistant turns, including the answer to its last question', async()=>{
+  const messages = [
+    {role:'user',content:'Tengo un Subaru Impreza y escucho un golpeteo.'},
+    {role:'assistant',content:'¿En qué situación lo escuchás?'},
+    {role:'user',content:'Al acelerar.'}
+  ];
+  const {body,request}=await chat(messages,{reply:'Puede venir de varias zonas. ¿Desde cuándo empezó?',offerWhatsApp:false,facts:facts({vehicle:'Subaru Impreza',issue:'Golpeteo',circumstances:'Al acelerar'})});
+  assert.deepEqual(request.input,messages);
+  assert.match(request.instructions,/no vuelvas a preguntar lo mismo/);
+  assert.match(request.instructions,/200 mil/);
+  assert.equal(request.store,false);
+  assert.equal(request.model,'gpt-4.1-mini');
+  assert.equal(request.text.format.strict,true);
+  assert.equal(body.source,'openai');
+  assert.equal(body.facts.circumstances,'Al acelerar');
+  assert.doesNotMatch(body.reply,/en qué situación/i);
 });
 
-test('answers a simple first vehicle message immediately without waiting for Gemini', async () => {
-  process.env.GEMINI_API_KEY = 'test-key';
-  const previousFetch = global.fetch;
-  let upstreamCalls = 0;
-  global.fetch = async () => { upstreamCalls += 1; throw new Error('Gemini should not be called'); };
-  try {
-    const res = response();
-    await handle({ method:'POST', body:{ messages:[{ role:'user', content:'Tengo un Subaru Impreza' }] }, headers:{}, socket:{} }, res, 'chat');
-    assert.equal(res.statusCode, 200);
-    assert.equal(upstreamCalls, 0);
-    assert.equal(JSON.parse(res.body).source, 'instant');
-    assert.match(JSON.parse(res.body).reply, /Subaru Impreza/);
-  } finally { global.fetch = previousFetch; }
+test('first messages use OpenAI too, without generic hardcoded questions',async()=>{
+  const {request,body}=await chat([{role:'user',content:'No arranca mi Subaru Impreza.'}],{reply:'Entiendo. ¿El motor gira cuando intentás arrancar?',offerWhatsApp:false,facts:facts({vehicle:'Subaru Impreza',issue:'No arranca'})});
+  assert.equal(request.input[0].content,'No arranca mi Subaru Impreza.');
+  assert.doesNotMatch(body.reply,/qué notaste exactamente/i);
 });
 
-test('answers a generic breakdown immediately and asks one useful question', async () => {
-  process.env.GEMINI_API_KEY = 'test-key';
-  const previousFetch = global.fetch;
-  global.fetch = async () => { throw new Error('Gemini should not be called'); };
-  try {
-    const res = response();
-    await handle({ method:'POST', body:{ messages:[{ role:'user', content:'Se me rompió el auto' }] }, headers:{}, socket:{} }, res, 'chat');
-    assert.equal(res.statusCode, 200);
-    assert.match(JSON.parse(res.body).reply, /¿Qué notaste exactamente/);
-  } finally { global.fetch = previousFetch; }
+test('short answers supply the intake used by the real WhatsApp control',async()=>{
+  const messages=[{role:'user',content:'Quiero llevar mi Subaru Impreza por un ruido al acelerar.'},
+    {role:'assistant',content:'¿Qué kilometraje tiene?'},{role:'user',content:'200 mil'},
+    {role:'assistant',content:'¿Cómo te llamás?'},{role:'user',content:'Manuel Leone'},
+    {role:'assistant',content:'¿Puede esperar una fecha?'},{role:'user',content:'Sí, puede esperar.'}];
+  const {body}=await chat(messages,{reply:'Perfecto, Manuel. Podés revisar la solicitud en WhatsApp.',offerWhatsApp:true,facts:facts({name:'Manuel Leone',vehicle:'Subaru Impreza',mileage:'200.000 km aprox.',issue:'Ruido al acelerar',circumstances:'Al acelerar',urgency:'Puede esperar una fecha coordinada'})});
+  assert.equal(body.handoffReady,true);
+  assert.equal(body.facts.name,'Manuel Leone');
+  assert.equal(body.facts.mileage,'200.000 km aprox.');
 });
 
-test('never claims the WhatsApp control is visible while required intake data is missing', async () => {
-  process.env.GEMINI_API_KEY = 'test-key';
-  const previousFetch = global.fetch;
-  global.fetch = async () => ({
-    ok: true,
-    json: async () => ({ candidates: [{ finishReason:'STOP', content:{ parts:[{ text:'Podés tocar “Abrir WhatsApp” debajo del chat.' }] } }] })
-  });
-  try {
-    const res = response();
-    await handle({ method:'POST', body:{
-      messages:[{ role:'user', content:'Quiero coordinar para mi Subaru Impreza de 200 mil kilómetros.' }],
-      intake:{ name:true, vehicle:true, mileage:true, issue:true, urgency:false }
-    }, headers:{}, socket:{} }, res, 'chat');
-    const body = JSON.parse(res.body);
-    assert.equal(body.handoffReady, false);
-    assert.doesNotMatch(body.reply, /debajo del chat|Abrir WhatsApp/i);
-    assert.match(body.reply, /urgente|fecha coordinada/i);
-  } finally { global.fetch = previousFetch; }
+test('missing data cannot be bypassed by frontend booleans or a premature model offer',async()=>{
+  const {body}=await chat([{role:'user',content:'Quiero un turno para mi Subaru.'}],{reply:'Podés tocar el botón de WhatsApp.',offerWhatsApp:true,facts:facts({vehicle:'Subaru'})},{name:true,vehicle:true,mileage:true,issue:true,urgency:true});
+  assert.equal(body.handoffReady,false);
+  assert.doesNotMatch(body.reply,/botón de WhatsApp/i);
+  assert.doesNotMatch(body.reply,/cómo te llamás/i,'guard does not fabricate another repeated question');
+});
+
+test('consultation alone never creates a handoff, even when all data is known',async()=>{
+  const {body}=await chat([{role:'user',content:'Solo quiero saber qué podría ser.'}],{reply:'Podría involucrar varios componentes; hay que revisarlo para confirmarlo.',offerWhatsApp:true,facts:facts({name:'Manuel',vehicle:'Subaru Impreza',mileage:'200.000 km',issue:'Ruido',circumstances:'Al acelerar',urgency:'Puede esperar'})});
+  assert.equal(body.handoffReady,false);
 });
 
 test('serves the selected Cedar voice without requiring Gemini for narration', async () => {
@@ -207,58 +197,44 @@ test('reports an interrupted audio stream so the browser can offer a complete re
   } finally { global.fetch = previousFetch; delete process.env.OPENAI_API_KEY; }
 });
 
-test('the workshop summary uses only customer facts and the fast summary model', async () => {
-  process.env.GEMINI_API_KEY = 'test-key';
-  const previousFetch = global.fetch;
+
+test('summary uses OpenAI and only customer statements, never assistant suggestions',async()=>{
+  process.env.OPENAI_API_KEY='test-key';
+  const old=global.fetch;
   let request;
-  let modelUrl;
-  global.fetch = async (url, options) => {
-    modelUrl = url;
-    request = JSON.parse(options.body);
-    return { ok:true, json:async () => ({ candidates:[{ finishReason:'STOP', content:{ parts:[{ text:'Se enciende la luz al acelerar. Tras pasar un pozo empezó un ruido, vibra la caja y sale más humo blanco.' }] } }] }) };
+  global.fetch=async(url,options)=>{
+    assert.equal(url,'https://api.openai.com/v1/responses');request=JSON.parse(options.body);
+    return {ok:true,json:async()=>output('Después de pasar un pozo comenzó un ruido al acelerar.')};
   };
   try {
-    const res = response();
-    await handle({ method:'POST', body:{ messages:[
-      { role:'user', content:'Se enciende la luz al acelerar; vibra la caja y sale más humo blanco.' },
-      { role:'assistant', content:'Entonces no hay ruidos ni golpes, ¿verdad?' },
-      { role:'user', content:'Después de pasar un pozo empezó un ruido raro.' }
-    ] }, headers:{}, socket:{} }, res, 'summary');
-    assert.equal(res.statusCode, 200);
-    assert.match(JSON.parse(res.body).summary, /pozo/);
-    assert.match(modelUrl, /gemini-3\.5-flash-lite:generateContent/);
-    assert.match(request.contents[0].parts[0].text, /pozo/);
-    assert.doesNotMatch(request.contents[0].parts[0].text, /no hay ruidos ni golpes/);
-  } finally { global.fetch = previousFetch; }
+    const res=response();
+    await handle({method:'POST',body:{messages:[{role:'user',content:'Después de un pozo hace ruido al acelerar.'},{role:'assistant',content:'¿También falla el freno?'}]},headers:{'x-forwarded-for':'summary-test'},socket:{}},res,'summary');
+    assert.equal(res.statusCode,200);
+    assert.match(request.input[0].content,/pozo/);
+    assert.doesNotMatch(request.input[0].content,/falla el freno/);
+    assert.match(JSON.parse(res.body).summary,/al acelerar/);
+  }finally{global.fetch=old;delete process.env.OPENAI_API_KEY;}
 });
 
-test('uses the backup Gemini model when the primary service is unavailable', async () => {
-  process.env.GEMINI_API_KEY = 'test-key';
-  const previousFetch = global.fetch;
-  const urls = [];
-  global.fetch = async (url) => {
-    urls.push(url);
-    return urls.length === 1
-      ? { ok: false, status: 503, json: async () => ({ error: { status: 'UNAVAILABLE' } }) }
-      : { ok: true, json: async () => ({ candidates: [{ finishReason: 'STOP', content: { parts: [{ text: 'Podemos revisar ese ruido en el taller.' }] } }] }) };
-  };
+test('provider outages return a real error instead of repeating a generic question',async()=>{
+  process.env.OPENAI_API_KEY='test-key';const old=global.fetch;let calls=0;
+  global.fetch=async(url)=>{calls++;assert.match(url,/api.openai.com/);return {ok:false,status:503,json:async()=>({error:{code:'unavailable'}})};};
   try {
-    const res = response();
-    await handle({ method: 'POST', body: { messages: [{ role: 'user', content: 'Ruido al frenar' }] }, headers: {}, socket: {} }, res, 'chat');
-    assert.equal(res.statusCode, 200);
-    assert.equal(JSON.parse(res.body).reply, 'Podemos revisar ese ruido en el taller.');
-    assert.match(urls[0], /gemini-3\.5-flash-lite/);
-    assert.match(urls[1], /gemini-3\.8-flash/);
-  } finally {
-    global.fetch = previousFetch;
-  }
+    const res=response();
+    await handle({method:'POST',body:{messages:[{role:'user',content:'Al acelerar.'}]},headers:{'x-forwarded-for':'outage-test'},socket:{}},res,'chat');
+    assert.equal(res.statusCode,502);assert.equal(calls,1);
+    assert.equal(JSON.parse(res.body).reply,undefined);
+    assert.match(JSON.parse(res.body).message,/Conservé/);
+  }finally{global.fetch=old;delete process.env.OPENAI_API_KEY;}
 });
 
-test('rejects any former audio-input action', async () => {
-  process.env.GEMINI_API_KEY = 'test-key';
-  for (const action of ['voice', 'transcribe']) {
-    const res = response();
-    await handle({ method:'POST', body:{ audio:'AAAA' }, headers:{}, socket:{} }, res, action);
-    assert.equal(res.statusCode, 404);
+test('status and chat require only OpenAI, and obsolete audio input is rejected',async()=>{
+  process.env.OPENAI_API_KEY='test-key';delete process.env.GEMINI_API_KEY;
+  const res=response();await handle({method:'GET'},res,'status');
+  assert.equal(JSON.parse(res.body).configured,true);
+  assert.equal(JSON.parse(res.body).provider,'openai');
+  for(const action of ['voice','transcribe']){
+    const responseObject=response();await handle({method:'POST'},responseObject,action);assert.equal(responseObject.statusCode,404);
   }
+  delete process.env.OPENAI_API_KEY;
 });

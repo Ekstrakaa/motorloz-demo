@@ -43,8 +43,8 @@
       }
     }), { threshold: .08, rootMargin: '0px 0px -4%' });
     const revealSelector = [
-      '.intro-feature-image', '.service-card', '.hyundai-image', '.diagnostic-mosaic .diagnostic-tile',
-      '.film-card', '.google-place-card', '.appointment-office', '.map-panel', '.arrival-slide-figure'
+      '.intro-feature-image', '.hyundai-image', '.diagnostic-mosaic .diagnostic-tile',
+      '.google-place-card', '.appointment-office', '.map-panel', '.arrival-slide-figure'
     ].join(',');
     document.querySelectorAll(revealSelector).forEach((node, index) => {
       node.classList.add('scroll-reveal');

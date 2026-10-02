@@ -37,6 +37,7 @@ test('the first greeting and successive replies speak in the same voice flow wit
   let summaryRelease;
   let deferSummary = false;
   let failSpeech = false;
+  let failChat = false;
   let speechFailureReason = 'limite_proveedor_voz';
   let transientSpeechFailures = 0;
   let deviceVoiceCalls = 0;
@@ -56,6 +57,7 @@ test('the first greeting and successive replies speak in the same voice flow wit
     async play() { throw new Error('stream should be used'); }
   }
   const replies = {
+    'Tiene 210 mil kilómetros, corrijo el dato.': 'Bien, tomo el kilometraje corregido.',
     Hola: '¡Hola! ¿Qué está pasando con tu auto?',
     'Tengo un Subaru, unos 200 mil kilómetros y anda mal': 'Entiendo. ¿Qué notás exactamente y desde cuándo empezó?',
     'Quiero reservar un turno': 'Claro, podemos preparar una consulta para coordinarlo.',
@@ -73,6 +75,7 @@ test('the first greeting and successive replies speak in the same voice flow wit
       const messages = JSON.parse(options.body).messages;
       chatHistories.push(messages);
       const message = messages.at(-1).content;
+      if (failChat) return {ok:false,json:async()=>({message:'Conservé lo que me dijiste. Reintentá en un momento.'})};
       return { ok: true, json: async () => ({ reply: replies[message] }) };
     }
     if (url.endsWith('/summary') && deferSummary) await new Promise(resolve => { summaryRelease = resolve; });
@@ -83,7 +86,7 @@ test('the first greeting and successive replies speak in the same voice flow wit
       if (transientSpeechFailures > 0) { transientSpeechFailures -= 1; return { ok:false, status:503 }; }
       const text = JSON.parse(options.body).text;
       spokenTexts.push(text);
-      const event = new TextEncoder().encode(`data: ${JSON.stringify({ event_type: 'step.delta', delta: { type: 'audio', data: 'AAAA' } })}\n\n`);
+      const event = new TextEncoder().encode(`data: ${JSON.stringify({ event_type: 'step.delta', delta: { type: 'audio', data: 'AAAAAA==' } })}\n\n`);
       let sent = false;
       return { ok: true, body: { getReader: () => ({ read: async () => sent ? { done: true } : (sent = true, { value: event, done: false }) }) } };
     }
@@ -98,6 +101,7 @@ test('the first greeting and successive replies speak in the same voice flow wit
     fetch, setTimeout: (callback, delay) => setTimeout(callback, delay >= 700 ? 45 : delay), clearTimeout, setInterval, clearInterval,
     requestAnimationFrame: callback => callback(), AbortController, TextDecoder, atob
   };
+  vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../assistant-pcm.js'), 'utf8'), context);
   vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../assistant-widget.js'), 'utf8'), context);
   get('#assistant-launcher').listeners.click();
   await new Promise(resolve => setTimeout(resolve, 120));
@@ -187,8 +191,18 @@ test('the first greeting and successive replies speak in the same voice flow wit
   assert.equal(get('#assistant-wa-retry').href, popup.location.href);
   assert.equal(get('#assistant-reservation-prompt').hidden, false, 'the conversation stays available while WhatsApp opens');
 
+  failChat = true;
+  await send('Tiene 210 mil kilómetros, corrijo el dato.');
+  assert.equal(JSON.parse(session.get('motorloz-assistant-conversation-v1')).at(-1).content,'Tiene 210 mil kilómetros, corrijo el dato.','failed reply preserves the customer answer in session history');
+  failChat = false;
+  const errorRow = get('#assistant-messages').children.find(item=>item.classList?.contains('is-error'));
+  const retryButton = errorRow.children.find(item=>item.className==='assistant-chat-retry');
+  assert.ok(retryButton,'a failed reply offers a real retry control');
+  await retryButton.listeners.click();
+  assert.equal(chatHistories.at(-1).filter(item=>item.content==='Tiene 210 mil kilómetros, corrijo el dato.').length,1,'retry does not duplicate the customer turn');
   failSpeech = true;
   await send('¿Y si falla la voz?');
+  assert.ok(chatHistories.at(-1).some(item=>item.content==='Tiene 210 mil kilómetros, corrijo el dato.'),'the next request still includes the answer received during a failure');
   assert.equal(deviceVoiceCalls, 0, 'a quota failure never switches to a different phone voice');
   assert.equal(wavCalls, 0, 'a quota failure does not make another request for the same model');
   assert.equal(get('#assistant-status').textContent, 'Reconectando voz…');

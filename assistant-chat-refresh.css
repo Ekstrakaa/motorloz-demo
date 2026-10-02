@@ -145,3 +145,5 @@
   .assistant-composer-meta #assistant-recording button { min-height: 29px; }
 }
 @media (prefers-reduced-motion: reduce) { .assistant-mic.is-recording { animation: none; } }
+
+.assistant-message .assistant-chat-retry{display:block;grid-column:2;justify-self:start;margin:7px 0 0;padding:10px 14px;min-height:44px;border:1px solid #507e84;border-radius:10px;background:#14383f;color:#f0ffff;font:650 12px/1.4 var(--body);}

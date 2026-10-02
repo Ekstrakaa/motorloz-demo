@@ -23,6 +23,10 @@
   const welcomeText = 'Hola, soy tu asistente de MOTORLOZ. Contame qué notaste en el auto para poder ayudarte y guiarte de la mejor manera, o qué mantenimiento o servicio estás buscando. Si podés, decime la marca, el modelo y el kilometraje para entender mejor de qué estamos hablando. Podés escribir o tocar el micrófono; al terminar, tocá Terminar y enviar.';
   const conversationKey = 'motorloz-assistant-conversation-v1';
   let history = [];
+  let conversationFacts = null;
+  let confirmedHandoff = null;
+  let chatAbort = null;
+  let conversationVersion = 0;
   let bookingDismissed = false;
   let handoffHistoryKey = '';
   let handoffSummaryPromise = null;
@@ -59,8 +63,8 @@
   let openSession = 0;
   let audioContext = null;
   let audioSources = new Set();
-  let nextAudioTime = 0;
   let streamFinished = false;
+  let pcmPlayer = null;
   let pageScrollY = 0;
   let followConversation = true;
   let scrollScheduled = false;
@@ -100,9 +104,10 @@
     speechAbort?.abort();
     speechAbort = null;
     activeSpeechButton = null;
+    pcmPlayer?.stop();
+    pcmPlayer = null;
     for (const source of audioSources) { try { source.stop(); } catch {} }
     audioSources.clear();
-    nextAudioTime = 0;
     streamFinished = false;
     voicePlayer.pause();
     voicePlayer.removeAttribute('src');
@@ -154,8 +159,24 @@
     const controller = new AbortController();
     speechAbort = controller;
     let received = false;
-    let oddByte = null;
     let pending = '';
+    const player = window.MOTORLOZ_PCM.create(audioContext, {
+      sources: audioSources,
+      onStart() {
+        if (request !== voiceRequest) return;
+        if (text === welcomeText) welcomePlayed = true;
+        statusEl.textContent = 'Disponible';
+        statusEl.removeAttribute('title');
+        muteButton.classList.remove('is-loading');
+        muteButton.classList.add('is-speaking');
+      },
+      onDrain() {
+        if (request !== voiceRequest) return;
+        muteButton.classList.remove('is-speaking');
+        activeSpeechButton = null;
+      }
+    });
+    pcmPlayer = player;
     const firstAudioTimeout = setTimeout(() => { if (!received) controller.abort(); }, 8000);
     const handleBlock = block => {
       const data = block.split(/\r?\n/).filter(line => line.startsWith('data:')).map(line => line.slice(5).trimStart()).join('\n');
@@ -165,39 +186,10 @@
       if (event.event_type === 'error') throw new Error('voice_interrupted');
       if (event.event_type !== 'step.delta' || event.delta?.type !== 'audio' || !event.delta.data) return;
       const raw = atob(event.delta.data);
-      const bytes = new Uint8Array(raw.length + (oddByte === null ? 0 : 1));
-      if (oddByte !== null) bytes[0] = oddByte;
-      for (let i = 0; i < raw.length; i += 1) bytes[i + (oddByte === null ? 0 : 1)] = raw.charCodeAt(i);
-      oddByte = bytes.length % 2 ? bytes.at(-1) : null;
-      const samples = bytes.length >> 1;
-      if (!samples || request !== voiceRequest) return;
-      const buffer = audioContext.createBuffer(1, samples, 24000);
-      const channel = buffer.getChannelData(0);
-      for (let i = 0; i < samples; i += 1) {
-        const value = bytes[i * 2] | (bytes[i * 2 + 1] << 8);
-        channel[i] = (value >= 32768 ? value - 65536 : value) / 32768;
-      }
-      const source = audioContext.createBufferSource();
-      source.buffer = buffer;
-      source.connect(audioContext.destination);
-      const start = Math.max(nextAudioTime, audioContext.currentTime + .035);
-      source.start(start);
-      if (text === welcomeText) welcomePlayed = true;
-      nextAudioTime = start + buffer.duration;
-      audioSources.add(source);
-      source.onended = () => {
-        audioSources.delete(source);
-        if (streamFinished && !audioSources.size && request === voiceRequest) {
-          muteButton.classList.remove('is-speaking');
-          activeSpeechButton = null;
-        }
-      };
+      if (!raw.length || request !== voiceRequest) return;
+      player.push(Uint8Array.from(raw, character => character.charCodeAt(0)));
       received = true;
       clearTimeout(firstAudioTimeout);
-      statusEl.textContent = 'Disponible';
-      statusEl.removeAttribute('title');
-      muteButton.classList.remove('is-loading');
-      muteButton.classList.add('is-speaking');
     };
     try {
       const response = await fetch('/api/assistant/speech-stream', {
@@ -217,13 +209,17 @@
         pending = blocks.pop() || '';
         blocks.forEach(handleBlock);
       }
+      if (request !== voiceRequest) { player.stop(); return false; }
+      pending += decoder.decode();
       if (pending.trim()) handleBlock(pending);
       if (!received) throw new Error('speech_stream_empty');
+      player.finish();
       streamFinished = true;
       if (!audioSources.size) { muteButton.classList.remove('is-speaking'); activeSpeechButton = null; }
       return true;
     } catch (error) {
-      if (received) { streamFinished = true; error.partialAudio = true; }
+      if (player.started) { streamFinished = true; try { player.finish(); } catch { player.stop(); } error.partialAudio = true; }
+      else player.stop();
       throw error;
     } finally {
       clearTimeout(firstAudioTimeout);
@@ -430,6 +426,12 @@
   }
 
   function welcome() {
+    conversationVersion += 1;
+    chatAbort?.abort();
+    chatAbort = null;
+    conversationFacts = null;
+    confirmedHandoff = null;
+    setBusy(false);
     followConversation = true;
     messagesEl.replaceChildren();
     reservationPrompt.hidden = true;
@@ -489,16 +491,24 @@
   }
 
   function saveConversation() {
-    try { window.sessionStorage?.setItem(conversationKey, JSON.stringify(history.slice(-20))); } catch {}
+    try {
+      window.sessionStorage?.setItem(conversationKey, JSON.stringify(history.slice(-40)));
+      window.sessionStorage?.setItem(conversationKey + '-facts', JSON.stringify(conversationFacts));
+      window.sessionStorage?.setItem(conversationKey + '-handoff', JSON.stringify(confirmedHandoff));
+    } catch {}
   }
 
   function restoreConversation() {
     try {
       const stored = JSON.parse(window.sessionStorage?.getItem(conversationKey) || '[]');
       if (!Array.isArray(stored)) return;
-      const restored = stored.slice(-20).filter(item => item && ['user', 'assistant'].includes(item.role) && typeof item.content === 'string' && item.content.trim()).map(item => ({ role:item.role, content:item.content.slice(0, 1200) }));
+      const restored = stored.slice(-40).filter(item => item && ['user', 'assistant'].includes(item.role) && typeof item.content === 'string' && item.content.trim()).map(item => ({ role:item.role, content:item.content.slice(0, 1200) }));
       if (!restored.length) return;
       history = restored;
+      const facts = JSON.parse(window.sessionStorage?.getItem(conversationKey + '-facts') || 'null');
+      if (facts && typeof facts === 'object') conversationFacts = Object.fromEntries(['name','vehicle','year','mileage','issue','circumstances','urgency'].map(field => [field, typeof facts[field] === 'string' ? facts[field] : '']));
+      const handoff = JSON.parse(window.sessionStorage?.getItem(conversationKey + '-handoff') || 'null');
+      confirmedHandoff = typeof handoff === 'boolean' ? handoff : null;
       for (const item of restored) bubble(item.content, item.role);
       lastSpokenText = restored.filter(item => item.role === 'assistant').at(-1)?.content || welcomeText;
       maybeShowBooking();
@@ -506,6 +516,7 @@
   }
 
   function maybeShowBooking(force = false) {
+    if (confirmedHandoff === false) { reservationPrompt.hidden = true; return; }
     if (bookingDismissed) {
       if (!/\b(?:turno|reservar|agendar|coordinar)\b/i.test(history.at(-2)?.content || '')) return;
       bookingDismissed = false;
@@ -565,6 +576,7 @@
   }
 
   function handoffDetails() {
+    if (conversationFacts) return conversationFacts;
     const customerTurns = history.filter(item => item.role === 'user').map(item => item.content.trim());
     const words = customerTurns.join(' ');
     const vehicle = words.match(/\b(Subaru|Toyota|Honda|Hyundai|Volkswagen|VW|BMW|Mercedes(?:-Benz)?|Nissan|Mazda|Suzuki|Mitsubishi|Kia|Chevrolet|Peugeot|Audi|Renault|Ford|Jeep|Fiat|Volvo|Citro[eë]n|Dodge|Ferrari|Porsche|Alfa Romeo)\b(?:\s+([A-Za-zÀ-ÿ][A-Za-zÀ-ÿ0-9-]+))?/i);
@@ -621,12 +633,17 @@
     return `https://wa.me/${window.MOTORLOZ?.whatsapp || '59891888288'}?text=${encodeURIComponent(sections.join('\n\n'))}`;
   }
 
-  async function requestReply(userMessage) {
+  async function requestReply(userMessage, retry = false) {
     if (!configured || busy) return;
-    history.push({ role: 'user', content: userMessage });
+    if (!retry) history.push({ role: 'user', content: userMessage });
+    confirmedHandoff = false;
+    reservationPrompt.hidden = true;
+    saveConversation();
     const pending = bubble('Ya te respondo…', 'assistant', { pending: true });
     setBusy(true);
     const controller = new AbortController();
+    const version = conversationVersion;
+    chatAbort = controller;
     const timeout = setTimeout(() => controller.abort(), 11_000);
     try {
       const response = await fetch('/api/assistant/chat', {
@@ -643,23 +660,43 @@
         }), signal:controller.signal
       });
       const result = await response.json();
+      if (version !== conversationVersion) return;
       pending.remove();
       if (!response.ok) throw new Error(result.message || 'No pude responder en este momento.');
       const replyText = String(result.reply || '').trim();
       if (!replyText) throw new Error('No pude responder en este momento.');
+      if (result.facts && typeof result.facts === 'object') {
+        conversationFacts = Object.fromEntries(['name','vehicle','year','mileage','issue','circumstances','urgency'].map(field => [field, typeof result.facts[field] === 'string' ? result.facts[field] : '']));
+      }
+      confirmedHandoff = typeof result.handoffReady === 'boolean' ? result.handoffReady : null;
       history.push({ role: 'assistant', content: replyText });
       saveConversation();
       bubble(replyText, 'assistant');
       lastSpokenText = replyText;
       speakReply(replyText);
-      maybeShowBooking(Boolean(result.handoffReady));
+      if (result.handoffReady === false) reservationPrompt.hidden = true;
+      else maybeShowBooking(Boolean(result.handoffReady));
     } catch (error) {
       pending.remove();
-      history.pop();
-      bubble(error.name === 'AbortError' ? 'La respuesta demoró demasiado. Probá de nuevo o escribinos por el formulario.' : error.message || 'No pude responder ahora. Probá de nuevo o escribinos por el formulario.', 'assistant', { error:true });
+      if (version !== conversationVersion) return;
+      saveConversation();
+      const row = bubble(error.name === 'AbortError' ? 'La respuesta demoró demasiado. Conservé lo que me dijiste; podés reintentar.' : error.message || 'No pude responder ahora. Conservé lo que me dijiste; podés reintentar.', 'assistant', { error:true });
+      const retryButton = document.createElement('button');
+      retryButton.type = 'button';
+      retryButton.className = 'assistant-chat-retry';
+      retryButton.textContent = 'Reintentar respuesta';
+      retryButton.addEventListener('click', () => {
+        if (busy || version !== conversationVersion || history.at(-1)?.role !== 'user' || history.at(-1)?.content !== userMessage) return;
+        retryButton.disabled = true;
+        row.remove();
+        return requestReply(userMessage, true);
+      });
+      row.append(retryButton);
+      followLatest();
     } finally {
       clearTimeout(timeout);
-      setBusy(false);
+      if (chatAbort === controller) chatAbort = null;
+      if (version === conversationVersion) setBusy(false);
     }
   }
 
@@ -940,7 +977,7 @@
   document.querySelector('#assistant-close').addEventListener('click', close);
   document.querySelector('#assistant-new').addEventListener('click', () => { resetDialog.hidden = false; });
   document.querySelector('#assistant-reset-no').addEventListener('click', () => { resetDialog.hidden = true; });
-  document.querySelector('#assistant-reset-yes').addEventListener('click', () => { resetDialog.hidden = true; stopSpeech(); cancelDictation(); welcome(); welcomePlayed = false; welcomeSpoken = configured && !muted; if (welcomeSpoken) speakReply(welcomeText); try { window.sessionStorage?.removeItem(conversationKey); } catch {} input.focus({preventScroll:true}); });
+  document.querySelector('#assistant-reset-yes').addEventListener('click', () => { resetDialog.hidden = true; stopSpeech(); cancelDictation(); welcome(); welcomePlayed = false; welcomeSpoken = configured && !muted; if (welcomeSpoken) speakReply(welcomeText); try { window.sessionStorage?.removeItem(conversationKey); window.sessionStorage?.removeItem(conversationKey + '-facts'); window.sessionStorage?.removeItem(conversationKey + '-handoff'); } catch {} input.focus({preventScroll:true}); });
   muteButton.addEventListener('click', () => {
     muted = !muted;
     updateMuteButton();
