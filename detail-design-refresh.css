@@ -358,9 +358,9 @@
 
 /* Blender-rendered service and workshop icons from one consistent atlas. */
 .service-icon,.why-icon {
-  background-image:url("assets/motorloz-icon-atlas.png")!important;background-repeat:no-repeat!important;background-size:400% 400%!important;
+  background-image:url("assets/motorloz-icon-atlas-optimized.webp")!important;background-repeat:no-repeat!important;background-size:400% 400%!important;
 }
-.service-icon { border-color:rgba(34,139,150,.17)!important;background-color:transparent!important;background-image:url("assets/motorloz-icon-atlas.png")!important;box-shadow:none!important; }
+.service-icon { border-color:rgba(34,139,150,.17)!important;background-color:transparent!important;background-image:url("assets/motorloz-icon-atlas-optimized.webp")!important;box-shadow:none!important; }
 .service-icon svg { display:none!important; }
 .why-card>.why-icon { display:block!important;width:46px!important;height:46px!important;padding:0!important;border:0!important;border-radius:0!important;background-color:transparent!important;box-shadow:none!important;filter:drop-shadow(0 7px 8px rgba(0,0,0,.18))!important; }
 .service-icon[data-icon-index="0"] { background-position:0% 0%!important; }

@@ -2,33 +2,33 @@
 (() => {
   const photo = (file, alt, clean=false, position='50% 50%') => ({src:`assets/${file.includes('.')?file:`${file}.png`}`,alt,clean,position});
   const pictures = {
-    subaruWide:photo('subaru-panoramica-privacy','Subaru, una pasión que se vive en el taller',true),
-    salon:photo('salon-panoramica','El taller, lleno de historias y vehículos',true),
-    classics:photo('subaru-clasicos','Subaru: una historia que sigue en movimiento',true),
-    workshopWide:photo('taller-panoramica','El taller, desde otra perspectiva',true),
-    lifts:photo('elevadores','Elevadores y espacios de trabajo',true),
-    planning:photo('equipo-planificacion','Atención al detalle, en cada trabajo',true),
-    working:photo('mecanica-subaru','El equipo en acción',true),
-    panorama:photo('multimarca-panoramica','Pasión multimarca, dentro de MOTORLOZ',true),
-    localAereo:photo('local-aereo','El local MOTORLOZ, visto desde arriba',true),
-    ferrariWide:photo('ferrari-panoramica','Ferrari y Subaru en el taller',true),
-    reception:photo('recepcion','La recepción del taller',true),
-    ferrari:photo('ferrari-taller','Ferrari negro en el taller'),
-    subaru:photo('autos-japoneses','Carácter japonés, atención multimarca'),
-    toyota:photo('toyota-frente','Toyota en MOTORLOZ'),
-    corvette:photo('corvette-taller','Corvette en el taller',true),
-    space:photo('instalaciones','Una mirada al interior del taller',true),
+    subaruWide:photo('subaru-panoramica-privacy-optimized.webp','Subaru, una pasión que se vive en el taller',true),
+    salon:photo('salon-panoramica-optimized.webp','El taller, lleno de historias y vehículos',true),
+    classics:photo('subaru-clasicos-optimized.webp','Subaru: una historia que sigue en movimiento',true),
+    workshopWide:photo('taller-panoramica-optimized.webp','El taller, desde otra perspectiva',true),
+    lifts:photo('elevadores-optimized.webp','Elevadores y espacios de trabajo',true),
+    planning:photo('equipo-planificacion-optimized.webp','Atención al detalle, en cada trabajo',true),
+    working:photo('mecanica-subaru-optimized.webp','El equipo en acción',true),
+    panorama:photo('multimarca-panoramica-optimized.webp','Pasión multimarca, dentro de MOTORLOZ',true),
+    localAereo:photo('local-aereo-optimized.webp','El local MOTORLOZ, visto desde arriba',true),
+    ferrariWide:photo('ferrari-panoramica-optimized.webp','Ferrari y Subaru en el taller',true),
+    reception:photo('recepcion-optimized.webp','La recepción del taller',true),
+    ferrari:photo('ferrari-taller-optimized.webp','Ferrari negro en el taller'),
+    subaru:photo('autos-japoneses-optimized.webp','Carácter japonés, atención multimarca'),
+    toyota:photo('toyota-frente-optimized.webp','Toyota en MOTORLOZ'),
+    corvette:photo('corvette-taller-optimized.webp','Corvette en el taller',true),
+    space:photo('instalaciones-optimized.webp','Una mirada al interior del taller',true),
     front:photo('local-frente-hires.webp','Exterior del taller MOTORLOZ con varios vehículos de clientes',true),
     inside:photo('taller-interior-overview.webp','Vista amplia del interior del taller MOTORLOZ',true),
-    newWorkshop:photo('intro-workshop-cars','Subaru azul y vehículos atendidos dentro del taller MOTORLOZ',true),
-    newOverhead:photo('intro-workshop-overhead','Vista elevada de los vehículos dentro del taller MOTORLOZ',true),
+    newWorkshop:photo('intro-workshop-cars-optimized.webp','Subaru azul y vehículos atendidos dentro del taller MOTORLOZ',true),
+    newOverhead:photo('intro-workshop-overhead-optimized.webp','Vista elevada de los vehículos dentro del taller MOTORLOZ',true),
     ferrariInShop:photo('ferrari-interior-cliente.webp','Ferrari negro atendido dentro del taller MOTORLOZ',true),
-    engineRepair:photo('equipo-revision-multimarca','Mecánico revisando un vehículo multimarca en el taller',true),
-    workbench:photo('equipo-planificacion','Mecánico trabajando en el banco de servicio',true),
-    facadeSubaru:photo('fachada-subaru-frente','Fachada de MOTORLOZ con un Subaru al frente',true),
-    diagnostic:photo('equipo-diagnostico','Tecnología y atención al detalle',false,'56% 45%'),
-    tools:photo('herramientas-taller','Herramientas listas para cada diagnóstico',true),
-    subaruFront:photo('subaru-frente','Subaru y atención especializada',true)
+    engineRepair:photo('equipo-revision-multimarca-optimized.webp','Mecánico revisando un vehículo multimarca en el taller',true),
+    workbench:photo('equipo-planificacion-optimized.webp','Mecánico trabajando en el banco de servicio',true),
+    facadeSubaru:photo('fachada-subaru-frente-optimized.webp','Fachada de MOTORLOZ con un Subaru al frente',true),
+    diagnostic:photo('equipo-diagnostico-optimized.webp','Tecnología y atención al detalle',false,'56% 45%'),
+    tools:photo('herramientas-taller-optimized.webp','Herramientas listas para cada diagnóstico',true),
+    subaruFront:photo('subaru-frente-optimized.webp','Subaru y atención especializada',true)
   };
   const groups = {
     hero:{items:[pictures.salon,pictures.workshopWide,pictures.subaruFront,pictures.panorama,pictures.space],interval:5900},
@@ -58,7 +58,7 @@
     async function show(direction){if(busy)return;busy=true;try{const target=(index+direction+items.length)%items.length;const image=await load(items[target]);if(!image)return;const incoming=1-active;paint(frames[incoming],items[target],image.cloneNode());frames[incoming].classList.add('is-current');frames[incoming].removeAttribute('aria-hidden');frames[active].classList.remove('is-current');frames[active].setAttribute('aria-hidden','true');active=incoming;index=target;updateLabels();if(visible)load(items[(index+1)%items.length]);}finally{busy=false;}}
     previous.addEventListener('click',()=>{show(-1);schedule();});next.addEventListener('click',()=>{show(1);schedule();});pause.addEventListener('click',()=>{paused=!paused;updateLabels();schedule();});
     root.addEventListener('keydown',event=>{if(event.key==='ArrowLeft'||event.key==='ArrowRight'){event.preventDefault();show(event.key==='ArrowLeft'?-1:1);schedule();}});
-    const firstImage=frames[0].querySelector('img');fitPhoto(firstImage);if(!firstImage.complete)firstImage.addEventListener('load',()=>fitPhoto(firstImage),{once:true});firstImage.alt=items[0].alt;firstImage.style.objectPosition=items[0].position;frames[0].style.backgroundImage=`url("${items[0].src}")`;frames[0].classList.toggle('clean-photo',items[0].clean);
+    const firstImage=frames[0].querySelector('img');fitPhoto(firstImage);if(!firstImage.complete)firstImage.addEventListener('load',()=>fitPhoto(firstImage),{once:true});firstImage.src=items[0].src;firstImage.alt=items[0].alt;firstImage.style.objectPosition=items[0].position;frames[0].style.backgroundImage=`url("${items[0].src}")`;frames[0].classList.toggle('clean-photo',items[0].clean);
     new IntersectionObserver(entries=>{visible=entries[0].isIntersecting;if(visible)load(items[(index+1)%items.length]);schedule();},{threshold:.15}).observe(root);
     document.addEventListener('visibilitychange',schedule);reduced.addEventListener('change',()=>{paused=reduced.matches;updateLabels();schedule();});
     updateLabels();

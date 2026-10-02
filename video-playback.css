@@ -1,0 +1,9 @@
+.video-retry {
+  position:absolute;z-index:8;right:14px;top:14px;min-height:44px;
+  padding:10px 15px;border:1px solid rgba(196,240,241,.65);border-radius:999px;
+  background:rgba(5,35,40,.92);color:#f2ffff;box-shadow:0 8px 24px #0004;
+  font-family:inherit;font-size:12px;font-weight:600;line-height:1.3;cursor:pointer;pointer-events:auto;
+}
+.video-retry[hidden] { display:none; }
+.video-retry:focus-visible { outline:3px solid #54d9e2;outline-offset:3px; }
+.hero > .video-retry { top:calc(var(--header-h,80px) + 18px); }

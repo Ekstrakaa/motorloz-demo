@@ -33,7 +33,7 @@
   display: block;
   width: 62px;
   height: 62px;
-  background-image: url('assets/intro-proof-icons.png');
+  background-image: url('assets/intro-proof-icons-optimized.webp');
   background-repeat: no-repeat;
   background-size: 300% 100%;
   filter: drop-shadow(0 5px 7px rgba(0, 44, 51, .14));

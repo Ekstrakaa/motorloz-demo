@@ -15,8 +15,8 @@ function element() {
     addEventListener: (name, listener) => { listeners[name] = listener; },
     setAttribute() {}, removeAttribute() {},
     focus() { this.focusCount += 1; },
-    append(...items) { this.children.push(...items); },
-    replaceChildren() { this.children = []; },
+    append(...items) { for (const item of items) { this.children = this.children.filter(child => child !== item); this.children.push(item); } },
+    replaceChildren(...items) { this.children = [...items]; },
     querySelector(selector) { return selector === '.assistant-speak' ? this.children.find(item => item.className === 'assistant-speak') || null : null; },
     querySelectorAll() { return []; },
     remove() {},
@@ -33,6 +33,9 @@ test('the first greeting and successive replies speak in the same voice flow wit
   const spokenTexts = [];
   const chatHistories = [];
   const contexts = [];
+  const resizeCallbacks = [];
+  let summaryRelease;
+  let deferSummary = false;
   let failSpeech = false;
   let speechFailureReason = 'limite_proveedor_voz';
   let transientSpeechFailures = 0;
@@ -72,6 +75,7 @@ test('the first greeting and successive replies speak in the same voice flow wit
       const message = messages.at(-1).content;
       return { ok: true, json: async () => ({ reply: replies[message] }) };
     }
+    if (url.endsWith('/summary') && deferSummary) await new Promise(resolve => { summaryRelease = resolve; });
     if (url.endsWith('/summary')) return { ok:true, json:async () => ({ summary:'La luz del tablero se encendió y el cliente quiere revisar el auto.' }) };
     if (url.endsWith('/speech-stream')) {
       speechAttempts += 1;
@@ -88,7 +92,7 @@ test('the first greeting and successive replies speak in the same voice flow wit
   };
   const context = {
     document: { querySelector: get, createElement: element, createTextNode: text => ({ textContent:text }), documentElement: element(), body: element(), addEventListener() {} },
-    window: { AudioContext, SpeechRecognition: null, speechSynthesis: { speak: () => { deviceVoiceCalls += 1; }, cancel() {}, getVoices: () => [{ lang:'es-UY' }] }, SpeechSynthesisUtterance: class {}, innerWidth: 393, innerHeight: 800, open: () => popup, sessionStorage: { getItem:key=>session.get(key), setItem:(key,value)=>session.set(key,value), removeItem:key=>session.delete(key) },
+    window: { ResizeObserver: class { constructor(callback) { resizeCallbacks.push(callback); } observe() {} }, AudioContext, SpeechRecognition: null, speechSynthesis: { speak: () => { deviceVoiceCalls += 1; }, cancel() {}, getVoices: () => [{ lang:'es-UY' }] }, SpeechSynthesisUtterance: class {}, innerWidth: 393, innerHeight: 800, open: () => popup, sessionStorage: { getItem:key=>session.get(key), setItem:(key,value)=>session.set(key,value), removeItem:key=>session.delete(key) },
       visualViewport: { height: 500, offsetTop: 0, addEventListener() {} }, setTimeout, addEventListener() {} },
     Audio, location: { search: '' }, URLSearchParams, URL: { revokeObjectURL() {} },
     fetch, setTimeout: (callback, delay) => setTimeout(callback, delay >= 700 ? 45 : delay), clearTimeout, setInterval, clearInterval,
@@ -144,7 +148,23 @@ test('the first greeting and successive replies speak in the same voice flow wit
   assert.equal(get('#assistant-reservation-prompt').hidden, true);
   await send('Desde que pasé un pozo vibra la caja y se enciende la luz del motor al acelerar');
   assert.equal(get('#assistant-reservation-prompt').hidden, true, 'symptom details alone do not push the customer toward WhatsApp');
+  get('#assistant-messages').scrollHeight = 1400;
+  get('#assistant-messages').clientHeight = 500;
+  deferSummary = true;
   await send('Puede esperar una fecha, no es urgente');
+  assert.equal(get('#assistant-messages').scrollTop, 1400, 'new WhatsApp UI follows after layout');
+  get('#assistant-messages').clientHeight = 320;
+  resizeCallbacks.forEach(callback => callback());
+  assert.equal(get('#assistant-messages').scrollTop, 1400, 'composer resize preserves the latest action');
+  get('#assistant-messages').scrollTop = 160;
+  get('#assistant-messages').listeners.scroll();
+  const firstCard = get('#assistant-messages').children.find(item => item.className === 'assistant-summary-card');
+  summaryRelease();
+  await new Promise(resolve => setTimeout(resolve, 10));
+  assert.equal(get('#assistant-messages').scrollTop, 160, 'async summary does not pull a visitor away from older messages');
+  assert.equal(get('#assistant-messages').children.find(item => item.className === 'assistant-summary-card'), firstCard, 'summary updates in place');
+  deferSummary = false;
+
   assert.equal(get('#assistant-reservation-prompt').hidden, false, 'the WhatsApp option appears as soon as the last missing detail arrives after a turn request');
   await send('Prepará la consulta para WhatsApp');
   assert.equal(get('#assistant-reservation-prompt').hidden, false, 'the WhatsApp option appears when the customer asks for it');

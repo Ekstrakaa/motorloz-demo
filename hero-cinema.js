@@ -11,10 +11,9 @@
   const sequence = [
     {
       type: 'video',
-      src: 'assets/motorloz-stock.mp4',
-      poster: 'assets/salon-panoramica.png',
-      start: 18.05,
-      end: 20.65,
+      src: 'assets/cinema-workshop.mp4',
+      poster: 'assets/salon-panoramica-optimized.webp',
+      start: 0,
       playbackRate: .72,
       duration: 3900,
       label: 'EL TALLER, EN MOVIMIENTO'
@@ -30,10 +29,9 @@
     },
     {
       type: 'video',
-      src: 'assets/motorloz-subaru-wrx.mp4',
+      src: 'assets/cinema-engine.mp4',
       poster: 'assets/hero-subaru.webp',
-      start: 1.5,
-      end: 8,
+      start: 0,
       playbackRate: .78,
       duration: 8500,
       label: 'MECÁNICA, DE CERCA'
@@ -64,6 +62,7 @@
   let visible = true;
   let transitionToken = 0;
   let transitioning = false;
+  const players = new Map();
 
   const requestedScene = Number(new URLSearchParams(location.search).get('scene'));
   if (Number.isInteger(requestedScene) && requestedScene >= 1 && requestedScene <= sequence.length) {
@@ -79,6 +78,8 @@
   }
 
   function stopFrame(frame) {
+    players.get(frame)?.dispose();
+    players.delete(frame);
     frame.querySelectorAll('video').forEach(video => {
       video.pause();
       video.removeAttribute('src');
@@ -116,34 +117,25 @@
     video.setAttribute('muted', '');
     video.setAttribute('playsinline', '');
     video.tabIndex = -1;
-    const beginAtSelectedShot = () => {
-      const safeStart = Math.min(item.start, Math.max(0, video.duration - .25));
-      video.pause();
-      video.playbackRate = item.playbackRate || 1;
-      const resume = () => {
-        video.dataset.segmentReady = 'true';
-        if (visible && !document.hidden) video.play().catch(() => {});
-      };
-      video.addEventListener('seeked', resume, { once: true });
-      video.currentTime = safeStart;
-      window.setTimeout(() => {
-        if (video.currentTime < safeStart - .5) video.currentTime = safeStart;
-        else resume();
-      }, 320);
-    };
-    video.addEventListener('loadedmetadata', beginAtSelectedShot, { once: true });
-    video.addEventListener('timeupdate', () => {
-      if (frame.classList.contains('is-current') && item.end && video.currentTime >= item.end) advance();
+    video.playbackRate = item.playbackRate || 1;
+    video.defaultPlaybackRate = item.playbackRate || 1;
+    video.addEventListener('ended', () => {
+      if (frame.classList.contains('is-current')) advance();
     });
     frame.append(video);
-    video.dataset.segmentStart = String(item.start);
-    video.src = item.src;
-    video.load();
+    const player = window.MOTORLOZ_VIDEO(video, {
+      host: root.parentElement, source: item.src,
+      shouldPlay: () => visible && frame.classList.contains('is-current') && !reducedMotion.matches,
+      onBlocked: () => clearTimeout(timer)
+    });
+    players.set(frame, player);
+    player.sync();
   }
 
   function schedule() {
     clearTimeout(timer);
-    if (!visible || document.hidden || reducedMotion.matches) return;
+    // Advance video scenes only when the actual clip ends, after buffering.
+    if (!visible || document.hidden || reducedMotion.matches || sequence[index].type === 'video') return;
     timer = window.setTimeout(advance, sequence[index].duration);
   }
 
@@ -164,11 +156,14 @@
       frames[incoming].removeAttribute('aria-hidden');
       frames[outgoing].classList.remove('is-current');
       frames[outgoing].setAttribute('aria-hidden', 'true');
-      window.setTimeout(() => stopFrame(frames[outgoing]), 1500);
+      window.setTimeout(() => {
+        if (token === transitionToken && !frames[outgoing].classList.contains('is-current')) stopFrame(frames[outgoing]);
+      }, 1500);
       active = incoming;
       index = nextIndex;
       updateMeta();
       transitioning = false;
+      players.forEach(player => player.sync());
       schedule();
     }));
   }
@@ -177,16 +172,16 @@
   updateMeta();
   schedule();
 
-  reducedMotion.addEventListener?.('change', schedule);
+  reducedMotion.addEventListener?.('change', () => { render(frames[active], sequence[index]); schedule(); });
 
   new IntersectionObserver(entries => {
     visible = entries[0].isIntersecting;
-    root.querySelectorAll('video').forEach(video => visible ? video.play().catch(() => {}) : video.pause());
+    players.forEach(player => player.sync());
     schedule();
   }, { threshold: .12 }).observe(root);
 
   document.addEventListener('visibilitychange', () => {
-    root.querySelectorAll('video').forEach(video => document.hidden ? video.pause() : video.play().catch(() => {}));
+    players.forEach(player => player.sync());
     schedule();
   });
 })();

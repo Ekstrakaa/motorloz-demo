@@ -119,3 +119,9 @@
   #ubicacion .location-directions,
   #assistant-launcher.assistant-launcher { transition: none !important; }
 }
+/* Navigation has four visible items when the desktop links collapse. */
+@media (min-width:761px) and (max-width:1050px) {
+  .header { grid-template-columns:minmax(0,1fr) auto auto auto!important; }
+  .header .header-cta { width:auto;justify-self:end; }
+  .header .menu-toggle { grid-column:auto!important;grid-row:auto!important; }
+}

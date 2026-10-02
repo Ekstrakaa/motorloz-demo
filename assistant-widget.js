@@ -62,6 +62,32 @@
   let nextAudioTime = 0;
   let streamFinished = false;
   let pageScrollY = 0;
+  let followConversation = true;
+  let scrollScheduled = false;
+
+  // Follow after layout settles, including keyboard and async summary changes.
+  function followLatest(force = false) {
+    if (force) followConversation = true;
+    if (!followConversation || scrollScheduled) return;
+    scrollScheduled = true;
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      if (followConversation) messagesEl.scrollTop = messagesEl.scrollHeight;
+      scrollScheduled = false;
+    }));
+  }
+  messagesEl.addEventListener('scroll', () => {
+    if (!scrollScheduled) followConversation = messagesEl.scrollHeight - messagesEl.scrollTop - (messagesEl.clientHeight || 0) < 96;
+  });
+  if (window.ResizeObserver) {
+    const observer = new window.ResizeObserver(() => followLatest());
+    observer.observe(messagesEl);
+    observer.observe(form);
+  }
+  function appendConversation(node) {
+    messagesEl.append(node);
+    // Keep the action beside the latest messages, in the same scroll area.
+    messagesEl.append(reservationPrompt);
+  }
   const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   const dictationTerms = window.MOTORLOZ_DICTATION || { normalize: text => text, choose: result => result?.[0]?.transcript?.trim() || '' };
   micButton.title = Recognition ? 'Dictar y enviar como texto' : 'Dictado no disponible en este navegador';
@@ -313,8 +339,7 @@
     activeSpeechButton = null;
   });
   function bubble(text, role, extra = {}) {
-    const distanceFromBottom = messagesEl.scrollHeight - messagesEl.scrollTop - (messagesEl.clientHeight || 0);
-    const keepFollowing = role === 'user' || !Number.isFinite(distanceFromBottom) || distanceFromBottom < 96;
+    if (role === 'user') followConversation = true;
     const row = document.createElement('div');
     row.className = `assistant-message assistant-message-${role}`;
     if (extra.welcome) {
@@ -339,8 +364,8 @@
       voiceTip.className = 'assistant-welcome-voice';
       voiceTip.textContent = '⌁  Podés escribir o tocar el micrófono. Al terminar, tocá “Terminar y enviar”.';
       row.append(kicker, heading, description, voiceTip);
-      messagesEl.append(row);
-      if (keepFollowing) messagesEl.scrollTop = messagesEl.scrollHeight;
+      appendConversation(row);
+      followLatest();
       return row;
     }
     const copy = document.createElement('p');
@@ -352,8 +377,8 @@
     row.append(copy, time);
     if (extra.pending) row.classList.add('is-pending');
     if (extra.error) row.classList.add('is-error');
-    messagesEl.append(row);
-    if (keepFollowing) messagesEl.scrollTop = messagesEl.scrollHeight;
+    appendConversation(row);
+    followLatest();
     return row;
   }
 
@@ -375,10 +400,10 @@
       details.urgency ? { kind:'urgency', value:details.urgency } : null
     ].filter(Boolean);
     if (!fields.length) return;
-    const distanceFromBottom = messagesEl.scrollHeight - messagesEl.scrollTop - (messagesEl.clientHeight || 0);
-    const keepFollowing = !Number.isFinite(distanceFromBottom) || distanceFromBottom < 96;
-    summaryCard?.remove();
-    const card = document.createElement('section');
+    const oldHeight = messagesEl.scrollHeight;
+    const oldTop = messagesEl.scrollTop;
+    const card = summaryCard || document.createElement('section');
+    const cardAbove = summaryCard && card.getBoundingClientRect?.().bottom < messagesEl.getBoundingClientRect?.().top;
     card.className = 'assistant-summary-card';
     card.setAttribute('aria-label', 'Resumen de tu consulta');
     const head = document.createElement('div');
@@ -397,13 +422,15 @@
       row.append(icon, value);
       list.append(row);
     }
-    card.append(head, list);
-    messagesEl.append(card);
+    card.replaceChildren(head, list);
+    if (!summaryCard) appendConversation(card);
     summaryCard = card;
-    if (keepFollowing) messagesEl.scrollTop = messagesEl.scrollHeight;
+    if (!followConversation && cardAbove) messagesEl.scrollTop = oldTop + messagesEl.scrollHeight - oldHeight;
+    followLatest();
   }
 
   function welcome() {
+    followConversation = true;
     messagesEl.replaceChildren();
     reservationPrompt.hidden = true;
     retryLink.hidden = true;
@@ -500,7 +527,8 @@
       renderSummaryCard(details);
       reservationPrompt.hidden = false;
       reservationPrompt.removeAttribute('aria-hidden');
-      if (!handoffSummaryPromise) {
+      followLatest();
+      if (!handoffSummaryPromise || handoffHistoryKey !== customerText) {
         handoffHistoryKey = customerText;
         handoffSummaryPromise = handoffSummary(details.issue);
         handoffSummaryPromise.then(issue => {
@@ -845,8 +873,7 @@
     const viewport = window.visualViewport;
     const visibleHeight = viewport?.height || window.innerHeight;
     if (!visibleHeight) return;
-    const distanceFromBottom = messagesEl.scrollHeight - messagesEl.scrollTop - (messagesEl.clientHeight || 0);
-    const keepComposerVisible = document.activeElement === input || !Number.isFinite(distanceFromBottom) || distanceFromBottom < 96;
+    const keepComposerVisible = document.activeElement === input || followConversation;
     const coveredHeight = viewport ? Math.max(0, (window.innerHeight || visibleHeight) - viewport.height - viewport.offsetTop) : 0;
     panel.style.setProperty?.('--assistant-visible-height', `${visibleHeight}px`);
     panel.style.setProperty?.('--assistant-keyboard-offset', '0px');
@@ -854,9 +881,7 @@
     panel.style.setProperty?.('--assistant-viewport-top', `${viewport?.offsetTop || 0}px`);
     panel.style.setProperty?.('--assistant-viewport-left', `${viewport?.offsetLeft || 0}px`);
     panel.classList.toggle('is-keyboard-open', coveredHeight > 80 && document.activeElement === input);
-    requestAnimationFrame(() => {
-      if (keepComposerVisible) messagesEl.scrollTop = messagesEl.scrollHeight;
-    });
+    if (keepComposerVisible) followLatest(true);
   }
 
   function settleMobileViewport() {
@@ -874,6 +899,7 @@
     document.body?.style?.setProperty?.('--assistant-page-lock-top', `${-pageScrollY}px`);
     document.documentElement?.classList.add('assistant-chat-open');
     document.body?.classList.add('assistant-chat-open');
+    window.dispatchEvent?.(new Event('motorloz:chat-visibility'));
     syncViewport();
     requestAnimationFrame(() => panel.classList.add('is-open'));
     panel.setAttribute('aria-hidden', 'false');
@@ -897,6 +923,7 @@
     cancelDictation();
     document.documentElement?.classList.remove('assistant-chat-open');
     document.body?.classList.remove('assistant-chat-open');
+    window.dispatchEvent?.(new Event('motorloz:chat-visibility'));
     window.scrollTo?.(0, pageScrollY);
     panel.classList.remove('is-open');
     panel.setAttribute('aria-hidden', 'true');
@@ -957,6 +984,7 @@
       const url = handoffUrl(details);
       retryLink.href = url;
       retryLink.hidden = false;
+      followLatest();
       if (popup) popup.location.href = url;
     } finally {
       reserveButton.disabled = false;
@@ -966,6 +994,7 @@
   document.querySelector('#assistant-reserve-later').addEventListener('click', () => {
     bookingDismissed = true;
     reservationPrompt.hidden = true;
+    followLatest();
   });
 
   welcome();

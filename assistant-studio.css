@@ -237,7 +237,14 @@
 .assistant-summary-icon svg { width: 19px; height: 19px; fill: none; stroke: #173f49; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
 .assistant-summary-row > span:last-child { min-width: 0; color: #16313b; font-size: 12px; line-height: 1.35; overflow-wrap: anywhere; }
 
-.assistant-window:has(.assistant-reservation-prompt:not([hidden])) { grid-template-rows: auto auto minmax(0, 1fr) auto auto; }
+.assistant-window:has(.assistant-reservation-prompt:not([hidden])) { grid-template-rows: auto auto minmax(0, 1fr) auto; }
+.assistant-messages { min-height: 0; overflow-anchor: none; scroll-behavior: auto; }
+.assistant-messages > * { flex-shrink: 0; }
+.assistant-messages .assistant-reservation-prompt { border: 1px solid var(--assistant-line); border-radius: 18px; margin-left: 37px; }
+.assistant-messages .assistant-reservation-copy { display:flex;flex-direction:row;align-items:center;gap:9px;text-align:left; }
+.assistant-messages .assistant-whatsapp-mark { width:30px;height:30px;border-radius:9px; }
+.assistant-messages .assistant-whatsapp-mark img { width:23px;height:23px; }
+.assistant-messages .assistant-reservation-prompt { gap:7px;padding:12px; }
 .assistant-reservation-prompt {
   display: grid;
   grid-template-columns: 1fr;
@@ -464,12 +471,14 @@
 }
 
 @media (max-width: 365px) {
-  .assistant-header { padding-inline: 11px; }
-  .assistant-header-logo { width: 84px; }
+  .assistant-header { padding-inline: 9px;gap:6px; }
+  .assistant-header-logo { width: 64px; }
+  .assistant-identity { gap:5px; }
+  .assistant-identity > div { width:85px; }
+  .assistant-subtitle { font-size:8px; }
   .assistant-header-actions button,
-  .assistant-header-actions #assistant-mute { width: 38px; height: 38px; }
-  .assistant-disclosure { grid-template-columns: 22px minmax(0, 1fr); }
-  .assistant-disclosure button { grid-column: 2; justify-self: start; padding: 0; border: 0; }
+  .assistant-header-actions #assistant-mute { width: 30px; height: 32px; }
+  .assistant-disclosure { grid-template-columns:18px minmax(0,1fr) auto; }
 }
 
 @media (prefers-reduced-motion: reduce) {
