@@ -52,6 +52,7 @@ function wantsCoordination(history) {
 function confirmedCoordination(history) {
   return history.some((item, index) => {
     if (item.role !== 'user') return false;
+    if (/\b(?:prepar[aá]l[oa]|hac[eé]l[oa])\b/i.test(item.content)) return true;
     if (/(?:prepar[aá](?:me)?|mand[aá](?:me)?|envi[aá](?:me)?|abr[ií]|pasemos|haceme).{0,40}(?:whatsapp|consulta|solicitud)|\b(?:reservame|agendame)\b/i.test(item.content)) return true;
     return /^(?:s[ií]|dale|ok|perfecto|hacelo|preparalo|vamos)(?:[,.!\s]|$)/i.test(item.content)
       && /(?:quer[eé]s|pod[eé]s).{0,70}(?:prepar\w*|revis\w*|envi\w*|coordin\w*).{0,55}(?:solicitud|consulta|whatsapp|revisi[oó]n)|(?:solicitud|consulta).{0,55}(?:whatsapp)/i.test(history[index - 1]?.content || '');
@@ -131,6 +132,10 @@ async function handle(req, res, action) {
     if (!history.length || history.at(-1).role !== 'user') return json(res, 400, { error: 'mensaje_invalido', message: 'Escribí una consulta para continuar.' });
     const answer = await callOpenAI(history, { structured: true });
     const facts = Object.fromEntries(factFields.map(field => [field, typeof answer.facts?.[field] === 'string' ? answer.facts[field].trim().slice(0, field === 'issue' ? 550 : 200) : '']));
+    const latestUser = history.at(-1).content;
+    // An explicit request to prepare the message can proceed without a mileage figure.
+    // Describe the absence accurately rather than leaving the conversation stuck on it.
+    if (!facts.mileage && /\b(?:prepar[aá]l[oa]|hac[eé]l[oa])\b/i.test(latestUser)) facts.mileage = 'Kilometraje no informado';
     const complete = factFields.filter(field => field !== 'year').every(field => facts[field]);
     const modelIntent = ['none', 'interested', 'confirmed'].includes(answer.coordinationIntent) ? answer.coordinationIntent : 'none';
     const askingHowToCoordinate = history.some(item => item.role === 'user' && /(?:c[oó]mo|qu[eé] (?:tengo|hay) que hacer).{0,80}(?:coordin|reserv|agend|turno|whatsapp)|c[oó]mo\s+(?:coordino|agendo|reservo)/i.test(item.content));

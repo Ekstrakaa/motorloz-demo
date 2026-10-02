@@ -134,6 +134,23 @@ test('the photographed wording cannot end at “I have all the details” withou
   assert.match(accepted.body.reply,/Revisar en WhatsApp/);
 });
 
+test('an explicit request to prepare can continue with mileage marked as not provided',async()=>{
+  const messages=[
+    {role:'user',content:'Mi Subaru Impreza vibra al acelerar desde ayer. Quiero coordinar una revisión.'},
+    {role:'assistant',content:'¿Cómo te llamás?'},
+    {role:'user',content:'Ana'},
+    {role:'assistant',content:'¿Qué kilometraje aproximado tiene? Si no lo sabés, decímelo.'},
+    {role:'user',content:'Sí, preparala'}
+  ];
+  const {body}=await chat(messages,{
+    facts:facts({name:'Ana',vehicle:'Subaru Impreza',issue:'Vibra al acelerar',circumstances:'Desde ayer',urgency:'Puede esperar una fecha coordinada'}),
+    coordinationIntent:'confirmed',reply:'Ana, ¿me decís el kilometraje para poder prepararla?'
+  });
+  assert.equal(body.handoffReady,true);
+  assert.equal(body.facts.mileage,'Kilometraje no informado');
+  assert.match(body.reply,/Revisar en WhatsApp/);
+});
+
 test('the model can understand a misspelled coordination request without an exact phrase match',async()=>{
   const full=facts({name:'Ana',vehicle:'Subaru Impreza',mileage:'200 mil',issue:'Vibración',circumstances:'Al acelerar',urgency:'Puede esperar'});
   const {body}=await chat([{role:'user',content:'ana subaru impreza 200 mil, vibra al acelerar, puede esperar. qiero coodinar la rebision'}],{
