@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title">
+  <title id="title">Asistente de taller con auriculares</title>
+  <defs>
+    <linearGradient id="shell" x1="16" y1="12" x2="112" y2="118" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#15545c"/>
+      <stop offset="1" stop-color="#071e23"/>
+    </linearGradient>
+    <linearGradient id="headset" x1="34" y1="35" x2="91" y2="88" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#f5ffff"/>
+      <stop offset="1" stop-color="#a9e9ec"/>
+    </linearGradient>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="2.4" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+  <circle cx="64" cy="64" r="59" fill="url(#shell)"/>
+  <circle cx="64" cy="64" r="57.5" fill="none" stroke="#65d3dc" stroke-opacity=".7" stroke-width="1.5"/>
+  <circle cx="64" cy="64" r="50" fill="none" stroke="#d9fcff" stroke-opacity=".08"/>
+  <path d="M34 65V59a30 30 0 0 1 60 0v6" fill="none" stroke="url(#headset)" stroke-linecap="round" stroke-width="7"/>
+  <rect x="29" y="57" width="14" height="28" rx="7" fill="#b8f5f7" stroke="#efffff" stroke-width="1.5"/>
+  <rect x="85" y="57" width="14" height="28" rx="7" fill="#43c2cf" stroke="#d7fbfc" stroke-width="1.5"/>
+  <path d="M92 83v5a10 10 0 0 1-10 10h-6" fill="none" stroke="#b8f5f7" stroke-linecap="round" stroke-width="4"/>
+  <circle cx="72" cy="98" r="4" fill="#49cad4" filter="url(#glow)"/>
+  <path d="M47 54h34a7 7 0 0 1 7 7v18a7 7 0 0 1-7 7H65l-10 8v-8h-8a7 7 0 0 1-7-7V61a7 7 0 0 1 7-7Z" fill="#102d32" stroke="#6bd7df" stroke-width="2"/>
+  <circle cx="55" cy="70" r="3" fill="#eaffff"/>
+  <circle cx="64" cy="70" r="3" fill="#63d6df"/>
+  <circle cx="73" cy="70" r="3" fill="#eaffff"/>
+  <path d="M54 79h20" fill="none" stroke="#7db7bb" stroke-linecap="round" stroke-width="2"/>
+</svg>

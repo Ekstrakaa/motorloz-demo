@@ -53,6 +53,15 @@
       zoomEnd: 1.055,
       duration: 5000,
       label: 'SUBARU, EN EL CORAZÓN'
+    },
+    {
+      type: 'image',
+      src: 'assets/hyundai-servicio-optimized.webp',
+      focus: '50% 55%',
+      zoomStart: 1.01,
+      zoomEnd: 1.045,
+      duration: 5000,
+      label: 'LOZANO & OLIVA · SERVICIO OFICIAL HYUNDAI'
     }
   ];
 

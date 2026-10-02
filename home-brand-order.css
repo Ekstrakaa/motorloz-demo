@@ -1,0 +1,79 @@
+/* Give the two official lines clear priority while keeping each surface legible. */
+.hero-signal {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  gap: 9px 15px !important;
+}
+.hero-hyundai-link {
+  display: inline-flex !important;
+  align-items: center !important;
+  min-height: 28px !important;
+  padding: 4px 10px !important;
+  border: 1px solid rgba(119, 225, 232, .52) !important;
+  border-radius: 999px !important;
+  background: rgba(4, 35, 39, .62) !important;
+  color: #d9fbfc !important;
+  font: 600 9px/1.2 var(--mono, Consolas, monospace) !important;
+  letter-spacing: .055em !important;
+  text-decoration: none !important;
+  white-space: nowrap !important;
+  backdrop-filter: blur(8px);
+}
+.hero-hyundai-link::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  margin-right: 7px;
+  border-radius: 50%;
+  background: #77e0e6;
+  box-shadow: 0 0 10px rgba(119, 224, 230, .75);
+}
+.hero-hyundai-link:hover { border-color: #bbf6f8 !important; color: #fff !important; }
+
+/* A clear official-service chapter leads into the broader workshop services. */
+.hyundai-section.section {
+  background: #e3ecea !important;
+  color: #142326 !important;
+  padding-block: clamp(48px, 6vw, 84px) !important;
+}
+.hyundai-section .hyundai-image { min-width: 0; }
+.hyundai-section .hyundai-image img {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  object-fit: cover;
+}
+.services.section {
+  background: #f7f8f6 !important;
+  color: #162326 !important;
+}
+
+/* The real customer-car gallery now provides a light visual break between films and the team story. */
+.customer-gallery {
+  position: relative !important;
+  z-index: 1;
+  margin: 0 !important;
+  padding: clamp(34px, 5vw, 60px) var(--pad, 22px) !important;
+  border: 0 !important;
+  background: linear-gradient(145deg, #f3f6f4, #e7eeeb) !important;
+  color: #152326 !important;
+}
+.customer-gallery::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(21, 116, 127, .25), transparent);
+}
+
+@media (max-width: 760px) {
+  .hero-signal { gap: 8px !important; }
+  .hero-hyundai-link { min-height: 27px !important; font-size: 8px !important; }
+  .hyundai-section.section { padding-block: 38px !important; }
+  .customer-gallery { padding: 30px 17px 36px !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-hyundai-link { backdrop-filter: none; }
+}

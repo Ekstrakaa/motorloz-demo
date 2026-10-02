@@ -1,7 +1,8 @@
 'use strict';
 (() => {
   const reviews = document.querySelector('#review-carousel');
-  if (!reviews || document.querySelector('.customer-gallery')) return;
+  const films = document.querySelector('.films-section');
+  if (!reviews || !films || document.querySelector('.customer-gallery')) return;
 
   const photos = [
     ['cliente-auto-01.webp', 'Todoterreno negro dentro del taller MOTORLOZ'],
@@ -77,6 +78,7 @@
   gallery.append(
     buildLane(photos, 'customer-gallery-opposite', 'Carrusel de fotos de autos de clientes')
   );
-  reviews.closest('.reviews').insertAdjacentElement('afterend', gallery);
+  const transition = films.closest('.diagnostic-films-aurora') || films;
+  transition.insertAdjacentElement('afterend', gallery);
 
 })();
