@@ -534,7 +534,7 @@
     const assistantOfferedHandoff = /(?:quer[eé]s|pod[eé]s).{0,55}(?:revisar|preparar|abrir).{0,45}(?:consulta|whatsapp)/i.test(latestAssistant);
     if (!force && !explicitHandoff && !acceptedOffer && !assistantOfferedHandoff) return;
     const details = handoffDetails();
-    if (details.name && details.vehicle && details.mileage && details.issue && details.urgency) {
+    if (details.name && details.vehicle && details.issue) {
       renderSummaryCard(details);
       reservationPrompt.hidden = false;
       reservationPrompt.removeAttribute('aria-hidden');
