@@ -14,9 +14,8 @@
     if (event.key === 'Escape' || event.key === 'Enter') dismiss();
   };
   if (!root.classList.contains('brand-intro-active')) { dismiss(); return; }
-  intro.querySelector('button').addEventListener('click', dismiss);
   document.addEventListener('keydown', onKey);
   // CSS also dismisses the overlay, even if this script cannot finish loading.
-  timer = setTimeout(dismiss, 3100);
+  timer = setTimeout(dismiss, 3200);
   window.addEventListener('pageshow', event => { if (event.persisted) dismiss(); });
 })();

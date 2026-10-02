@@ -1,71 +1,76 @@
-/* A short studio ident: the original symbol assembles with its wordmark. */
+/* A restrained three-second ident: the ML mark anchors the wordmark reveal. */
 .brand-intro { display:none; }
 .brand-intro-active .brand-intro {
   position:fixed;inset:0;z-index:10000;display:grid!important;place-items:center;
   padding:32px;color:#eff9f8;background:#070d10;isolation:isolate;overflow:hidden;
-  animation:brand-studio-out 3.05s cubic-bezier(.4,0,.2,1) both;
+  animation:brand-studio-out 3.15s cubic-bezier(.22,.7,.22,1) both;
 }
 html.brand-intro-active { scrollbar-color:#070d10 #070d10; }
 .brand-intro-atmosphere {
   position:absolute;z-index:-1;inset:0;pointer-events:none;
-  background:linear-gradient(180deg,#070d10 3%,rgba(7,13,16,.7) 48%,#070d10 95%),
-    linear-gradient(90deg,#070d10,rgba(7,13,16,.42) 45%,#070d10),
+  background:linear-gradient(180deg,rgba(7,13,16,.48) 0%,rgba(7,13,16,.2) 42%,rgba(7,13,16,.24) 70%,rgba(7,13,16,.62) 100%),
+    linear-gradient(90deg,rgba(7,13,16,.22),rgba(7,13,16,.04) 42%,rgba(7,13,16,.05) 63%,rgba(7,13,16,.25)),
     url('assets/taller-interior-overview.webp') center 45%/cover;
-  animation:brand-atmosphere 2.6s ease both;
+  animation:brand-atmosphere 3.3s cubic-bezier(.2,.7,.2,1) both;
 }
 .brand-intro-atmosphere::after {
   content:"";position:absolute;inset:0;
-  background:radial-gradient(ellipse at 50% 45%,rgba(45,165,180,.1),transparent 58%);
+  background:radial-gradient(ellipse at 50% 44%,rgba(45,165,180,.13),transparent 60%);
 }
 .brand-intro-studio { position:relative;width:min(680px,85vw); }
 .brand-intro-lockup { position:relative;width:100%;aspect-ratio:3/1; }
 .brand-intro-lockup img { position:absolute;inset:0;display:block;width:100%;height:100%;max-width:none;object-fit:contain; }
 .brand-intro-symbol {
   clip-path:inset(0 68% 0 0);transform-origin:16% 50%;
-  animation:brand-symbol-position 1.25s cubic-bezier(.16,1,.3,1) both;
+  animation:brand-symbol-position 1.18s cubic-bezier(.2,.78,.23,1) both;
 }
 .brand-intro-name {
   clip-path:inset(0 0 0 32%);
-  animation:brand-name-arrive .85s cubic-bezier(.16,1,.3,1) .62s both;
+  animation:brand-name-arrive .9s cubic-bezier(.2,.78,.23,1) .58s both;
 }
 .brand-intro-light {
   position:absolute;inset:0;pointer-events:none;
   -webkit-mask:url('assets/motorloz-logo.png') center/contain no-repeat;
   mask:url('assets/motorloz-logo.png') center/contain no-repeat;
-  background:linear-gradient(110deg,transparent 37%,rgba(211,249,252,.8) 46%,#fff 49%,transparent 56%);
-  background-size:300% 100%;mix-blend-mode:screen;
-  animation:brand-light-pass 1.05s ease-in-out 1.05s both;
+  background:linear-gradient(110deg,transparent 39%,rgba(211,249,252,.7) 48%,#fff 50%,transparent 56%);
+  background-size:290% 100%;mix-blend-mode:screen;
+  animation:brand-light-pass .8s cubic-bezier(.2,.7,.2,1) 1.28s both;
 }
 .brand-intro-caption {
-  position:relative;margin:23px 0 0;text-align:center;color:#bacbcf;
-  font:400 clamp(13px,1.3vw,16px)/1.6 var(--body,"Segoe UI",sans-serif);letter-spacing:.025em;
-  animation:brand-caption-arrive .7s ease 1.05s both;
+  position:relative;margin:23px 0 0;text-align:center;color:#d0dcdd;
+  font:400 clamp(13px,1.3vw,16px)/1.6 var(--body,"Segoe UI",sans-serif);letter-spacing:.035em;
+  animation:brand-caption-arrive .58s ease 1.18s both;
 }
-.brand-intro-caption::before { content:"";display:block;width:28px;height:1px;margin:0 auto 16px;background:#70b8c3; }
+.brand-intro-caption::before { content:"";display:block;width:30px;height:1px;margin:0 auto 16px;background:#70b8c3; }
 .brand-intro-signature {
   position:absolute;left:max(32px,env(safe-area-inset-left));right:max(32px,env(safe-area-inset-right));
   bottom:max(29px,env(safe-area-inset-bottom));display:flex;justify-content:space-between;gap:16px;
-  padding-top:17px;border-top:1px solid rgba(186,214,219,.15);color:#7f999f;
+  padding-top:17px;border-top:1px solid rgba(186,214,219,.2);color:#9aadb0;
   font:9px/1.5 var(--mono,"Consolas",monospace);letter-spacing:.16em;
-  animation:brand-caption-arrive .7s ease .55s both;
+  animation:brand-caption-arrive .58s ease .7s both;
 }
-.brand-intro>button {
-  position:absolute;z-index:1;top:max(22px,env(safe-area-inset-top));right:max(26px,env(safe-area-inset-right));
-  display:flex;align-items:center;min-height:44px;padding:8px 0;border:0;background:transparent;
-  color:#b6c9ce;font:12px var(--body,"Segoe UI",sans-serif);cursor:pointer;
-}
-.brand-intro>button:focus-visible { outline:2px solid #74cdd7;outline-offset:6px; }
 @keyframes brand-symbol-position {
-  0% { opacity:0;transform:translateX(33.5%) scale(1.18);filter:brightness(1.35); }
-  23% { opacity:1;transform:translateX(33.5%) scale(1.18);filter:brightness(1.1); }
-  40% { opacity:1;transform:translateX(33.5%) scale(1.18); }
+  0% { opacity:0;transform:translateX(33.5%) scale(1.12);filter:brightness(1.45) drop-shadow(0 0 18px rgba(47,188,203,.25)); }
+  22% { opacity:1;transform:translateX(33.5%) scale(1.12);filter:brightness(1.16) drop-shadow(0 0 12px rgba(47,188,203,.18)); }
+  53% { opacity:1;transform:translateX(33.5%) scale(1.12);filter:brightness(1.06); }
   100% { opacity:1;transform:none;filter:none; }
 }
-@keyframes brand-name-arrive { from { opacity:0;transform:translateX(14px);filter:blur(3px); } to { opacity:1;transform:none;filter:none; } }
-@keyframes brand-light-pass { 0% { opacity:0;background-position:100% 0; } 15% { opacity:.65; } 85% { opacity:.65; } 100% { opacity:0;background-position:0 0; } }
+@keyframes brand-name-arrive {
+  from { opacity:.25;clip-path:inset(0 0 0 100%);transform:translateX(-7px);filter:blur(2px); }
+  to { opacity:1;clip-path:inset(0 0 0 32%);transform:none;filter:none; }
+}
+@keyframes brand-light-pass {
+  from { opacity:0;background-position:115% 0; }
+  28% { opacity:.58; }
+  to { opacity:0;background-position:-15% 0; }
+}
 @keyframes brand-caption-arrive { from { opacity:0;transform:translateY(5px); } to { opacity:1;transform:none; } }
-@keyframes brand-atmosphere { from { opacity:0;transform:scale(1.025); } to { opacity:1;transform:none; } }
-@keyframes brand-studio-out { 0%,78% { opacity:1;visibility:visible; } 99% { opacity:0;visibility:visible;pointer-events:none; } 100% { opacity:0;visibility:hidden;pointer-events:none; } }
+@keyframes brand-atmosphere { from { opacity:.8;transform:scale(1.035); } to { opacity:1;transform:scale(1.005); } }
+@keyframes brand-studio-out {
+  0%,82% { opacity:1;visibility:visible; }
+  98% { opacity:0;visibility:visible;pointer-events:none; }
+  100% { opacity:0;visibility:hidden;pointer-events:none; }
+}
 @media(max-width:760px) {
   .brand-intro-active .brand-intro { padding:24px; }
   .brand-intro-studio { width:min(500px,87vw); }
