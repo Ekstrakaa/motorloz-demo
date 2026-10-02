@@ -1,0 +1,331 @@
+/* A cooler, cinematic Hyundai chapter between Subaru and the service catalogue. */
+.hyundai-signature.section {
+  display: block !important;
+  padding: clamp(42px, 5.5vw, 78px) var(--pad, 28px) clamp(34px, 4vw, 58px) !important;
+  overflow: hidden;
+  color: #f3f5f4 !important;
+  background:
+    radial-gradient(ellipse at 14% 55%, rgba(30, 117, 128, .16), transparent 48%),
+    linear-gradient(135deg, #0b1113 0%, #10191b 55%, #080d0f 100%) !important;
+}
+.hyundai-signature .section-label {
+  display: flex !important;
+  justify-content: space-between;
+  gap: 18px;
+  max-width: 1320px;
+  margin: 0 auto clamp(26px, 4vw, 50px) !important;
+  color: #91abad !important;
+}
+.hyundai-signature .section-label span:first-child { color: #6cd6df; }
+.hyundai-signature .hyundai-inner {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1.18fr) minmax(320px, .82fr) !important;
+  align-items: center;
+  gap: clamp(34px, 6.2vw, 96px) !important;
+  width: min(100%, 1320px) !important;
+  margin: 0 auto !important;
+}
+.hyundai-signature .hyundai-image {
+  position: relative;
+  isolation: isolate;
+  min-width: 0;
+  height: clamp(350px, 43vw, 590px) !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  overflow: visible !important;
+  border: 1px solid rgba(227, 238, 238, .17);
+  background: #131a1c;
+  box-shadow: 0 28px 75px rgba(0, 0, 0, .38);
+}
+.hyundai-signature .hyundai-image::before {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  content: "";
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(4, 9, 11, .32), transparent 30% 60%, rgba(4, 9, 11, .73));
+}
+.hyundai-signature .hyundai-image>img {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  object-fit: cover !important;
+  object-position: center 54%;
+  animation: hyundai-scene-drift 28s ease-in-out infinite alternate;
+}
+.hyundai-image-index {
+  position: absolute;
+  z-index: 2;
+  top: 18px;
+  left: 19px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  color: #eef4f3;
+  font: 600 8px var(--mono, monospace);
+  letter-spacing: .13em;
+  text-shadow: 0 1px 10px #0009;
+}
+.hyundai-image-index::before { width: 19px; height: 1px; content: ""; background: #64dce5; }
+.hyundai-image-index b { color: #9caeaf; font-weight: 500; }
+.hyundai-signature .hyundai-image figcaption {
+  position: absolute;
+  z-index: 2;
+  right: 26px;
+  bottom: 24px;
+  left: 26px;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  color: #f3f5f4;
+  text-shadow: 0 2px 15px #000b;
+}
+.hyundai-signature .hyundai-image figcaption span:first-child {
+  font: 600 clamp(24px, 3.3vw, 44px)/1 var(--body, sans-serif);
+  letter-spacing: .08em;
+}
+.hyundai-signature .hyundai-image figcaption span:last-child {
+  color: #d0dada;
+  font: 600 8px var(--mono, monospace);
+  letter-spacing: .13em;
+}
+.hyundai-emblem-card {
+  position: absolute;
+  z-index: 3;
+  right: clamp(-29px, -2vw, -14px);
+  top: 50%;
+  width: clamp(158px, 18vw, 236px);
+  margin: 0;
+  padding: 7px 7px 9px;
+  overflow: hidden;
+  border: 1px solid rgba(226, 240, 241, .39);
+  background: #070b0d;
+  box-shadow: 0 13px 36px rgba(0, 0, 0, .48), 0 0 24px rgba(108, 214, 223, .11);
+  transform: translateY(-50%);
+}
+.hyundai-emblem-card::after {
+  position: absolute;
+  inset: 7px 7px 23px;
+  content: "";
+  pointer-events: none;
+  background: linear-gradient(112deg, transparent 34%, rgba(225, 250, 251, .22) 49%, transparent 62%);
+  transform: translateX(-125%);
+  animation: hyundai-metal-glint 7s ease-in-out infinite;
+}
+.hyundai-emblem-card img { display: block; width: 100%; aspect-ratio: 1.775; object-fit: cover; }
+.hyundai-emblem-card span {
+  display: block;
+  padding-top: 7px;
+  color: #acbabc;
+  font: 600 7px var(--mono, monospace);
+  letter-spacing: .15em;
+  text-align: center;
+}
+.hyundai-signature .hyundai-copy {
+  align-self: center;
+  max-width: 590px !important;
+  padding: 8px 0 !important;
+  text-align: left !important;
+}
+.hyundai-signature .hyundai-copy>.eyebrow {
+  display: block !important;
+  margin: 0 0 16px !important;
+  color: #77d8df !important;
+  font: 600 9px var(--mono, monospace);
+  letter-spacing: .16em;
+}
+.hyundai-signature .hyundai-badge {
+  display: inline-flex !important;
+  justify-content: flex-start !important;
+  gap: 11px;
+  margin: 0 0 25px !important;
+  padding: 9px 13px;
+  border: 1px solid rgba(207, 219, 220, .19);
+  background: linear-gradient(110deg, rgba(227, 235, 235, .08), rgba(255, 255, 255, .015));
+  color: #f3f5f4;
+}
+.hyundai-signature .hyundai-badge img { display: none !important; }
+.hyundai-signature .hyundai-badge span {
+  color: #f0f3f2;
+  font-size: 13px !important;
+  letter-spacing: .2em !important;
+  text-shadow: 0 1px 2px #fff4, 0 -1px 3px #000;
+}
+.hyundai-signature .hyundai-badge i {
+  padding-left: 11px;
+  border-left-color: rgba(199, 214, 215, .45);
+  color: #aebbbc;
+  font: 600 7px var(--mono, monospace);
+  letter-spacing: .14em;
+}
+.hyundai-signature .hyundai-copy h2 {
+  max-width: 12ch;
+  margin: 0 0 19px !important;
+  color: #f4f6f5 !important;
+  font-size: clamp(36px, 4.3vw, 62px) !important;
+  line-height: .99 !important;
+  text-align: left !important;
+  text-wrap: balance;
+}
+.hyundai-signature .hyundai-copy h2 em { color: #72d3dc !important; font-style: normal; }
+.hyundai-signature .hyundai-copy>p:not(.eyebrow) {
+  max-width: 47ch;
+  margin: 0 0 13px !important;
+  color: #b9c6c7 !important;
+  font-size: 13px;
+  line-height: 1.78;
+  text-align: left !important;
+}
+.hyundai-signature .hyundai-copy>a.text-link {
+  display: inline-flex;
+  justify-content: flex-start !important;
+  gap: 11px;
+  margin: 14px 0 0 !important;
+  padding: 12px 16px;
+  border: 1px solid rgba(113, 214, 224, .56);
+  color: #edfcfc !important;
+  background: linear-gradient(110deg, rgba(24, 130, 143, .26), rgba(17, 39, 42, .42));
+  text-align: left !important;
+  text-decoration: none;
+  transition: background .2s ease, border-color .2s ease, transform .2s ease;
+}
+.hyundai-signature .hyundai-copy>a.text-link:hover { border-color: #a1f2f5; background: rgba(25, 137, 150, .4); transform: translateY(-2px); }
+.hyundai-signature .hyundai-source {
+  display: block !important;
+  margin: 24px 0 0 !important;
+  color: #718487 !important;
+  font: 600 7px var(--mono, monospace);
+  letter-spacing: .12em;
+  line-height: 1.6;
+  text-align: left !important;
+}
+.hyundai-proof-strip {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 17px;
+  max-width: 1320px;
+  margin: clamp(28px, 4.4vw, 58px) auto 0;
+  padding-top: 17px;
+  border-top: 1px solid rgba(205, 222, 224, .14);
+}
+.hyundai-proof-strip>img {
+  width: 72px;
+  height: 58px;
+  object-fit: cover;
+  object-position: center;
+  filter: saturate(.8) contrast(1.04);
+}
+.hyundai-proof-strip>div { display: grid; gap: 5px; }
+.hyundai-proof-strip .eyebrow { margin: 0; color: #6acbd4; font: 600 7px var(--mono, monospace); letter-spacing: .15em; }
+.hyundai-proof-strip strong { color: #dce6e5; font-size: 11px; font-weight: 550; }
+.hyundai-proof-location { color: #92a5a7; font: 600 7px var(--mono, monospace); letter-spacing: .12em; }
+.hyundai-proof-location i { padding-inline: 4px; color: #58bec8; font-style: normal; }
+
+@keyframes hyundai-scene-drift { from { transform: scale(1); } to { transform: scale(1.075); } }
+@keyframes hyundai-metal-glint { 0%, 58%, 100% { transform: translateX(-125%); } 78% { transform: translateX(125%); } }
+
+/* Give the four opposed pistons and crankshaft a restrained, legible idle cycle. */
+.subaru-section .engine-sketch.is-revving img { animation: boxer-engine-thrum 2.8s ease-in-out infinite !important; }
+.subaru-section .engine-sketch::after {
+  content: "" !important;
+  position: absolute !important;
+  z-index: 3 !important;
+  top: 67% !important;
+  left: 50% !important;
+  width: 17% !important;
+  aspect-ratio: 1 !important;
+  border: 1px solid rgba(47, 191, 203, .45) !important;
+  border-radius: 50% !important;
+  background: conic-gradient(from 0deg, transparent 0 67%, rgba(54, 207, 217, .65) 79%, transparent 89% 100%) !important;
+  box-shadow: 0 0 0 4px rgba(44, 184, 197, .055), 0 0 20px rgba(37, 182, 194, .2) !important;
+  transform: translate(-50%, -50%) !important;
+  animation: boxer-crank-glow 1.3s linear infinite !important;
+}
+.subaru-section .engine-sketch:not(.is-revving)::after { animation: none !important; }
+.boxer-motion-visor {
+  position: absolute;
+  z-index: 4;
+  top: 8%;
+  left: 2%;
+  width: clamp(156px, 18vw, 224px);
+  padding: 8px 9px 5px;
+  overflow: hidden;
+  border: 1px solid rgba(57, 158, 168, .34);
+  background: linear-gradient(135deg, rgba(7, 25, 29, .92), rgba(11, 43, 47, .82));
+  box-shadow: 0 13px 30px rgba(6, 25, 29, .24), inset 0 1px rgba(235, 255, 255, .08);
+  backdrop-filter: blur(9px);
+}
+.boxer-visor-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #d9eeee;
+  font: 650 7px var(--mono, monospace);
+  letter-spacing: .15em;
+}
+.boxer-visor-label i { color: #50cbd6; font-style: normal; }
+.boxer-motion-visor svg { display: block; width: 100%; margin-top: 4px; overflow: visible; }
+.boxer-motion-visor .cylinder-rail { fill: none; stroke: rgba(115, 220, 226, .23); stroke-width: 2; }
+.boxer-motion-visor .cylinder-edge { fill: none; stroke: rgba(205, 224, 224, .44); stroke-width: 1; }
+.boxer-motion-visor .piston rect { fill: url(#boxer-metal); stroke: #d5e4e4; stroke-width: .8; }
+.boxer-motion-visor .piston path { fill: none; stroke: rgba(37, 83, 88, .72); stroke-width: 1; }
+.boxer-motion-visor .connecting-rods { fill: none; stroke: url(#boxer-glass); stroke-width: 2; stroke-linecap: round; opacity: .8; transform-box: view-box; transform-origin: 50% 50%; }
+.boxer-motion-visor .crankwheel { fill: none; stroke: rgba(217, 234, 234, .7); stroke-width: 1.4; transform-box: view-box; transform-origin: 50% 50%; }
+.boxer-motion-visor .crankwheel circle:first-child { fill: rgba(6, 18, 21, .5); stroke: #63d2dc; stroke-width: 1.5; }
+.boxer-motion-visor .crankwheel circle:nth-child(2) { stroke: rgba(223, 240, 240, .58); }
+.boxer-motion-visor .crank-pin { fill: #70e4e9; filter: drop-shadow(0 0 3px rgba(72, 222, 231, .8)); }
+.boxer-motion-visor text { fill: #94b0b2; font: 5px var(--mono, monospace); letter-spacing: .09em; }
+.engine-sketch.is-revving .piston-a { animation: boxer-piston-a .78s ease-in-out infinite alternate; }
+.engine-sketch.is-revving .piston-b { animation: boxer-piston-b .78s ease-in-out infinite alternate; }
+.engine-sketch.is-revving .piston-c { animation: boxer-piston-c .78s ease-in-out -.39s infinite alternate; }
+.engine-sketch.is-revving .piston-d { animation: boxer-piston-d .78s ease-in-out -.39s infinite alternate; }
+.engine-sketch.is-revving .crankwheel { animation: boxer-crankwheel 1.56s linear infinite; }
+.engine-sketch.is-revving .connecting-rods { animation: boxer-rod-cycle 1.56s ease-in-out infinite alternate; }
+@keyframes boxer-engine-thrum { 0%, 100% { transform: translateY(0) scale(1.015); } 50% { transform: translateY(-1.5px) scale(1.025); } }
+@keyframes boxer-crank-glow { to { transform: translate(-50%, -50%) rotate(360deg); } }
+@keyframes boxer-crankwheel { to { transform: rotate(360deg); } }
+@keyframes boxer-rod-cycle { to { transform: rotate(13deg); } }
+@keyframes boxer-piston-a { to { transform: translateX(-7px); } }
+@keyframes boxer-piston-b { to { transform: translateX(7px); } }
+@keyframes boxer-piston-c { to { transform: translateX(-7px); } }
+@keyframes boxer-piston-d { to { transform: translateX(7px); } }
+
+/* Replace the earlier flat badge with a small 3D render while keeping the same controls. */
+#assistant-launcher .assistant-launcher-avatar { border: 0 !important; border-radius: 0 !important; background: transparent !important; box-shadow: none !important; }
+#assistant-launcher .assistant-launcher-avatar img { display: block !important; width: 100% !important; height: 100% !important; object-fit: contain !important; filter: drop-shadow(0 3px 7px rgba(52, 205, 215, .34)) !important; }
+#assistant-launcher .assistant-launcher-avatar::before { content: none !important; background: none !important; }
+.assistant-header .assistant-header-logo img { content: url("assets/asistente-3d-headset-premium-512.png?v=20261002-headset3d1") !important; }
+.assistant-message-assistant:not(.assistant-message-welcome)::before,
+.assistant-message-welcome::before { background-image: url("assets/asistente-3d-headset-premium-512.png?v=20261002-headset3d1") !important; background-size: contain !important; }
+
+@media (max-width: 760px) {
+  .hyundai-signature.section { padding: 34px 0 31px !important; }
+  .hyundai-signature>.section-label { margin: 0 18px 20px !important; font-size: 7px; }
+  .hyundai-signature .hyundai-inner { grid-template-columns: minmax(0, 1fr) !important; gap: 28px !important; }
+  .hyundai-signature .hyundai-image { width: 100vw !important; height: clamp(280px, 80vw, 390px) !important; margin-inline: calc(50% - 50vw) !important; }
+  .hyundai-emblem-card { right: 14px; top: auto; bottom: 54px; width: clamp(130px, 39vw, 172px); transform: none; }
+  .hyundai-signature .hyundai-image figcaption { right: 17px; bottom: 17px; left: 17px; align-items: end; }
+  .hyundai-signature .hyundai-image figcaption span:first-child { font-size: 24px; }
+  .hyundai-signature .hyundai-image figcaption span:last-child { max-width: 140px; font-size: 6px; line-height: 1.5; text-align: right; }
+  .hyundai-signature .hyundai-copy { margin-inline: 20px !important; padding: 0 !important; }
+  .hyundai-signature .hyundai-copy h2 { max-width: 13ch; font-size: clamp(37px, 10vw, 48px) !important; }
+  .hyundai-signature .hyundai-copy>p:not(.eyebrow) { font-size: 12px; }
+  .hyundai-proof-strip { grid-template-columns: 58px minmax(0, 1fr); gap: 12px; margin: 27px 19px 0; }
+  .hyundai-proof-strip>img { width: 58px; height: 48px; }
+  .hyundai-proof-strip strong { font-size: 10px; }
+  .hyundai-proof-location { grid-column: 2; font-size: 6px; }
+  .boxer-motion-visor { top: 8%; left: -1%; width: clamp(142px, 43vw, 184px); }
+  .subaru-section .engine-sketch::after { width: 19% !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hyundai-signature .hyundai-image>img,
+  .hyundai-emblem-card::after,
+  .subaru-section .engine-sketch img,
+  .subaru-section .engine-sketch::after,
+  .engine-sketch .piston,
+  .engine-sketch .crankwheel,
+  .engine-sketch .connecting-rods { animation: none !important; }
+}
