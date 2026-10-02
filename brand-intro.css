@@ -8,14 +8,15 @@
 html.brand-intro-active { scrollbar-color:#070d10 #070d10; }
 .brand-intro-atmosphere {
   position:absolute;z-index:-1;inset:0;pointer-events:none;
-  background:linear-gradient(180deg,rgba(7,13,16,.48) 0%,rgba(7,13,16,.2) 42%,rgba(7,13,16,.24) 70%,rgba(7,13,16,.62) 100%),
-    linear-gradient(90deg,rgba(7,13,16,.22),rgba(7,13,16,.04) 42%,rgba(7,13,16,.05) 63%,rgba(7,13,16,.25)),
+  background:linear-gradient(180deg,rgba(7,13,16,.56) 0%,rgba(7,13,16,.3) 42%,rgba(7,13,16,.34) 70%,rgba(7,13,16,.68) 100%),
+    linear-gradient(90deg,rgba(7,13,16,.28),rgba(7,13,16,.08) 42%,rgba(7,13,16,.09) 63%,rgba(7,13,16,.3)),
     url('assets/taller-interior-overview.webp') center 45%/cover;
-  animation:brand-atmosphere 3.3s cubic-bezier(.2,.7,.2,1) both;
+  animation:brand-atmosphere 2.65s cubic-bezier(.2,.7,.2,1) both;
 }
 .brand-intro-atmosphere::after {
   content:"";position:absolute;inset:0;
-  background:radial-gradient(ellipse at 50% 44%,rgba(45,165,180,.13),transparent 60%);
+  background:radial-gradient(ellipse at 50% 48%,rgba(5,11,13,.32) 0%,rgba(5,11,13,.2) 30%,transparent 66%),
+    radial-gradient(ellipse at 50% 44%,rgba(45,165,180,.1),transparent 60%);
 }
 .brand-intro-studio { position:relative;width:min(680px,85vw); }
 .brand-intro-lockup { position:relative;width:100%;aspect-ratio:3/1; }
@@ -65,7 +66,11 @@ html.brand-intro-active { scrollbar-color:#070d10 #070d10; }
   to { opacity:0;background-position:-15% 0; }
 }
 @keyframes brand-caption-arrive { from { opacity:0;transform:translateY(5px); } to { opacity:1;transform:none; } }
-@keyframes brand-atmosphere { from { opacity:.8;transform:scale(1.035); } to { opacity:1;transform:scale(1.005); } }
+@keyframes brand-atmosphere {
+  from { opacity:0;transform:scale(1.04);filter:blur(4px) brightness(.82); }
+  55% { opacity:1;filter:blur(1.5px) brightness(.94); }
+  to { opacity:1;transform:scale(1.005);filter:blur(0) brightness(1); }
+}
 @keyframes brand-studio-out {
   0%,82% { opacity:1;visibility:visible; }
   98% { opacity:0;visibility:visible;pointer-events:none; }
