@@ -1,4 +1,4 @@
-/* A restrained three-second ident: the ML mark anchors the wordmark reveal. */
+/* A restrained three-second ident built around Pablo Lozano's original lockup. */
 .brand-intro { display:none; }
 .brand-intro-active .brand-intro {
   position:fixed;inset:0;z-index:10000;display:grid!important;place-items:center;
@@ -8,35 +8,19 @@
 html.brand-intro-active { scrollbar-color:#070d10 #070d10; }
 .brand-intro-atmosphere {
   position:absolute;z-index:-1;inset:0;pointer-events:none;
-  background:linear-gradient(180deg,rgba(7,13,16,.56) 0%,rgba(7,13,16,.3) 42%,rgba(7,13,16,.34) 70%,rgba(7,13,16,.68) 100%),
-    linear-gradient(90deg,rgba(7,13,16,.28),rgba(7,13,16,.08) 42%,rgba(7,13,16,.09) 63%,rgba(7,13,16,.3)),
+  background:linear-gradient(180deg,rgba(7,13,16,.66) 0%,rgba(7,13,16,.4) 42%,rgba(7,13,16,.44) 70%,rgba(7,13,16,.76) 100%),
+    linear-gradient(90deg,rgba(7,13,16,.36),rgba(7,13,16,.14) 42%,rgba(7,13,16,.15) 63%,rgba(7,13,16,.36)),
     url('assets/taller-interior-overview.webp') center 45%/cover;
   animation:brand-atmosphere 2.65s cubic-bezier(.2,.7,.2,1) both;
 }
 .brand-intro-atmosphere::after {
   content:"";position:absolute;inset:0;
-  background:radial-gradient(ellipse at 50% 48%,rgba(5,11,13,.38) 0%,rgba(5,11,13,.24) 30%,transparent 66%),
+  background:radial-gradient(ellipse at 50% 48%,rgba(5,11,13,.48) 0%,rgba(5,11,13,.32) 30%,transparent 66%),
     radial-gradient(ellipse at 50% 44%,rgba(45,165,180,.1),transparent 60%);
 }
 .brand-intro-studio { position:relative;width:min(680px,85vw); }
 .brand-intro-lockup { position:relative;width:100%;aspect-ratio:3/1; }
 .brand-intro-lockup img { position:absolute;inset:0;display:block;width:100%;height:100%;max-width:none;object-fit:contain; }
-.brand-intro-symbol {
-  clip-path:inset(0 68% 0 0);transform-origin:16% 50%;
-  animation:brand-symbol-position 1.18s cubic-bezier(.2,.78,.23,1) both;
-}
-.brand-intro-name {
-  clip-path:inset(0 0 0 32%);
-  animation:brand-name-arrive .9s cubic-bezier(.2,.78,.23,1) .58s both;
-}
-.brand-intro-light {
-  position:absolute;inset:0;pointer-events:none;
-  -webkit-mask:url('assets/motorloz-logo.png') center/contain no-repeat;
-  mask:url('assets/motorloz-logo.png') center/contain no-repeat;
-  background:linear-gradient(110deg,transparent 39%,rgba(211,249,252,.7) 48%,#fff 50%,transparent 56%);
-  background-size:290% 100%;mix-blend-mode:screen;
-  animation:brand-light-pass .8s cubic-bezier(.2,.7,.2,1) 1.28s both;
-}
 .brand-intro-caption {
   position:relative;margin:23px 0 0;text-align:center;color:#d0dcdd;
   font:400 clamp(13px,1.3vw,16px)/1.6 var(--body,"Segoe UI",sans-serif);letter-spacing:.035em;
@@ -50,26 +34,11 @@ html.brand-intro-active { scrollbar-color:#070d10 #070d10; }
   font:9px/1.5 var(--mono,"Consolas",monospace);letter-spacing:.16em;
   animation:brand-caption-arrive .58s ease .7s both;
 }
-@keyframes brand-symbol-position {
-  0% { opacity:0;transform:translateX(33.5%) scale(1.12);filter:brightness(1.45) drop-shadow(0 0 18px rgba(47,188,203,.25)); }
-  22% { opacity:1;transform:translateX(33.5%) scale(1.12);filter:brightness(1.16) drop-shadow(0 0 12px rgba(47,188,203,.18)); }
-  53% { opacity:1;transform:translateX(33.5%) scale(1.12);filter:brightness(1.06); }
-  100% { opacity:1;transform:none;filter:none; }
-}
-@keyframes brand-name-arrive {
-  from { opacity:.25;clip-path:inset(0 0 0 100%);transform:translateX(-7px);filter:blur(2px); }
-  to { opacity:1;clip-path:inset(0 0 0 32%);transform:none;filter:none; }
-}
-@keyframes brand-light-pass {
-  from { opacity:0;background-position:115% 0; }
-  28% { opacity:.58; }
-  to { opacity:0;background-position:-15% 0; }
-}
 @keyframes brand-caption-arrive { from { opacity:0;transform:translateY(5px); } to { opacity:1;transform:none; } }
 @keyframes brand-atmosphere {
-  from { opacity:0;transform:scale(1.04);filter:blur(4px) brightness(.82); }
-  55% { opacity:1;filter:blur(1.5px) brightness(.94); }
-  to { opacity:1;transform:scale(1.005);filter:blur(0) brightness(1); }
+  from { opacity:0;transform:scale(1.04);filter:blur(5px) brightness(.70); }
+  55% { opacity:1;filter:blur(2px) brightness(.79); }
+  to { opacity:1;transform:scale(1.02);filter:blur(1.2px) brightness(.82); }
 }
 @keyframes brand-studio-out {
   0%,82% { opacity:1;visibility:visible; }

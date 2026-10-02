@@ -1,0 +1,85 @@
+/* Transparent redraw of Pablo Lozano's signature; the small assistant avatar reuses its P type. */
+.brand-art-original {
+  display:block!important;width:clamp(136px,14vw,170px)!important;height:auto!important;
+  max-height:66px!important;box-sizing:border-box!important;padding:0!important;object-fit:contain!important;
+  object-position:center!important;border:0!important;border-radius:0!important;background:transparent!important;
+  box-shadow:none!important;filter:drop-shadow(0 4px 10px rgba(0,0,0,.28));
+}
+.header .brand-lockup {width:auto!important;flex:0 0 auto!important;}
+.footer-brand .brand-art-original {
+  width:min(235px,30vw)!important;height:auto!important;max-height:none!important;
+  filter:drop-shadow(0 7px 16px rgba(0,0,0,.35));
+}
+.contact-brand img {
+  display:block!important;width:min(260px,84%)!important;height:auto!important;max-height:none!important;
+  padding:0!important;object-fit:contain!important;border:0!important;border-radius:0!important;
+  background:transparent!important;box-shadow:none!important;filter:drop-shadow(0 4px 9px rgba(9,35,39,.1));
+}
+.assistant-header .assistant-header-logo {
+  display:grid;place-items:center;flex:none;width:104px!important;height:auto!important;max-height:48px;
+  padding:0!important;overflow:visible;border:0!important;border-radius:0!important;background:transparent!important;
+  box-shadow:none!important;
+}
+.assistant-header .assistant-header-logo img {display:block;width:100%!important;height:auto!important;object-fit:contain!important;}
+#assistant-launcher .assistant-launcher-avatar {
+  display:grid;place-items:center;width:52px!important;height:52px!important;box-sizing:border-box!important;
+  padding:0!important;overflow:visible!important;border:0!important;border-radius:0!important;
+  background:transparent!important;box-shadow:none!important;
+}
+#assistant-launcher .assistant-launcher-avatar img {
+  display:block!important;width:70%!important;height:70%!important;object-fit:contain!important;border-radius:0!important;
+  filter:drop-shadow(0 2px 4px rgba(0,0,0,.32));
+}
+#assistant-launcher .assistant-launcher-avatar>span {right:-1px!important;bottom:-1px!important;border:2px solid #09262b!important;}
+.assistant-message-assistant:not(.assistant-message-welcome)::before,
+.assistant-message-welcome::before {
+  background-color:#0a3a42!important;
+  background-image:url("assets/pablo-assistant-avatar.png?v=20261002-mobilebrand4")!important;
+  background-position:center!important;background-size:70% auto!important;background-repeat:no-repeat!important;
+}
+.brand-intro-studio {position:relative;width:min(680px,85vw)!important;display:flex;flex-direction:column;align-items:center;}
+.brand-intro-studio::before {
+  content:"";position:absolute;z-index:-1;inset:10% 8% 18%;border-radius:50%;
+  background:radial-gradient(ellipse,rgba(119,213,217,.2),rgba(30,104,113,.11) 43%,transparent 72%);
+  filter:blur(24px);pointer-events:none;
+}
+.brand-intro-lockup.brand-intro-original {
+  position:relative;display:block;width:min(580px,80vw);height:auto;aspect-ratio:auto;overflow:visible;
+  border:0;border-radius:0;background:transparent;box-shadow:none;
+  animation:brand-original-mark-in .9s cubic-bezier(.2,.72,.2,1) both;
+}
+.brand-intro-lockup.brand-intro-original img {
+  position:static;display:block;width:100%;height:auto;max-width:none;object-fit:contain;
+  border:0;border-radius:0;background:transparent;filter:drop-shadow(0 9px 18px rgba(0,0,0,.35));
+  clip-path:inset(0 100% 0 0);animation:pablo-wordmark-reveal 1.18s cubic-bezier(.2,.76,.24,1) .12s both;
+}
+.brand-intro-lockup.brand-intro-original::after {
+  content:"";position:absolute;z-index:2;inset:0;pointer-events:none;mix-blend-mode:screen;
+  background:linear-gradient(108deg,transparent 42%,rgba(220,250,252,.72) 49%,#fff 50%,transparent 57%);
+  background-size:260% 100%;opacity:0;
+  -webkit-mask:url("assets/pablo-lozano-logo-dark-transparent.png?v=20261002-mobilebrand4") center/contain no-repeat;
+  mask:url("assets/pablo-lozano-logo-dark-transparent.png?v=20261002-mobilebrand4") center/contain no-repeat;
+  animation:pablo-wordmark-sheen 1s cubic-bezier(.2,.7,.2,1) .72s both;
+}
+.brand-intro-original+.brand-intro-caption {margin-top:28px;animation-delay:.36s;}
+.brand-intro-original+.brand-intro-caption::before {margin-bottom:13px;}
+@keyframes pablo-wordmark-reveal {from {clip-path:inset(0 100% 0 0);filter:brightness(1.22) blur(1px);}to {clip-path:inset(0);filter:drop-shadow(0 9px 18px rgba(0,0,0,.35));}}
+@keyframes pablo-wordmark-sheen {0% {opacity:0;background-position:125% 0;}28% {opacity:.7;}100% {opacity:0;background-position:-25% 0;}}
+@keyframes brand-original-mark-in {
+  from {opacity:0;transform:translateY(7px) scale(.985);filter:blur(1px);}
+  to {opacity:1;transform:none;filter:none;}
+}
+@media(max-width:760px) {
+  .brand-art-original {width:126px!important;max-height:58px!important;}
+  .footer-brand .brand-art-original {width:min(210px,68vw)!important;max-height:none!important;}
+  .contact-brand img {width:min(240px,84%)!important;}
+  .assistant-header .assistant-header-logo {width:91px!important;max-height:44px;}
+  #assistant-launcher .assistant-launcher-avatar {width:44px!important;height:44px!important;}
+  #assistant-launcher .assistant-launcher-avatar img {width:70%!important;height:70%!important;}
+  .brand-intro-studio {width:min(560px,88vw)!important;}
+  .brand-intro-lockup.brand-intro-original {width:min(490px,84vw);}
+}
+@media(prefers-reduced-motion:reduce) {
+  .brand-intro-lockup.brand-intro-original,.brand-intro-lockup.brand-intro-original img {animation:none;clip-path:none;opacity:1;}
+  .brand-intro-lockup.brand-intro-original::after {display:none;}
+}
