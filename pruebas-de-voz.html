@@ -20,7 +20,9 @@
     .samples { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
     article { border-radius: var(--radius); border: 1px solid var(--line); background: var(--card); padding: 24px; display: flex; flex-direction: column; min-width: 0; transition: border-color .2s, background .2s; }
     article.playing { border-color: var(--accent); background: #143338; }
-    .number { width: 46px; height: 46px; border: 1px solid #3a6063; border-radius: 50%; display: grid; place-items: center; color: var(--accent); font-size: 20px; margin-bottom: 24px; font-variant-numeric: tabular-nums; }
+    .sample-label { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+    .tone { color: var(--muted); font-size: 12px; }
+    .number { width: 46px; height: 46px; border: 1px solid #3a6063; border-radius: 50%; display: grid; place-items: center; color: var(--accent); font-size: 20px; margin-bottom: 0; flex-shrink: 0; font-variant-numeric: tabular-nums; }
     h2 { font-size: 25px; line-height: 1.13; letter-spacing: -.03em; margin: 0 0 12px; }
     article p { color: var(--muted); line-height: 1.6; font-size: 14px; margin: 0 0 24px; }
     .player { margin-top: auto; }
@@ -41,7 +43,7 @@
       .intro p { font-size: 15px; }
       .samples { grid-template-columns: 1fr; gap: 14px; }
       article { padding: 22px; }
-      .number { width: 36px; height: 36px; font-size: 16px; margin-bottom: 14px; }
+      .number { width: 36px; height: 36px; font-size: 16px; margin-bottom: 0; }
       h2 { font-size: 24px; }
       article p { margin-bottom: 18px; }
       footer { flex-direction: column; gap: 8px; }
@@ -53,32 +55,50 @@
   <main>
     <header class="brand"><img src="assets/motorloz-logo.png" alt="MOTORLOZ · Taller Pablo Lozano"><span>Elegir la voz del asistente</span></header>
     <div class="intro">
-      <span class="eyebrow">Tres estilos nuevos · Español rioplatense</span>
+      <span class="eyebrow">Seis voces de OpenAI · Nueva comparación</span>
       <h1>Una voz que te acompañe.</h1>
-      <p>La misma consulta de mecánica, con tres maneras de decirla. Escuchá cómo pregunta, explica y transmite calma.</p>
+      <p>Seis voces y tonalidades distintas con el mismo texto de taller. Pedimos acento uruguayo y conversación natural: escuchalas y elegí según cómo suenan.</p>
     </div>
-    <section class="samples" aria-label="Pruebas de voz">
+    <section class="samples" aria-label="Seis pruebas de voz">
       <article>
-        <span class="number" aria-hidden="true">01</span>
-        <h2>1. Cercano<br>y tranquilo</h2>
-        <p>Una charla amable, con tono relajado y preguntas suaves. La intención es acompañar sin sonar solemne.</p>
-        <div class="player"><audio controls preload="metadata" aria-label="Escuchar prueba 1: cercano y tranquilo" src="assets/voice-styles/prueba-1.mp3"></audio><span class="state" aria-live="polite">Listo para escuchar</span><a class="download" href="assets/voice-styles/prueba-1.mp3" download>Descargar prueba 1</a></div>
+        <div class="sample-label"><span class="number" aria-hidden="true">01</span><span class="tone">Medio y suave</span></div>
+        <h2>1. Cálido y cercano</h2>
+        <p>Un tono medio y amable. La intención es conversar de cerca y escuchar.</p>
+        <div class="player"><audio controls preload="metadata" aria-label="Escuchar prueba 1: Cálido y cercano" src="assets/voice-styles/seleccion-1.mp3"></audio><span class="state" aria-live="polite">Listo para escuchar</span><a class="download" href="assets/voice-styles/seleccion-1.mp3" download>Descargar prueba 1</a></div>
       </article>
       <article>
-        <span class="number" aria-hidden="true">02</span>
-        <h2>2. Expresivo<br>y atento</h2>
-        <p>Más reacción al escuchar el problema y más cambios de entonación al preguntar y explicar.</p>
-        <div class="player"><audio controls preload="metadata" aria-label="Escuchar prueba 2: expresivo y atento" src="assets/voice-styles/prueba-2.mp3"></audio><span class="state" aria-live="polite">Listo para escuchar</span><a class="download" href="assets/voice-styles/prueba-2.mp3" download>Descargar prueba 2</a></div>
+        <div class="sample-label"><span class="number" aria-hidden="true">02</span><span class="tone">Medio y dinámico</span></div>
+        <h2>2. Ágil y conversador</h2>
+        <p>Más ritmo y variación al preguntar. La intención es una charla espontánea.</p>
+        <div class="player"><audio controls preload="metadata" aria-label="Escuchar prueba 2: Ágil y conversador" src="assets/voice-styles/seleccion-2.mp3"></audio><span class="state" aria-live="polite">Listo para escuchar</span><a class="download" href="assets/voice-styles/seleccion-2.mp3" download>Descargar prueba 2</a></div>
       </article>
       <article>
-        <span class="number" aria-hidden="true">03</span>
-        <h2>3. Mecánico<br>experimentado</h2>
-        <p>Un tono más firme y reflexivo, que transmite criterio al explicar qué conviene revisar.</p>
-        <div class="player"><audio controls preload="metadata" aria-label="Escuchar prueba 3: mecánico experimentado" src="assets/voice-styles/prueba-3.mp3"></audio><span class="state" aria-live="polite">Listo para escuchar</span><a class="download" href="assets/voice-styles/prueba-3.mp3" download>Descargar prueba 3</a></div>
+        <div class="sample-label"><span class="number" aria-hidden="true">03</span><span class="tone">Grave y calmado</span></div>
+        <h2>3. Sereno y atento</h2>
+        <p>Un tono grave con preocupación contenida y una explicación tranquila.</p>
+        <div class="player"><audio controls preload="metadata" aria-label="Escuchar prueba 3: Sereno y atento" src="assets/voice-styles/seleccion-3.mp3"></audio><span class="state" aria-live="polite">Listo para escuchar</span><a class="download" href="assets/voice-styles/seleccion-3.mp3" download>Descargar prueba 3</a></div>
+      </article>
+      <article>
+        <div class="sample-label"><span class="number" aria-hidden="true">04</span><span class="tone">Medio y luminoso</span></div>
+        <h2>4. Amable y liviano</h2>
+        <p>Un tono más liviano y abierto. La intención es que dé confianza para preguntar.</p>
+        <div class="player"><audio controls preload="metadata" aria-label="Escuchar prueba 4: Amable y liviano" src="assets/voice-styles/seleccion-4.mp3"></audio><span class="state" aria-live="polite">Listo para escuchar</span><a class="download" href="assets/voice-styles/seleccion-4.mp3" download>Descargar prueba 4</a></div>
+      </article>
+      <article>
+        <div class="sample-label"><span class="number" aria-hidden="true">05</span><span class="tone">Medio y reflexivo</span></div>
+        <h2>5. Claro y didáctico</h2>
+        <p>La explicación busca claridad, con pausas cortas y un tono reflexivo.</p>
+        <div class="player"><audio controls preload="metadata" aria-label="Escuchar prueba 5: Claro y didáctico" src="assets/voice-styles/seleccion-5.mp3"></audio><span class="state" aria-live="polite">Listo para escuchar</span><a class="download" href="assets/voice-styles/seleccion-5.mp3" download>Descargar prueba 5</a></div>
+      </article>
+      <article>
+        <div class="sample-label"><span class="number" aria-hidden="true">06</span><span class="tone">Grave y firme</span></div>
+        <h2>6. Firme y de taller</h2>
+        <p>Un tono grave con más presencia. La intención es transmitir criterio sin solemnidad.</p>
+        <div class="player"><audio controls preload="metadata" aria-label="Escuchar prueba 6: Firme y de taller" src="assets/voice-styles/seleccion-6.mp3"></audio><span class="state" aria-live="polite">Listo para escuchar</span><a class="download" href="assets/voice-styles/seleccion-6.mp3" download>Descargar prueba 6</a></div>
       </article>
     </section>
-    <details><summary>Ver el texto que dicen las tres voces</summary><blockquote>¿Un golpeteo después de un pozo? Ta, contame un poquito más. ¿Lo sentís al doblar o cuando agarrás otra irregularidad? Puede venir de distintas partes de la suspensión. Con eso solo no te puedo decir qué se dañó, pero sí ayudarte a ordenar lo que conviene revisar.</blockquote></details>
-    <footer><strong>Decime cuál se acerca más: 1, 2 o 3.</strong><span>Voces generadas por IA. Audios guardados: repetirlos no genera consumo de API.</span></footer>
+    <details><summary>Ver el texto que dicen las seis voces</summary><blockquote>Bien, te entiendo. Si el ruido empezó después de ese pozo, vamos por partes. ¿Lo sentís al doblar o también cuando vas derecho? Puede ser algo de la suspensión, pero hay que revisarlo para saber. Decime qué auto tenés y lo vemos juntos.</blockquote></details>
+    <footer><strong>Decime cuál se acerca más: del 1 al 6.</strong><span>Voces generadas por IA. Audios guardados: repetirlos no genera consumo de API.</span></footer>
   </main>
   <script>
     const players = [...document.querySelectorAll('audio')];
