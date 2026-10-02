@@ -1,0 +1,163 @@
+/* Clearer, more confident calls to action in the MOTORLOZ teal palette. */
+:is(.hero-copy .button.light, .header .header-cta, #diagnostic-chat-open) {
+  position: relative !important;
+  isolation: isolate !important;
+  overflow: hidden !important;
+  border: 1px solid rgba(167, 239, 239, .84) !important;
+  background:
+    radial-gradient(ellipse at 22% -18%, rgba(125, 235, 235, .34), transparent 48%),
+    linear-gradient(128deg, #147985 0%, #0c6470 44%, #103e4a 100%) !important;
+  color: #f7ffff !important;
+  text-shadow: 0 1px 2px rgba(0, 24, 30, .28) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .48),
+    inset 0 -2px 0 rgba(1, 24, 31, .3),
+    0 12px 28px rgba(3, 37, 44, .3),
+    0 0 0 1px rgba(65, 196, 204, .16) !important;
+  backdrop-filter: blur(12px) saturate(125%) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(125%) !important;
+  transition: transform .26s cubic-bezier(.2, .75, .25, 1), box-shadow .26s ease, border-color .26s ease, filter .26s ease !important;
+}
+
+:is(.hero-copy .button.light, .header .header-cta, #diagnostic-chat-open):hover {
+  transform: translateY(-2px) !important;
+  border-color: rgba(220, 255, 253, .98) !important;
+  filter: brightness(1.1) saturate(1.08) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .58),
+    inset 0 -2px 0 rgba(1, 24, 31, .24),
+    0 17px 34px rgba(3, 37, 44, .35),
+    0 0 22px rgba(64, 191, 199, .2) !important;
+}
+
+:is(.hero-copy .button.light, .header .header-cta, #diagnostic-chat-open):active {
+  transform: translateY(0) scale(.985) !important;
+}
+
+.hero-copy .button.light {
+  width: 238px !important;
+  min-width: 238px !important;
+  min-height: 58px !important;
+  justify-content: space-between !important;
+  gap: 14px !important;
+  padding: 7px 8px 7px 20px !important;
+  border-radius: 999px !important;
+  font-size: 13px !important;
+  letter-spacing: .005em !important;
+}
+
+#diagnostic-chat-open {
+  width: min(100%, 286px) !important;
+  min-width: min(100%, 286px) !important;
+  min-height: 58px !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  padding: 7px 8px 7px 20px !important;
+  border-radius: 999px !important;
+  font-size: 13px !important;
+  letter-spacing: 0 !important;
+  text-align: left !important;
+}
+
+.hero-copy .button.light > span,
+#diagnostic-chat-open > span,
+.header .header-cta > span[aria-hidden="true"] {
+  position: relative !important;
+  z-index: 1 !important;
+  display: grid !important;
+  place-items: center !important;
+  flex: 0 0 40px !important;
+  width: 40px !important;
+  height: 40px !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+  border: 1px solid rgba(219, 255, 253, .58) !important;
+  border-radius: 50% !important;
+  background: linear-gradient(145deg, rgba(198, 255, 251, .28), rgba(30, 135, 146, .28)) !important;
+  color: #f4ffff !important;
+  box-shadow: inset 0 1px rgba(255, 255, 255, .28), 0 3px 9px rgba(0, 28, 34, .15) !important;
+  font-size: 0 !important;
+  line-height: 0 !important;
+  text-shadow: none !important;
+  transition: transform .26s cubic-bezier(.2, .75, .25, 1), background .26s ease !important;
+}
+
+.hero-copy .button.light > span::before,
+#diagnostic-chat-open > span::before,
+.header .header-cta > span[aria-hidden="true"]::before {
+  content: "↗" !important;
+  position: static !important;
+  display: block !important;
+  width: auto !important;
+  height: auto !important;
+  border: 0 !important;
+  color: inherit !important;
+  font: 500 20px/1 "Segoe UI", Arial, sans-serif !important;
+}
+
+.hero-copy .button.light > span::after,
+#diagnostic-chat-open > span::after,
+.header .header-cta > span[aria-hidden="true"]::after {
+  content: none !important;
+}
+
+:is(.hero-copy .button.light, #diagnostic-chat-open):hover > span {
+  transform: translate(1px, -1px) !important;
+  background: linear-gradient(145deg, rgba(221, 255, 252, .4), rgba(39, 156, 164, .38)) !important;
+}
+
+.header .header-cta {
+  min-height: 46px !important;
+  gap: 11px !important;
+  padding: 5px 6px 5px 17px !important;
+  border-radius: 999px !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  letter-spacing: .015em !important;
+  white-space: nowrap !important;
+}
+
+.header .header-cta > span[aria-hidden="true"] {
+  flex-basis: 32px !important;
+  width: 32px !important;
+  height: 32px !important;
+}
+
+.header .header-cta > span[aria-hidden="true"]::before {
+  font-size: 17px !important;
+}
+
+@media (max-width: 760px) {
+  .hero-copy .button.light {
+    width: min(100%, 230px) !important;
+    min-width: min(100%, 230px) !important;
+    min-height: 54px !important;
+    padding-left: 17px !important;
+    font-size: 12px !important;
+  }
+
+  #diagnostic-chat-open {
+    width: min(100%, 286px) !important;
+    min-width: 0 !important;
+    min-height: 56px !important;
+    padding-left: 17px !important;
+    font-size: 12px !important;
+  }
+
+  .hero-copy .button.light > span,
+  #diagnostic-chat-open > span {
+    flex-basis: 38px !important;
+    width: 38px !important;
+    height: 38px !important;
+  }
+
+  .header .header-cta > span[aria-hidden="true"] { display: none !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :is(.hero-copy .button.light, .header .header-cta, #diagnostic-chat-open),
+  .hero-copy .button.light > span,
+  #diagnostic-chat-open > span {
+    transition: none !important;
+  }
+}
