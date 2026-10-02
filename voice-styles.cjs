@@ -1,18 +1,16 @@
-const text = '¿Un golpeteo después de un pozo? Ta, contame un poquito más. ¿Lo sentís al doblar o cuando agarrás otra irregularidad? Puede venir de distintas partes de la suspensión. Con eso solo no te puedo decir qué se dañó, pero sí ayudarte a ordenar lo que conviene revisar.';
+const text = 'Bien, te entiendo. Si el ruido empezó después de ese pozo, vamos por partes. ¿Lo sentís al doblar o también cuando vas derecho? Puede ser algo de la suspensión, pero hay que revisarlo para saber. Decime qué auto tenés y lo vemos juntos.';
 
-const base = 'Interpret this as one person speaking directly to another in a small workshop. Speak entirely in native Uruguayan Rioplatense Spanish, using the voseo and pronunciation in the script. Adult male voice. Deliver the supplied words exactly once. The client is worried: acknowledge that with attentive, measured concern, then explain clearly and calmly. The opening is a genuine question, not a greeting. The final sentence reassures without promising a diagnosis. Keep technical Spanish words intelligible. Let sentence lengths and intention shape the rhythm.';
+const base = `IDIOMA: español en toda la muestra. ACENTO: uruguayo de Montevideo, rioplatense cotidiano, estable de principio a fin. Voseo auténtico: sentís, decime, tenés. Pronunciá las vocales españolas puras; la erre española y la jota española; la ye y la elle con el rehilamiento suave habitual en Montevideo. Conservá el acento uruguayo al decir términos de mecánica. La voz no cambia al inglés ni toma la pronunciación de un hablante estadounidense. PERSONA: hombre adulto del taller, conversando a corta distancia con un cliente preocupado. INTERPRETACIÓN: respondé con atención real, usando grupos de palabras ligados y pausas según el sentido. Cada pregunta tiene intención de escuchar la respuesta. El texto es una conversación hablada, sin presentación de locutor, sin leer una lista y sin exagerar el acento. Decí exactamente el texto suministrado, una sola vez. La preocupación es moderada; transmití ayuda sin prometer un diagnóstico.`;
 
-module.exports = Object.freeze({
-  1: {
-    voice: 'ballad', model: 'gpt-4o-mini-tts', label: 'Cercano y tranquilo', text,
-    instructions: `${base} Delivery: an informal, warm conversation with a familiar client. Relaxed mid-register, soft phrase endings, slight smile only in the invitation to explain. Ask the second question with real curiosity. Leave a short thinking pause before the explanation. Keep the pace natural rather than slow.`
-  },
-  2: {
-    voice: 'fable', model: 'gpt-4o-mini-tts', label: 'Expresivo y atento', text,
-    instructions: `${base} Delivery: a lively but grounded workshop advisor. Make the first question carry a small, authentic reaction of concern. Use flexible pitch and conversational emphasis on the differences between turning and road irregularities. Explain with energy, then settle into a calm reassuring ending. A spontaneous spoken exchange, without theatrical acting.`
-  },
-  3: {
-    voice: 'cedar', model: 'gpt-4o-mini-tts', label: 'Mecánico experimentado', text,
-    instructions: `${base} Delivery: a mature mechanic, thoughtful and confident, speaking at normal conversational speed. A grounded lower register, concise phrase endings, modest breath between ideas. The questions sound attentive and practical. Pause briefly at the diagnostic uncertainty, then finish with helpful warmth. Keep a varied conversational cadence, not a lecture.`
-  }
-});
+const definitions = [
+  ['ash', 'Cálido y cercano', 'Medio y suave', 'Registro medio masculino y cálido, con una leve textura de voz. El inicio es una respuesta cercana a alguien que ya habló. Ritmo ágil de conversación; la pregunta sube apenas y el cierre es amable. Un asesor que escucha sin apurar.', 'Un tono medio y amable. La intención es conversar de cerca y escuchar.'],
+  ['echo', 'Ágil y conversador', 'Medio y dinámico', 'Registro medio masculino, despierto y espontáneo. Ligá las frases como en una charla; cambiá el ritmo al pasar de escuchar a preguntar. Hacé una pausa corta tras vamos por partes. La pregunta es curiosa y el final invita a seguir conversando, con calidez.', 'Más ritmo y variación al preguntar. La intención es una charla espontánea.'],
+  ['cedar', 'Sereno y atento', 'Grave y calmado', 'Registro grave masculino, próximo y sereno. Bien, te entiendo lleva empatía contenida, como si el cliente estuviera inquieto. Bajá ligeramente la intensidad al explicar la incertidumbre. Preguntá con interés real y cerrá con una seguridad tranquila, a velocidad normal.', 'Un tono grave con preocupación contenida y una explicación tranquila.'],
+  ['ballad', 'Amable y liviano', 'Medio y luminoso', 'Registro medio masculino, liviano y accesible. Sonrisa muy leve en el cierre; el problema se toma en serio. Usá melodía conversacional suave y frases fluidas, sin solemnidad. La pregunta contrasta al doblar con cuando vas derecho y espera una respuesta.', 'Un tono más liviano y abierto. La intención es que dé confianza para preguntar.'],
+  ['verse', 'Claro y didáctico', 'Medio y reflexivo', 'Registro medio masculino, concreto y reflexivo. Explicá como a alguien al lado del auto: claridad sin dar una clase. Pequeño cambio de intención antes de puede ser algo, marcando que es una posibilidad. Pregunta sencilla, vocales relajadas y cierre cálido, ritmo natural.', 'La explicación busca claridad, con pausas cortas y un tono reflexivo.'],
+  ['onyx', 'Firme y de taller', 'Grave y firme', 'Registro grave masculino con presencia cotidiana. Evitá el bajo impostado de publicidad: la voz viene de una persona hablando normalmente en el taller. Ataques suaves, frases ligadas, pregunta atenta y final cercano. Ritmo vivo sin apuro, firmeza sin frialdad.', 'Un tono grave con más presencia. La intención es transmitir criterio sin solemnidad.']
+];
+
+module.exports = Object.freeze(Object.fromEntries(definitions.map(([voice, label, tone, direction, description], index) => [String(index + 1), Object.freeze({
+  voice, label, tone, description, text, model: 'gpt-4o-mini-tts', instructions: `${base}\nTONALIDAD E INTERPRETACIÓN: ${direction}`
+})])));
