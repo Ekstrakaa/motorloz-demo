@@ -90,7 +90,7 @@ test('never claims the WhatsApp control is visible while required intake data is
   } finally { global.fetch = previousFetch; }
 });
 
-test('serves the selected Onyx voice without requiring Gemini for narration', async () => {
+test('serves the selected Cedar voice without requiring Gemini for narration', async () => {
   process.env.OPENAI_API_KEY = 'test-key';
   const geminiKey = process.env.GEMINI_API_KEY;
   delete process.env.GEMINI_API_KEY;
@@ -107,13 +107,13 @@ test('serves the selected Onyx voice without requiring Gemini for narration', as
     assert.equal(res.statusCode, 200);
     assert.equal(res.headers['Content-Type'], 'audio/wav');
     assert.equal(Buffer.compare(res.body.subarray(0,wav.length), wav), 0);
-    assert.equal(request.voice, 'onyx');
+    assert.equal(request.voice, 'cedar');
     assert.equal(request.model, 'gpt-4o-mini-tts');
     assert.equal(request.response_format, 'wav');
     assert.equal(request.input, 'Hola, soy Motor Los, Pablo Lozano.');
     assert.match(request.instructions, /uruguayo de Montevideo/);
     assert.match(request.instructions, /nunca Motorola/);
-    assert.equal(res.headers['X-Voice'], 'onyx');
+    assert.equal(res.headers['X-Voice'], 'cedar');
   } finally {
     global.fetch = previousFetch;
     if(geminiKey) process.env.GEMINI_API_KEY = geminiKey;
@@ -144,7 +144,7 @@ test('streams fixed-voice audio chunks without waiting for the complete recordin
     const frames = Buffer.concat(res.chunks).toString().trim().split('\n\n').map(frame => JSON.parse(frame.slice(6)));
     assert.deepEqual(Buffer.concat(frames.map(frame => Buffer.from(frame.delta.data, 'base64'))), pcm);
     assert.equal(request.response_format, 'pcm');
-    assert.equal(request.voice, 'onyx');
+    assert.equal(request.voice, 'cedar');
   } finally {
     global.fetch = previousFetch;
     release();
@@ -185,7 +185,7 @@ test('an exhausted OpenAI balance never calls Gemini or changes the selected voi
     await handle({ method: 'POST', body: { text: 'Hola' }, headers: {}, socket: {} }, res, 'speech-stream');
     assert.equal(res.statusCode, 429);
     assert.equal(requests.length, 1);
-    assert.equal(requests[0].voice, 'onyx');
+    assert.equal(requests[0].voice, 'cedar');
     assert.equal(JSON.parse(res.body).error, 'saldo_openai_agotado');
   } finally { global.fetch = previousFetch; delete process.env.OPENAI_API_KEY; }
 });
