@@ -38,12 +38,12 @@
     },
     {
       type: 'image',
-      src: 'assets/hero-ferrari.webp',
-      focus: '48% 51%',
+      src: 'assets/hero-bruno.png',
+      focus: '50% 49%',
       zoomStart: 1.025,
       zoomEnd: 1.065,
       duration: 5000,
-      label: 'PASIÓN MULTIMARCA'
+      label: 'BRUNO · DIAGNÓSTICO EN EL TALLER'
     },
     {
       type: 'image',

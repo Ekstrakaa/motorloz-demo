@@ -78,7 +78,7 @@
   rotateImages('[data-subaru-carousel]', '.subaru-carousel-stage img', 4800, (i, n) => {
     const label = document.querySelector('.subaru-carousel-caption span:first-child');
     const count = document.querySelector('[data-carousel-index]');
-    if (label) label.textContent = i ? 'SUBARU · ATENCIÓN MULTIMARCA' : 'SUBARU · DETALLE';
+    if (label) label.textContent = ['SUBARU · DETALLE', 'SUBARU · ATENCIÓN MULTIMARCA', 'SUBARU · EN EL TALLER'][i];
     if (count) count.textContent = `${String(i + 1).padStart(2, '0')} / ${String(n).padStart(2, '0')}`;
   });
   const diagLabels = ['ATENCIÓN TOYOTA GR', 'DETALLE · TOYOTA GR', 'CORVETTE · TALLER', 'MOTOR PORSCHE · REVISIÓN'];

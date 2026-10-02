@@ -67,7 +67,17 @@ test('the first greeting and successive replies speak in the same voice flow wit
     'Prepará la consulta para WhatsApp': 'Claro, podés revisar el mensaje antes de enviarlo.',
     '¿Y si falla la voz?': 'Te sigo respondiendo por escrito.',
     'Probá otra vez la voz': 'Ahora sí, te escucho.',
-    '¿Qué pasó con el cupo?': 'El chat sigue disponible por texto.'
+    '¿Qué pasó con el cupo?': 'El chat sigue disponible por texto.',
+    'Cómo puedo hacer para coordinar una revisión en el taller con esto': {
+      reply:'Ya tengo los datos para la consulta, Emmanuel. ¿Querés que prepare la solicitud para que la revises y la envíes al taller por WhatsApp?',
+      handoffReady:false,
+      facts:{name:'Emmanuel Leoni',vehicle:'Subaru Impreza',year:'',mileage:'200 mil km',issue:'Vibración al acelerar',circumstances:'Desde ayer',urgency:'Puede esperar'}
+    },
+    'Sí, preparala': {
+      reply:'Listo, Emmanuel. Tocá “Abrir WhatsApp” acá abajo para revisar y enviar la solicitud.',
+      handoffReady:true,
+      facts:{name:'Emmanuel Leoni',vehicle:'Subaru Impreza',year:'',mileage:'200 mil km',issue:'Vibración al acelerar',circumstances:'Desde ayer',urgency:'Puede esperar'}
+    }
   };
   const fetch = async (url, options) => {
     if (url.endsWith('/status')) return { ok: true, json: async () => ({ configured: true }) };
@@ -76,7 +86,7 @@ test('the first greeting and successive replies speak in the same voice flow wit
       chatHistories.push(messages);
       const message = messages.at(-1).content;
       if (failChat) return {ok:false,json:async()=>({message:'Conservé lo que me dijiste. Reintentá en un momento.'})};
-      return { ok: true, json: async () => ({ reply: replies[message] }) };
+      return { ok: true, json: async () => typeof replies[message] === 'string' ? { reply: replies[message] } : replies[message] };
     }
     if (url.endsWith('/summary') && deferSummary) await new Promise(resolve => { summaryRelease = resolve; });
     if (url.endsWith('/summary')) return { ok:true, json:async () => ({ summary:'La luz del tablero se encendió y el cliente quiere revisar el auto.' }) };
@@ -234,5 +244,12 @@ test('the first greeting and successive replies speak in the same voice flow wit
   await new Promise(resolve => setTimeout(resolve, 80));
   assert.equal(speechAttempts, attemptsAtEmptyBalance, 'an exhausted balance does not make repeated billable requests');
   assert.equal(deviceVoiceCalls, 0, 'OpenAI balance errors never select a phone voice');
+
+  await send('Cómo puedo hacer para coordinar una revisión en el taller con esto');
+  assert.equal(get('#assistant-reservation-prompt').hidden, true, 'the confirmation question comes before the WhatsApp control');
+  await send('Sí, preparala');
+  assert.equal(get('#assistant-reservation-prompt').hidden, false, 'the control appears after the customer confirms');
+  const confirmedCard = get('#assistant-messages').children.find(item => item.className === 'assistant-summary-card');
+  assert.ok(confirmedCard, 'the WhatsApp draft is visible in the conversation');
 
 });

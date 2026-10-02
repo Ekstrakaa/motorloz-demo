@@ -39,7 +39,7 @@ test('OpenAI receives real user and assistant turns, including the answer to its
     {role:'assistant',content:'¿En qué situación lo escuchás?'},
     {role:'user',content:'Al acelerar.'}
   ];
-  const {body,request}=await chat(messages,{reply:'Puede venir de varias zonas. ¿Desde cuándo empezó?',offerWhatsApp:false,facts:facts({vehicle:'Subaru Impreza',issue:'Golpeteo',circumstances:'Al acelerar'})});
+  const {body,request}=await chat(messages,{reply:'Puede venir de varias zonas. ¿Desde cuándo empezó?',coordinationIntent:'none',facts:facts({vehicle:'Subaru Impreza',issue:'Golpeteo',circumstances:'Al acelerar'})});
   assert.deepEqual(request.input,messages);
   assert.match(request.instructions,/no vuelvas a preguntar lo mismo/);
   assert.match(request.instructions,/200 mil/);
@@ -52,62 +52,111 @@ test('OpenAI receives real user and assistant turns, including the answer to its
 });
 
 test('first messages use OpenAI too, without generic hardcoded questions',async()=>{
-  const {request,body}=await chat([{role:'user',content:'No arranca mi Subaru Impreza.'}],{reply:'Entiendo. ¿El motor gira cuando intentás arrancar?',offerWhatsApp:false,facts:facts({vehicle:'Subaru Impreza',issue:'No arranca'})});
+  const {request,body}=await chat([{role:'user',content:'No arranca mi Subaru Impreza.'}],{reply:'Entiendo. ¿El motor gira cuando intentás arrancar?',coordinationIntent:'none',facts:facts({vehicle:'Subaru Impreza',issue:'No arranca'})});
   assert.equal(request.input[0].content,'No arranca mi Subaru Impreza.');
   assert.doesNotMatch(body.reply,/qué notaste exactamente/i);
 });
 
-test('short answers supply the intake used by the real WhatsApp control',async()=>{
+test('short answers lead to an explicit confirmation before the WhatsApp control',async()=>{
   const messages=[{role:'user',content:'Quiero llevar mi Subaru Impreza por un ruido al acelerar.'},
     {role:'assistant',content:'¿Qué kilometraje tiene?'},{role:'user',content:'200 mil'},
     {role:'assistant',content:'¿Cómo te llamás?'},{role:'user',content:'Manuel Leone'},
     {role:'assistant',content:'¿Puede esperar una fecha?'},{role:'user',content:'Sí, puede esperar.'}];
-  const {body}=await chat(messages,{reply:'Perfecto, Manuel. Podés revisar la solicitud en WhatsApp.',offerWhatsApp:true,facts:facts({name:'Manuel Leone',vehicle:'Subaru Impreza',mileage:'200.000 km aprox.',issue:'Ruido al acelerar',circumstances:'Al acelerar',urgency:'Puede esperar una fecha coordinada'})});
-  assert.equal(body.handoffReady,true);
+  const {body}=await chat(messages,{reply:'Perfecto, Manuel. Podés revisar la solicitud en WhatsApp.',coordinationIntent:'interested',facts:facts({name:'Manuel Leone',vehicle:'Subaru Impreza',mileage:'200.000 km aprox.',issue:'Ruido al acelerar',circumstances:'Al acelerar',urgency:'Puede esperar una fecha coordinada'})});
+  assert.equal(body.handoffReady,false);
+  assert.match(body.reply,/¿Querés que prepare la solicitud/);
   assert.equal(body.facts.name,'Manuel Leone');
   assert.equal(body.facts.mileage,'200.000 km aprox.');
+  const accepted = await chat([...messages,{role:'assistant',content:body.reply},{role:'user',content:'Sí, dale'}],{
+    reply:'Ya tengo todos los datos.',coordinationIntent:'none',
+    facts:facts({name:'Manuel Leone',vehicle:'Subaru Impreza',mileage:'200.000 km aprox.',issue:'Ruido al acelerar',circumstances:'Al acelerar',urgency:'Puede esperar una fecha coordinada'})
+  });
+  assert.equal(accepted.body.handoffReady,true);
+  assert.match(accepted.body.reply,/Revisar en WhatsApp/);
 });
 
 test('missing data cannot be bypassed by frontend booleans or a premature model offer',async()=>{
-  const {body}=await chat([{role:'user',content:'Quiero un turno para mi Subaru.'}],{reply:'Podés tocar el botón de WhatsApp.',offerWhatsApp:true,facts:facts({vehicle:'Subaru'})},{name:true,vehicle:true,mileage:true,issue:true,urgency:true});
+  const {body}=await chat([{role:'user',content:'Quiero un turno para mi Subaru.'}],{reply:'Podés tocar el botón de WhatsApp.',coordinationIntent:'confirmed',facts:facts({vehicle:'Subaru'})},{name:true,vehicle:true,mileage:true,issue:true,urgency:true});
   assert.equal(body.handoffReady,false);
   assert.doesNotMatch(body.reply,/botón de WhatsApp/i);
-  assert.doesNotMatch(body.reply,/cómo te llamás/i,'guard does not fabricate another repeated question');
+  assert.match(body.reply,/kilometraje/i,'the next required detail is explicit');
 });
 
 test('consultation alone never creates a handoff, even when all data is known',async()=>{
-  const {body}=await chat([{role:'user',content:'Solo quiero saber qué podría ser.'}],{reply:'Podría involucrar varios componentes; hay que revisarlo para confirmarlo.',offerWhatsApp:true,facts:facts({name:'Manuel',vehicle:'Subaru Impreza',mileage:'200.000 km',issue:'Ruido',circumstances:'Al acelerar',urgency:'Puede esperar'})});
+  const {body}=await chat([{role:'user',content:'Solo quiero saber qué podría ser.'}],{reply:'Podría involucrar varios componentes; hay que revisarlo para confirmarlo.',coordinationIntent:'confirmed',facts:facts({name:'Manuel',vehicle:'Subaru Impreza',mileage:'200.000 km',issue:'Ruido',circumstances:'Al acelerar',urgency:'Puede esperar'})});
   assert.equal(body.handoffReady,false);
 });
 
 test('known mileage is never requested again when the provider tries to reconfirm it',async()=>{
-  const {body,request}=await chat([{role:'user',content:'Me llamo Manuel, Subaru Impreza de 200 mil km, ruido al acelerar desde ayer, puede esperar. Quiero llevarlo.'}],{
+  const {body,request}=await chat([{role:'user',content:'Me llamo Manuel, Subaru Impreza de 200 mil km, ruido al acelerar desde ayer, puede esperar. Prepará la consulta.'}],{
     facts:facts({name:'Manuel',vehicle:'Subaru Impreza',mileage:'200 mil',issue:'Golpeteo',circumstances:'Al acelerar desde ayer',urgency:'Puede esperar'}),
-    offerWhatsApp:true,reply:'Perfecto, Manuel. Para preparar todo bien, me confirmás porfa el año de tu Subaru Impreza y los kilómetros aproximados? Así tenemos todo listo para cuando quieras traerlo.'
+    coordinationIntent:'confirmed',reply:'Perfecto, Manuel. Para preparar todo bien, me confirmás porfa el año de tu Subaru Impreza y los kilómetros aproximados? Así tenemos todo listo para cuando quieras traerlo.'
   });
-  assert.deepEqual(Object.keys(request.text.format.schema.properties),['facts','offerWhatsApp','reply']);
+  assert.deepEqual(Object.keys(request.text.format.schema.properties),['facts','coordinationIntent','reply']);
   assert.equal(body.handoffReady,true);
   assert.doesNotMatch(body.reply,/confirmás|kilómetros aproximados/);
-  assert.match(body.reply,/botón de WhatsApp/);
+  assert.match(body.reply,/Revisar en WhatsApp/);
 });
 
 test('the condition and start already answered cannot be requested a second time',async()=>{
   const {body}=await chat([{role:'assistant',content:'¿En qué situación lo notás?'},{role:'user',content:'Al acelerar, empezó ayer.'}],{
-    facts:facts({vehicle:'Subaru Impreza',issue:'Golpeteo al acelerar',circumstances:'Desde ayer'}),offerWhatsApp:false,
+    facts:facts({vehicle:'Subaru Impreza',issue:'Golpeteo al acelerar',circumstances:'Desde ayer'}),coordinationIntent:'none',
     reply:'Lo anoté. ¿En qué situación lo notás? ¿Desde cuándo empezó?'
   });
   assert.equal(body.reply,'Lo anoté.');
 });
 
 test('the workshop confirms the date and the ready response points to the visible button',async()=>{
-  const {body}=await chat([{role:'user',content:'Ana, Subaru Impreza, 200 mil km, golpeteo al acelerar desde ayer, puede esperar. Quiero coordinar.'}],{
-    facts:facts({name:'Ana',vehicle:'Subaru Impreza',mileage:'200 mil',issue:'Golpeteo',circumstances:'Al acelerar desde ayer',urgency:'Puede esperar'}),offerWhatsApp:true,
+  const {body}=await chat([{role:'user',content:'Ana, Subaru Impreza, 200 mil km, golpeteo al acelerar desde ayer, puede esperar. Prepará la solicitud.'}],{
+    facts:facts({name:'Ana',vehicle:'Subaru Impreza',mileage:'200 mil',issue:'Golpeteo',circumstances:'Al acelerar desde ayer',urgency:'Puede esperar'}),coordinationIntent:'confirmed',
     reply:'Gracias por contarme, Ana. Para coordinar la revisión, ¿podés confirmarme un día y horario que te convenga para acercarte al taller?'
   });
   assert.equal(body.handoffReady,true);
   assert.doesNotMatch(body.reply,/confirmarme|te convenga/);
-  assert.match(body.reply,/botón de WhatsApp/);
+  assert.match(body.reply,/Revisar en WhatsApp/);
   assert.match(body.reply,/taller te confirma día y horario/);
+});
+
+test('the photographed wording cannot end at “I have all the details” without a next action',async()=>{
+  const messages=[
+    {role:'user',content:'Tengo una vibración en mi Subaru Impreza, al acelerar desde ayer, unos 200 mil km. Puede esperar.'},
+    {role:'assistant',content:'¿Preferís coordinar una revisión en el taller?'},
+    {role:'user',content:'Cómo puedo hacer para coordinar una revisión en el taller con esto'},
+    {role:'assistant',content:'¿Cómo te llamás?'},
+    {role:'user',content:'Yo soy Emmanuel Emmanuel Leoni'}
+  ];
+  const full=facts({name:'Emmanuel Emmanuel Leoni',vehicle:'Subaru Impreza',mileage:'200 mil km',issue:'Vibración',circumstances:'Al acelerar desde ayer',urgency:'Puede esperar'});
+  const {body}=await chat(messages,{facts:full,coordinationIntent:'confirmed',reply:'Entiendo, Emmanuel. Ya tengo todos los datos para ayudarte a coordinar la revisión de la vibración en tu Impreza.'});
+  assert.equal(body.handoffReady,false);
+  assert.match(body.reply,/¿Querés que prepare la solicitud/);
+  const accepted=await chat([...messages,{role:'assistant',content:body.reply},{role:'user',content:'Sí'}],{facts:full,coordinationIntent:'none',reply:'Ya tengo todos los datos.'});
+  assert.equal(accepted.body.handoffReady,true);
+  assert.match(accepted.body.reply,/Revisar en WhatsApp/);
+});
+
+test('the model can understand a misspelled coordination request without an exact phrase match',async()=>{
+  const full=facts({name:'Ana',vehicle:'Subaru Impreza',mileage:'200 mil',issue:'Vibración',circumstances:'Al acelerar',urgency:'Puede esperar'});
+  const {body}=await chat([{role:'user',content:'ana subaru impreza 200 mil, vibra al acelerar, puede esperar. qiero coodinar la rebision'}],{
+    facts:full,coordinationIntent:'interested',reply:'Entiendo, Ana. ¿Querés que prepare la solicitud para que la revises por WhatsApp?'
+  });
+  assert.equal(body.handoffReady,false);
+  assert.match(body.reply,/Entiendo, Ana/,'a useful model reply stays intact');
+  const accepted=await chat([{role:'user',content:'ana subaru impreza 200 mil, vibra al acelerar, puede esperar. qiero coodinar la rebision'},
+    {role:'assistant',content:body.reply},{role:'user',content:'si preparala'}],{
+    facts:full,coordinationIntent:'confirmed',reply:'Bien, Ana.'
+  });
+  assert.equal(accepted.body.handoffReady,true);
+  assert.match(accepted.body.reply,/Revisar en WhatsApp/);
+});
+
+test('a scheduling question keeps urgent driving advice visible',async()=>{
+  const {body}=await chat([{role:'user',content:'No me frenan bien los frenos. ¿Cómo coordino una revisión?'}],{
+    facts:facts({vehicle:'Subaru Impreza',issue:'Falla de frenos'}),coordinationIntent:'none',
+    reply:'No sigas conduciendo el auto y pedí asistencia. ¿Querés coordinar una revisión?'
+  });
+  assert.match(body.reply,/No sigas conduciendo/);
+  assert.match(body.reply,/kilometraje/);
+  assert.equal(body.handoffReady,false);
 });
 
 test('serves the selected Cedar voice without requiring Gemini for narration', async () => {

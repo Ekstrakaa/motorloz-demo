@@ -40,61 +40,14 @@
 .services .service-card-copy>a[data-service]:is(:hover,:focus-visible) { background:#234c56!important;border-color:#248a94!important; }
 .services .service-card-copy>a[data-service]:active { transform:translateY(0)!important; }
 
-/* A photographic invitation to explore the workshop's own Instagram. */
-.people .workshop-journal {
-  position:relative;max-width:560px;margin:30px auto 0;padding:23px;
-  background:#101f24;border:1px solid #354b50;border-radius:19px;
-  box-shadow:0 18px 40px rgba(0,0,0,.2);text-align:left;
-}
-.journal-heading { display:flex;align-items:center;gap:12px;margin-bottom:18px; }
-.journal-heading>img { width:28px;height:28px; }
-.journal-heading>div { display:grid;gap:3px; }
-.journal-heading span { color:#a3bcc0;font:9px/1.4 var(--mono);letter-spacing:.15em; }
-.journal-heading strong { color:#f2f7f5;font:650 14px/1.3 var(--body); }
-.workshop-journal h3 { margin:0 0 9px;color:#f3f7f6;font:750 clamp(24px,2.5vw,30px)/1.1 var(--body);letter-spacing:-.04em; }
-.people .workshop-journal p { margin:0 0 18px!important;color:#b5c7ca!important;font-size:13px!important;line-height:1.6!important;text-align:left!important; }
-.journal-photos { display:grid;grid-template-columns:1.15fr 1fr 1fr;gap:6px;margin-bottom:19px; }
-.journal-photos img { width:100%;height:116px;object-fit:cover;border-radius:5px; }
-.people .workshop-journal>a {
-  display:flex;align-items:center;justify-content:space-between;gap:10px;
-  width:100%;min-height:49px;padding:10px 12px 10px 16px;background:#d3eef0;
-  border:1px solid #efffff;border-radius:11px;color:#0a3038;font:750 12px/1.4 var(--body);
-  box-shadow:inset 0 1px #fff,0 6px 14px rgba(0,0,0,.15);transition:background .2s,border-color .2s;
-}
-.workshop-journal>a span { display:grid;place-items:center;flex:0 0 28px;height:28px;border-radius:7px;background:#14383f;color:#e3f7f8;font-size:18px;transition:transform .2s; }
-.people .workshop-journal>a:is(:hover,:focus-visible) { background:#efffff;border-color:#8ad7df; }
-.workshop-journal>a:hover span { transform:translate(1px,-1px); }
-
-/* Useful answers stay compact and open without scripts or a new service. */
-.visit-guide { padding:clamp(44px,6vw,80px) var(--pad);background:#edf1ef;border-top:1px solid #d6e0de;color:#15272b; }
-.visit-guide-inner { display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:clamp(30px,6vw,90px);max-width:1240px;margin:auto; }
-.visit-guide h2 { margin:10px 0 16px;font:750 clamp(30px,3.5vw,44px)/1.08 var(--body);letter-spacing:-.045em; }
-.visit-guide-intro>p:last-child { max-width:33ch;margin:0;color:#52676b;font-size:14px;line-height:1.7; }
-.visit-guide .eyebrow { color:#28727b; }
-.visit-answers { border-top:1px solid #bfcfcd; }
-.visit-answers details { border-bottom:1px solid #bfcfcd; }
-.visit-answers summary { display:flex;align-items:center;justify-content:space-between;gap:20px;min-height:64px;padding:16px 0;list-style:none;cursor:pointer;font:650 14px/1.5 var(--body); }
-.visit-answers summary::-webkit-details-marker { display:none; }
-.visit-answers summary::after { content:"+";flex:none;display:grid;place-items:center;width:28px;height:28px;border:1px solid #adc3c2;border-radius:50%;color:#285c64;font:20px/1 var(--body); }
-.visit-answers details[open] summary::after { content:"−";background:#153a42;border-color:#153a42;color:#eef9f9; }
-.visit-answers details>p { margin:0;padding:0 42px 19px 0;color:#4d6468;font-size:13px;line-height:1.75;max-width:64ch; }
-.visit-answers details a { color:#116975;text-decoration:underline;text-underline-offset:4px; }
-.visit-answers summary:focus-visible { outline:2px solid #167a86;outline-offset:3px; }
 @media(max-width:760px) {
   .services .service-card-copy { padding:19px 17px 17px!important; }
   .services .service-title-row { margin:10px 0 14px!important; }
   .services .service-title-row h3 { font-size:18px!important; }
-  .people .workshop-journal { padding:20px;max-width:none;margin-top:27px; }
-  .journal-photos img { height:100px; }
-  .visit-guide-inner { grid-template-columns:1fr;gap:24px; }
-  .visit-guide-intro>p:last-child { max-width:44ch; }
 }
 @media(max-width:370px) {
   .services .service-title-row h3 { font-size:16px!important; }
-  .people .workshop-journal { padding:16px; }
-  .journal-photos img { height:86px; }
 }
-@media(prefers-reduced-motion:reduce) { .workshop-journal>a span { transition:none; } }
 
 /* Slow changing color inside the actions; the buttons themselves stay still. */
 .services .service-card-copy>a[data-service],
