@@ -6,7 +6,7 @@
 .services .service-card::after { content:none!important; }
 .services .service-card-copy {
   padding:22px 21px 21px!important;background:#f7f9f8!important;
-  display:grid!important;grid-template-columns:minmax(0,1fr)!important;grid-template-rows:auto auto auto 1fr auto!important;row-gap:0;
+  display:grid!important;grid-template-columns:minmax(0,1fr)!important;grid-template-rows:auto auto auto 1fr!important;row-gap:0;
 }
 .services .service-card-copy>span {
   grid-column:1/-1!important;grid-row:1!important;border-bottom:1px solid #d9e2e1;padding-bottom:11px;
@@ -19,26 +19,10 @@
 .services .service-title-row::after { content:none!important; }
 .services .service-title-row h3 { white-space:normal!important;line-height:1.16!important;min-height:0!important;font-size:clamp(18px,1.5vw,21px)!important; }
 .services .service-card-copy>p { grid-column:1/-1!important;grid-row:3!important;min-height:0!important;margin:0 0 16px!important;color:#445b60!important;font-size:13px!important;line-height:1.65!important; }
-.services .service-card-copy>ul { grid-column:1/-1!important;grid-row:4!important;min-height:0!important;margin:0 0 18px!important;padding:0!important;display:grid;gap:5px;color:#445b60!important;font-size:12px!important; }
+.services .service-card-copy>ul { grid-column:1/-1!important;grid-row:4!important;min-height:0!important;margin:0!important;padding:13px 0 0!important;display:grid;align-content:start;gap:7px;border-top:1px solid #d6e0df;color:#445b60!important;font-size:12px!important; }
+.services .service-card-copy>ul::before { content:"QUÉ REVISAMOS";display:block;margin-bottom:5px;color:#557078;font:700 9px/1.4 var(--mono);letter-spacing:.13em; }
 .services .service-card-copy>ul>li { padding-left:15px!important; }
 .services .service-card-copy>ul>li::before { width:5px!important;height:5px!important;border-radius:1px!important;background:#258b95!important; }
-.services .service-card-copy>a[data-service] {
-  grid-column:1/-1!important;grid-row:5!important;justify-self:stretch!important;align-self:end!important;justify-content:space-between!important;width:100%!important;
-  gap:14px!important;min-height:47px!important;margin:0!important;padding:10px 14px!important;
-  background:linear-gradient(115deg,#21434d,#102a33)!important;color:#f6ffff!important;
-  border:1px solid #547d85!important;border-radius:11px!important;font-size:12px!important;
-  box-shadow:inset 0 1px rgba(255,255,255,.24),0 6px 13px rgba(15,43,51,.12)!important;
-  backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
-}
-.services .service-card-copy>a[data-service]::before { content:none!important; }
-.services .service-card-copy>a[data-service]::after {
-  content:"↗"!important;position:static!important;display:grid!important;place-items:center;
-  inset:auto!important;width:26px!important;height:26px!important;margin:0!important;
-  background:#31545e!important;color:#d9faf9!important;border-radius:7px!important;
-  font:17px/1 var(--body)!important;opacity:1!important;box-shadow:none!important;
-}
-.services .service-card-copy>a[data-service]:is(:hover,:focus-visible) { background:#234c56!important;border-color:#248a94!important; }
-.services .service-card-copy>a[data-service]:active { transform:translateY(0)!important; }
 
 @media(max-width:760px) {
   .services .service-card-copy { padding:19px 17px 17px!important; }
@@ -50,7 +34,6 @@
 }
 
 /* Slow changing color inside the actions; the buttons themselves stay still. */
-.services .service-card-copy>a[data-service],
 .hyundai-copy .hyundai-service-action,
 .films-grid .film-caption>a {
   background:linear-gradient(115deg,#102d35 0%,#17535a 27%,#144f45 51%,#153c4b 74%,#102d35 100%)!important;
@@ -59,9 +42,6 @@
   color:#f4ffff!important;border:1px solid #6a9396!important;
   box-shadow:inset 0 1px rgba(255,255,255,.24),inset 0 -1px rgba(0,0,0,.15),0 6px 16px rgba(11,36,40,.15)!important;
 }
-.services .service-card:nth-child(3n+2) a[data-service] { animation-delay:-3s!important; }
-.services .service-card:nth-child(3n) a[data-service] { animation-delay:-6s!important; }
-.services .service-card-copy>a[data-service]::after { background:rgba(230,255,255,.13)!important;border:1px solid rgba(222,255,255,.18)!important; }
 .hyundai-copy .hyundai-service-action {
   display:inline-flex!important;align-items:center;justify-content:space-between;gap:24px;
   min-height:54px;padding:13px 18px!important;margin:22px 0 13px!important;
@@ -75,10 +55,9 @@
 }
 .films-grid .film-caption>a::after { content:none!important; }
 .films-grid .film-caption>a>span { display:grid;place-items:center;width:25px;height:25px;flex-shrink:0;border-radius:6px;background:rgba(228,255,255,.12);font-size:18px; }
-.hyundai-copy .hyundai-service-action:is(:hover,:focus-visible),.films-grid .film-caption>a:is(:hover,:focus-visible),
-.services .service-card-copy>a[data-service]:is(:hover,:focus-visible) { border-color:#a8e4e4!important;color:white!important; }
+.hyundai-copy .hyundai-service-action:is(:hover,:focus-visible),.films-grid .film-caption>a:is(:hover,:focus-visible) { border-color:#a8e4e4!important;color:white!important; }
 @keyframes workshop-action-color { from { background-position:0% 30%; } to { background-position:100% 70%; } }
 @media(max-width:760px) { .films-grid .film-caption>a { padding:9px 10px!important;gap:7px!important;font-size:10px!important;text-shadow:none!important;min-height:46px!important; } .hyundai-copy .hyundai-service-action { display:flex!important;width:100%;max-width:360px;margin-inline:auto!important; } }
 @media(prefers-reduced-motion:reduce) {
-  .services .service-card-copy>a[data-service],.hyundai-copy .hyundai-service-action,.films-grid .film-caption>a { animation:none!important; }
+  .hyundai-copy .hyundai-service-action,.films-grid .film-caption>a { animation:none!important; }
 }
