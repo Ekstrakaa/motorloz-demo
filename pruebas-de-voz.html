@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="es-UY">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Elegir la voz · MOTORLOZ</title>
+  <style>
+    :root { color-scheme: dark; --bg: #09191c; --card: #10282c; --ink: #edf7f5; --muted: #a7bfbe; --accent: #68d3cf; --line: #2b4548; --radius: 24px; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--ink); font-family: "Aptos", "Segoe UI", system-ui, sans-serif; }
+    main { max-width: 1040px; margin: auto; padding: max(30px, env(safe-area-inset-top)) 24px max(32px, env(safe-area-inset-bottom)); }
+    .brand { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-bottom: 24px; border-bottom: 1px solid var(--line); }
+    .brand img { width: 156px; height: auto; display: block; }
+    .brand span, .eyebrow { font-size: 11px; text-transform: uppercase; letter-spacing: .16em; font-weight: 650; color: var(--muted); }
+    .intro { max-width: 690px; padding: 42px 0 30px; }
+    .eyebrow { color: var(--accent); }
+    h1 { font-size: clamp(36px, 6vw, 64px); font-weight: 650; letter-spacing: -.055em; line-height: 1.05; margin: 14px 0 18px; }
+    .intro p { color: var(--muted); max-width: 620px; font-size: 17px; line-height: 1.6; margin: 0; }
+    .samples { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+    article { border-radius: var(--radius); border: 1px solid var(--line); background: var(--card); padding: 24px; display: flex; flex-direction: column; min-width: 0; transition: border-color .2s, background .2s; }
+    article.playing { border-color: var(--accent); background: #143338; }
+    .number { width: 46px; height: 46px; border: 1px solid #3a6063; border-radius: 50%; display: grid; place-items: center; color: var(--accent); font-size: 20px; margin-bottom: 24px; font-variant-numeric: tabular-nums; }
+    h2 { font-size: 25px; line-height: 1.13; letter-spacing: -.03em; margin: 0 0 12px; }
+    article p { color: var(--muted); line-height: 1.6; font-size: 14px; margin: 0 0 24px; }
+    .player { margin-top: auto; }
+    audio { display: block; width: 100%; height: 48px; }
+    .state { display: block; min-height: 20px; margin-top: 12px; font-size: 12px; color: var(--muted); }
+    .download { font-size: 12px; color: var(--accent); text-underline-offset: 3px; }
+    details { margin-top: 28px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 18px 0; }
+    summary { cursor: pointer; color: var(--muted); font-size: 14px; min-height: 28px; }
+    blockquote { color: #c9dfdc; margin: 16px 0 0; max-width: 740px; line-height: 1.7; font-size: 15px; }
+    footer { display: flex; justify-content: space-between; gap: 20px; padding-top: 22px; color: var(--muted); font-size: 13px; line-height: 1.5; }
+    footer strong { color: var(--ink); font-weight: 600; }
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 5px; }
+    @media(max-width: 760px) {
+      main { padding-inline: 18px; }
+      .brand img { width: 132px; }
+      .brand span { font-size: 9px; max-width: 96px; text-align: right; line-height: 1.5; }
+      .intro { padding: 32px 0 26px; }
+      .intro p { font-size: 15px; }
+      .samples { grid-template-columns: 1fr; gap: 14px; }
+      article { padding: 22px; }
+      .number { width: 36px; height: 36px; font-size: 16px; margin-bottom: 14px; }
+      h2 { font-size: 24px; }
+      article p { margin-bottom: 18px; }
+      footer { flex-direction: column; gap: 8px; }
+    }
+    @media(prefers-reduced-motion: reduce) { article { transition: none; } }
+  </style>
+</head>
+<body>
+  <main>
+    <header class="brand"><img src="assets/motorloz-logo.png" alt="MOTORLOZ · Taller Pablo Lozano"><span>Elegir la voz del asistente</span></header>
+    <div class="intro">
+      <span class="eyebrow">Tres estilos nuevos · Español rioplatense</span>
+      <h1>Una voz que te acompañe.</h1>
+      <p>La misma consulta de mecánica, con tres maneras de decirla. Escuchá cómo pregunta, explica y transmite calma.</p>
+    </div>
+    <section class="samples" aria-label="Pruebas de voz">
+      <article>
+        <span class="number" aria-hidden="true">01</span>
+        <h2>1. Cercano<br>y tranquilo</h2>
+        <p>Una charla amable, con tono relajado y preguntas suaves. La intención es acompañar sin sonar solemne.</p>
+        <div class="player"><audio controls preload="metadata" aria-label="Escuchar prueba 1: cercano y tranquilo" src="assets/voice-styles/prueba-1.mp3"></audio><span class="state" aria-live="polite">Listo para escuchar</span><a class="download" href="assets/voice-styles/prueba-1.mp3" download>Descargar prueba 1</a></div>
+      </article>
+      <article>
+        <span class="number" aria-hidden="true">02</span>
+        <h2>2. Expresivo<br>y atento</h2>
+        <p>Más reacción al escuchar el problema y más cambios de entonación al preguntar y explicar.</p>
+        <div class="player"><audio controls preload="metadata" aria-label="Escuchar prueba 2: expresivo y atento" src="assets/voice-styles/prueba-2.mp3"></audio><span class="state" aria-live="polite">Listo para escuchar</span><a class="download" href="assets/voice-styles/prueba-2.mp3" download>Descargar prueba 2</a></div>
+      </article>
+      <article>
+        <span class="number" aria-hidden="true">03</span>
+        <h2>3. Mecánico<br>experimentado</h2>
+        <p>Un tono más firme y reflexivo, que transmite criterio al explicar qué conviene revisar.</p>
+        <div class="player"><audio controls preload="metadata" aria-label="Escuchar prueba 3: mecánico experimentado" src="assets/voice-styles/prueba-3.mp3"></audio><span class="state" aria-live="polite">Listo para escuchar</span><a class="download" href="assets/voice-styles/prueba-3.mp3" download>Descargar prueba 3</a></div>
+      </article>
+    </section>
+    <details><summary>Ver el texto que dicen las tres voces</summary><blockquote>¿Un golpeteo después de un pozo? Ta, contame un poquito más. ¿Lo sentís al doblar o cuando agarrás otra irregularidad? Puede venir de distintas partes de la suspensión. Con eso solo no te puedo decir qué se dañó, pero sí ayudarte a ordenar lo que conviene revisar.</blockquote></details>
+    <footer><strong>Decime cuál se acerca más: 1, 2 o 3.</strong><span>Voces generadas por IA. Audios guardados: repetirlos no genera consumo de API.</span></footer>
+  </main>
+  <script>
+    const players = [...document.querySelectorAll('audio')];
+    players.forEach(player => {
+      const card = player.closest('article');
+      const status = card.querySelector('.state');
+      player.addEventListener('play', () => {
+        players.forEach(other => { if (other !== player) other.pause(); });
+        card.classList.add('playing');
+        status.textContent = 'Escuchando…';
+      });
+      player.addEventListener('pause', () => { card.classList.remove('playing'); if (!player.ended) status.textContent = 'En pausa'; });
+      player.addEventListener('ended', () => { card.classList.remove('playing'); status.textContent = 'Podés volver a escucharlo'; });
+      player.addEventListener('error', () => { card.classList.remove('playing'); status.textContent = 'Probá el enlace de descarga para abrir el audio.'; });
+    });
+  </script>
+</body>
+</html>
