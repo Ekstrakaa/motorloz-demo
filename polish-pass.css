@@ -281,6 +281,14 @@ main#contenido>:not(.background-tile-trace) {position:relative;z-index:1}
 }
 @media(prefers-reduced-motion:reduce) { .customer-gallery-track { animation:none!important; } }
 
+/* En táctil, el estado hover puede quedarse activo tras un toque y congelar la galería. */
+@media (hover:none), (pointer:coarse), (max-width:760px) {
+  .customer-gallery:hover .customer-gallery-track,
+  .customer-gallery:focus-within .customer-gallery-track {
+    animation-play-state:running;
+  }
+}
+
 /* Keep the Subaru illustration, caption and copy in separate, predictable rows. */
 .subaru-section .japan-gallery { align-items:start!important; }
 .subaru-section .japan-heading { align-self:start!important; }
