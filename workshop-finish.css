@@ -9,21 +9,21 @@
   display:grid!important;grid-template-columns:minmax(0,1fr)!important;grid-template-rows:auto auto auto 1fr auto!important;row-gap:0;
 }
 .services .service-card-copy>span {
-  grid-column:1/-1;border-bottom:1px solid #d9e2e1;padding-bottom:11px;
+  grid-column:1/-1!important;grid-row:1!important;border-bottom:1px solid #d9e2e1;padding-bottom:11px;
   color:#526a6e!important;letter-spacing:.12em!important;font-size:9px!important;
 }
 .services .service-title-row {
-  grid-column:1/-1;background:none!important;border:0!important;border-radius:0!important;
+  grid-column:1/-1!important;grid-row:2!important;background:none!important;border:0!important;border-radius:0!important;
   padding:0!important;margin:14px 0 13px!important;gap:12px!important;
 }
 .services .service-title-row::after { content:none!important; }
 .services .service-title-row h3 { white-space:normal!important;line-height:1.16!important;min-height:0!important;font-size:clamp(18px,1.5vw,21px)!important; }
-.services .service-card-copy>p { grid-column:1/-1;min-height:0!important;margin:0 0 16px!important;color:#445b60!important;font-size:13px!important;line-height:1.65!important; }
-.services .service-card-copy>ul { grid-column:1/-1;min-height:0!important;margin:0 0 18px!important;padding:0!important;display:grid;gap:5px;color:#445b60!important;font-size:12px!important; }
+.services .service-card-copy>p { grid-column:1/-1!important;grid-row:3!important;min-height:0!important;margin:0 0 16px!important;color:#445b60!important;font-size:13px!important;line-height:1.65!important; }
+.services .service-card-copy>ul { grid-column:1/-1!important;grid-row:4!important;min-height:0!important;margin:0 0 18px!important;padding:0!important;display:grid;gap:5px;color:#445b60!important;font-size:12px!important; }
 .services .service-card-copy>ul>li { padding-left:15px!important; }
 .services .service-card-copy>ul>li::before { width:5px!important;height:5px!important;border-radius:1px!important;background:#258b95!important; }
 .services .service-card-copy>a[data-service] {
-  grid-column:1/-1!important;justify-self:stretch!important;align-self:end!important;justify-content:space-between!important;width:100%!important;
+  grid-column:1/-1!important;grid-row:5!important;justify-self:stretch!important;align-self:end!important;justify-content:space-between!important;width:100%!important;
   gap:14px!important;min-height:47px!important;margin:0!important;padding:10px 14px!important;
   background:linear-gradient(115deg,#21434d,#102a33)!important;color:#f6ffff!important;
   border:1px solid #547d85!important;border-radius:11px!important;font-size:12px!important;
