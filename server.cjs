@@ -13,6 +13,7 @@ try {
     if (match && !process.env[match[1]]) process.env[match[1]] = match[2].replace(/^(["'])(.*)\1$/, '$2');
   }
 } catch {}
+const assistant = require('./gemini-assistant.cjs');
 
 function json(res, status, data) {
   res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' });
@@ -21,7 +22,7 @@ function json(res, status, data) {
 
 async function handleApi(req, res, pathname) {
   const action = pathname.startsWith('/api/assistant/') ? pathname.slice('/api/assistant/'.length) : '';
-  if (!['status', 'chat', 'voice', 'summary'].includes(action)) return false;
+  if (!['status', 'chat', 'speech', 'speech-stream', 'summary'].includes(action)) return false;
   if (req.method === 'POST') {
     try {
       const chunks = [];
@@ -54,6 +55,7 @@ const types = {
   '.xml': 'application/xml',
   '.txt': 'text/plain; charset=utf-8',
   '.mp4': 'video/mp4',
+  '.mp3': 'audio/mpeg',
   '.webm': 'video/webm'
 };
 

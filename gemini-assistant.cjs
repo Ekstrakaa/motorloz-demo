@@ -1,8 +1,6 @@
 const MODEL = process.env.GEMINI_CHAT_MODEL || 'gemini-3.5-flash-lite';
-const SPEECH_MODEL = process.env.GEMINI_SPEECH_MODEL || 'gemini-3.8-flash-tts';
-const SPEECH_FALLBACK_MODEL = process.env.GEMINI_SPEECH_FALLBACK_MODEL || 'gemini-3.8-flash-lite-tts';
-const SPEECH_MODELS = [...new Set([SPEECH_MODEL, SPEECH_FALLBACK_MODEL])];
-const SPEECH_VOICE = 'Algieba';
+const narrator = require('./openai-narrator.cjs');
+const { generateSpeech, streamSpeech } = narrator;
 const SUMMARY_MODEL = process.env.GEMINI_SUMMARY_MODEL || 'gemini-3.5-flash-lite';
 const SYSTEM_PROMPT = `Sos la recepción virtual de MOTORLOZ, taller multimarca en Montevideo. Tu trabajo es escuchar, orientar sin diagnosticar y preparar una consulta clara para WhatsApp. Pablo es el dueño del taller y Bruno forma parte del equipo experimentado; podés mencionarlos naturalmente al explicar que revisarán el caso, sin prometer que una persona concreta estará disponible. El equipo humano confirma día, hora, disponibilidad y detalles finales: vos nunca confirmás una reserva. Conversá en español rioplatense cálido y natural. Usá todo el historial disponible: recordá lo ya dicho y no repitas preguntas ni datos. Si solo saluda, saludá y preguntá en qué podés ayudar; no hables de turnos. También atendés mantenimiento y servicios programados: aceite, frenos, alineación y revisiones; si pregunta por eso, preguntá qué servicio necesita, para qué vehículo y el kilometraje, sin inventar intervalos ni precios. Si la persona dice solo “tengo un Subaru, unos 200 mil kilómetros y anda mal”, no diagnostiques ni ofrezcas turno enseguida: preguntá qué nota exactamente y desde cuándo. Si cuenta un síntoma, explicá brevemente qué sistemas podrían estar relacionados sin afirmar una causa y hacé una sola pregunta útil sobre cuándo ocurre, qué aviso aparece, cómo se siente o si empezó después de un pozo, golpe o movimiento brusco. Preguntá sobre golpes solo cuando sea pertinente; nunca sugieras que ocurrió si el cliente no lo dijo. Procurá reunir sin interrogatorio: nombre, marca, modelo, año, kilometraje aproximado, síntomas, circunstancias y desde cuándo. Si no sabe año, modelo o kilometraje exacto, aceptá la aproximación. Después de que el cliente responda al menos una pregunta de seguimiento y ya tengas los datos esenciales, ofrecé preparar la consulta estructurada para WhatsApp. Si pide turno antes, seguí la conversación para obtener lo esencial y pedí el nombre si falta; no lo des por confirmado. Nunca pidas teléfono: WhatsApp ya identifica al remitente. No mandes al formulario general de la página. Cuando ya sea oportuno pasar a WhatsApp, decí que la persona puede tocar “Preparar solicitud” debajo del chat para revisar el borrador; no escribas el mensaje de WhatsApp dentro de tu respuesta, no inventes enlaces y no prometas respuesta inmediata del taller. Respondé en 2 a 4 frases breves, normalmente menos de 400 caracteres; no seas telegráfico ni escribas una biblia. No repitas “traelo al taller” ni ofrezcas reservar en cada respuesta. No asegures precios, presupuestos, repuestos ni disponibilidad. No afirmes que es seguro conducir sin una evaluación: si hay humo abundante, olor fuerte a combustible, falla de frenos, sobrecalentamiento, pérdida de dirección o daño tras un impacto, indicá detenerse en lugar seguro, no seguir conduciendo y pedir asistencia. No indiques abrir el sistema de refrigeración caliente. Para otros temas, explicá con amabilidad que el chat ayuda con consultas sobre vehículos y MOTORLOZ.`;
 const rateLimits = new Map();
@@ -12,8 +10,6 @@ const CHAT_PROMPT = SYSTEM_PROMPT
   .replace('“Preparar solicitud” debajo del chat para revisar el borrador', '“Abrir WhatsApp” debajo del chat para revisar el mensaje allí');
 const DICTATION_GUIDANCE = ' El dictado puede confundir nombres de vehículos. Si una marca o un modelo nuevos contradicen lo que dijo antes el cliente (por ejemplo Subaru frente a Hyundai), preguntá cuál es el correcto antes de darlo por confirmado o preparar WhatsApp. Impreza, Hawkeye y Wagon pueden aparecer al hablar de un Subaru; no sustituyas esos términos por palabras comunes ni inventes un modelo a partir de una transcripción dudosa.';
 const DIALOGUE_GUIDANCE = ' Tu prioridad en cada turno es responder lo que la persona acaba de decir o preguntar. Si describe un golpeteo o ruido, explicá en lenguaje simple que puede venir de distintas zonas y preguntá una cosa concreta para ubicarlo (por ejemplo si aparece al acelerar, frenar o pasar por irregularidades); si comenzó después de un pozo, tené en cuenta ese dato sin afirmar una causa. Si pide información general sobre un auto, servicio o mantenimiento, contestá de forma útil aunque todavía no quiera reservar. Guiá la conversación de a un dato por vez y recordá lo ya contestado. Antes de ofrecer WhatsApp necesitás: nombre, marca y modelo, kilometraje aproximado (o que diga que no lo sabe), qué necesita o qué síntoma nota, desde cuándo o en qué situación ocurre, y si precisa atención urgente o puede esperar una fecha. Si falta algo y la persona quiere coordinar con el taller, pedí solamente el dato más útil que falte. La urgencia expresa la necesidad del cliente y no reemplaza una evaluación de seguridad. No conviertas una consulta informativa en una reserva: si la persona solo busca entender un síntoma, una pieza o un mantenimiento, respondé y seguí ayudando sin ofrecer WhatsApp. Cuando estén todos los datos y la persona pida turno, quiera llevar el auto o muestre intención clara de coordinar, respondé la inquietud pendiente y preguntá naturalmente si quiere revisar la consulta en WhatsApp; el botón aparecerá debajo. No repitas saludos, el nombre MOTORLOZ ni los nombres Pablo y Bruno en respuestas consecutivas. Evitá frases de venta y preguntas de formulario; mantené una conversación natural de una pregunta útil por vez.';
-const SPEECH_STYLE = 'Leé exactamente el texto recibido, sin agregar ni omitir palabras. Español rioplatense de Montevideo. Voz cálida, natural y cercana, ritmo conversacional tranquilo; sin tono robótico ni locución publicitaria. El nombre del taller se pronuncia Motor Los, dos palabras; nunca Motorola.';
-
 function spokenTranscript(text) {
   // Display and WhatsApp keep the real brand; only the sound gets a phonetic hint.
   return text.replace(/\bMOTORLOZ\b/gi, 'Motor Los');
@@ -156,100 +152,6 @@ async function callGemini(contents, { maxOutputTokens = 768, systemInstruction =
   throw lastError;
 }
 
-async function requestSpeech(text, stream = false, model = SPEECH_MODEL, signal) {
-  return fetch('https://generativelanguage.googleapis.com/v1beta/interactions', {
-    method: 'POST',
-    signal,
-    headers: { 'Content-Type': 'application/json', 'x-goog-api-key': process.env.GEMINI_API_KEY },
-    body: JSON.stringify({
-      model,
-      input: [{ type: 'user_input', content: [{
-        type: 'text', text: spokenTranscript(text),
-        annotations: [{ type: 'speech_metadata', style: SPEECH_STYLE }]
-      }] }],
-      response_format: { type: 'audio' },
-      generation_config: { speech_config: [{ voice: SPEECH_VOICE }] },
-      ...(stream ? { stream: true } : {})
-    })
-  });
-}
-
-async function generateSpeech(text) {
-  let lastError;
-  for (const model of SPEECH_MODELS) {
-    const upstream = await requestSpeech(text, false, model);
-    const result = await upstream.json().catch(() => ({}));
-    if (!upstream.ok) {
-      lastError = new Error('gemini_speech_failed');
-      lastError.upstreamStatus = upstream.status;
-      lastError.upstreamCode = result.error?.status || result.error?.code || 'unknown';
-      if ([429, 500, 502, 503, 504].includes(upstream.status)) continue;
-      throw lastError;
-    }
-    const audio = (result.steps || []).flatMap(step => step.content || []).filter(part => part.type === 'audio' && part.data).at(-1);
-    const wav = audio && Buffer.from(audio.data, 'base64');
-    if (wav && wav.subarray(0, 4).toString() === 'RIFF') return wav;
-    lastError = new Error('gemini_speech_empty');
-  }
-  throw lastError;
-}
-
-async function streamSpeech(text, req, res) {
-  const controller = new AbortController();
-  const onDisconnect = () => controller.abort();
-  req.on?.('aborted', onDisconnect);
-  res.on?.('close', onDisconnect);
-  let lastError;
-  try {
-   for (const model of SPEECH_MODELS) {
-    let upstream;
-    try { upstream = await requestSpeech(text, true, model, controller.signal); }
-    catch (error) { if (controller.signal.aborted) return; throw error; }
-    if (!upstream.ok) {
-      const result = await upstream.json().catch(() => ({}));
-      lastError = new Error('gemini_speech_failed');
-      lastError.upstreamStatus = upstream.status;
-      lastError.upstreamCode = result.error?.status || result.error?.code || 'unknown';
-      if ([429, 500, 502, 503, 504].includes(upstream.status)) continue;
-      throw lastError;
-    }
-    if (!upstream.body) { lastError = new Error('gemini_speech_stream_empty'); continue; }
-    let buffered = '';
-    let started = false;
-    try {
-      for await (const chunk of upstream.body) {
-        if (!started) {
-          buffered += Buffer.from(chunk).toString('utf8');
-          if (/"event_type":"error"/.test(buffered)) {
-            lastError = new Error('gemini_speech_stream_error');
-            if (/"code":"rate_limit_exceeded"/.test(buffered)) lastError.upstreamStatus = 429;
-            break;
-          }
-          if (!/"event_type":"step.delta"/.test(buffered)) continue;
-          res.statusCode = 200;
-          res.setHeader('Content-Type', 'text/event-stream; charset=utf-8');
-          res.setHeader('Cache-Control', 'no-store, no-transform');
-          res.setHeader('X-Content-Type-Options', 'nosniff');
-          res.write(buffered);
-          buffered = '';
-          started = true;
-        } else res.write(chunk);
-      }
-      if (started) { if (!res.destroyed) res.end(); return; }
-    } catch (error) {
-      if (controller.signal.aborted) return;
-      if (started) { if (!res.destroyed) res.end(); return; }
-      lastError = error;
-    }
-    lastError ||= new Error('gemini_speech_stream_empty');
-   }
-   throw lastError;
-  } finally {
-    req.off?.('aborted', onDisconnect);
-    res.off?.('close', onDisconnect);
-  }
-}
-
 function userMessage(message) {
   return [{ role: 'user', parts: [{ text: message }] }];
 }
@@ -260,10 +162,10 @@ async function handle(req, res, action) {
     return;
   }
   if (action === 'status') {
-    json(res, 200, { configured: Boolean(process.env.GEMINI_API_KEY), model: MODEL });
+    json(res, 200, { configured: Boolean(process.env.GEMINI_API_KEY), model: MODEL, speechConfigured: Boolean(process.env.OPENAI_API_KEY), speechProvider: 'openai', voice: narrator.voice });
     return;
   }
-  if (!process.env.GEMINI_API_KEY) {
+  if (!(action.startsWith('speech') ? process.env.OPENAI_API_KEY : process.env.GEMINI_API_KEY)) {
     json(res, 503, { error: 'asistente_no_configurado', message: 'La IA todavía no está conectada. Podés usar el formulario de contacto.' });
     return;
   }
@@ -282,12 +184,14 @@ async function handle(req, res, action) {
         return;
       }
       if (action === 'speech-stream') {
-        await streamSpeech(text, req, res);
+        await streamSpeech(spokenTranscript(text), req, res);
         return;
       }
-      const wav = await generateSpeech(text);
+      const wav = await generateSpeech(spokenTranscript(text), req, res);
       res.statusCode = 200;
       res.setHeader('Content-Type', 'audio/wav');
+      res.setHeader('X-Voice-Provider', 'openai');
+      res.setHeader('X-Voice', narrator.voice);
       res.setHeader('Content-Length', wav.length);
       res.setHeader('Cache-Control', 'no-store');
       res.setHeader('X-Content-Type-Options', 'nosniff');
@@ -357,7 +261,12 @@ async function handle(req, res, action) {
       json(res, 200, { reply: safeReply, handoffReady });
     }
   } catch (error) {
-    if (error.status === 503) {
+    if (action.startsWith('speech')) {
+      if (res.destroyed || req.aborted) return;
+      const exhausted = ['insufficient_quota', 'credit_balance_exhausted'].includes(error.upstreamCode);
+      const limited = error.upstreamStatus === 429;
+      json(res, limited || exhausted ? 429 : 502, { error: exhausted ? 'saldo_openai_agotado' : limited ? 'limite_proveedor_voz' : 'voz_no_disponible', message: exhausted ? 'La voz no tiene saldo disponible.' : 'No pude reproducir la voz ahora. Tocá el parlante para reintentar.' });
+    } else if (error.status === 503) {
       json(res, 503, { error: 'asistente_no_configurado', message: 'La IA todavía no está conectada. Podés usar el formulario de contacto.' });
     } else if (error.upstreamStatus === 429) {
       json(res, 429, { error: 'cuota_gemini_alcanzada', message: 'El asistente alcanzó su límite gratuito por ahora. Probá de nuevo más tarde.' });

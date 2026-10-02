@@ -130,12 +130,13 @@
     let received = false;
     let oddByte = null;
     let pending = '';
-    const firstAudioTimeout = setTimeout(() => { if (!received) controller.abort(); }, 5500);
+    const firstAudioTimeout = setTimeout(() => { if (!received) controller.abort(); }, 8000);
     const handleBlock = block => {
       const data = block.split(/\r?\n/).filter(line => line.startsWith('data:')).map(line => line.slice(5).trimStart()).join('\n');
       if (!data || data === '[DONE]') return;
       let event;
       try { event = JSON.parse(data); } catch { return; }
+      if (event.event_type === 'error') throw new Error('voice_interrupted');
       if (event.event_type !== 'step.delta' || event.delta?.type !== 'audio' || !event.delta.data) return;
       const raw = atob(event.delta.data);
       const bytes = new Uint8Array(raw.length + (oddByte === null ? 0 : 1));
@@ -196,7 +197,7 @@
       if (!audioSources.size) { muteButton.classList.remove('is-speaking'); activeSpeechButton = null; }
       return true;
     } catch (error) {
-      if (received) { streamFinished = true; return true; }
+      if (received) { streamFinished = true; error.partialAudio = true; }
       throw error;
     } finally {
       clearTimeout(firstAudioTimeout);
@@ -257,7 +258,9 @@
           return;
         } catch (error) {
           if (request !== voiceRequest) return;
+          if (error.partialAudio) throw error;
           if (audioSources.size) { streamFinished = true; return; }
+          if (error.reason === 'saldo_openai_agotado') throw error;
           if (error.status === 429) throw error;
         }
       }
@@ -268,7 +271,13 @@
       if (request !== voiceRequest) return;
       activeSpeechButton = null;
       muteButton.classList.remove('is-speaking');
-      if (error.status === 429 && error.reason === 'limite_temporal') {
+      if (error.partialAudio) {
+        statusEl.textContent = 'Audio interrumpido';
+        statusEl.title = 'Tocá el parlante para escuchar de nuevo la respuesta completa.';
+      } else if (error.reason === 'saldo_openai_agotado') {
+        statusEl.textContent = 'Voz sin saldo';
+        statusEl.title = 'El saldo de OpenAI para la voz está agotado.';
+      } else if (error.status === 429 && error.reason === 'limite_temporal') {
         statusEl.textContent = 'Voz sin cupo';
         statusEl.title = 'El cupo temporal de voz está agotado. Intentá más tarde.';
       } else if (error.status === 429 && retryCount < 1 && !muted && !panel.hidden) {

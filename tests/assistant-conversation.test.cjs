@@ -34,7 +34,7 @@ test('the first greeting and successive replies speak in the same voice flow wit
   const chatHistories = [];
   const contexts = [];
   let failSpeech = false;
-  let speechFailureReason = 'cuota_gemini_alcanzada';
+  let speechFailureReason = 'limite_proveedor_voz';
   let transientSpeechFailures = 0;
   let deviceVoiceCalls = 0;
   let wavCalls = 0;
@@ -175,14 +175,14 @@ test('the first greeting and successive replies speak in the same voice flow wit
   const attemptsBeforeRecovery = speechAttempts;
   failSpeech = false;
   await new Promise(resolve => setTimeout(resolve, 80));
-  assert.ok(speechAttempts > attemptsBeforeRecovery, 'the same Gemini voice retries after a temporary quota error');
+  assert.ok(speechAttempts > attemptsBeforeRecovery, 'the selected voice retries after a temporary rate limit');
   assert.equal(spokenTexts.at(-1), replies['¿Y si falla la voz?']);
   assert.equal(get('#assistant-status').textContent, 'Disponible');
 
   transientSpeechFailures = 1;
   await send('Probá otra vez la voz');
   await new Promise(resolve => setTimeout(resolve, 80));
-  assert.equal(spokenTexts.at(-1), replies['Probá otra vez la voz'], 'a transient voice failure retries the same Gemini voice');
+  assert.equal(spokenTexts.at(-1), replies['Probá otra vez la voz'], 'a transient voice failure retries the selected voice');
   assert.equal(get('#assistant-status').textContent, 'Disponible');
 
   failSpeech = true;
@@ -192,5 +192,13 @@ test('the first greeting and successive replies speak in the same voice flow wit
   const attemptsAtSiteLimit = speechAttempts;
   await new Promise(resolve => setTimeout(resolve, 80));
   assert.equal(speechAttempts, attemptsAtSiteLimit, 'a site limit does not trigger futile short retries');
+
+  speechFailureReason = 'saldo_openai_agotado';
+  await send('¿Qué pasó con el cupo?');
+  assert.equal(get('#assistant-status').textContent, 'Voz sin saldo');
+  const attemptsAtEmptyBalance = speechAttempts;
+  await new Promise(resolve => setTimeout(resolve, 80));
+  assert.equal(speechAttempts, attemptsAtEmptyBalance, 'an exhausted balance does not make repeated billable requests');
+  assert.equal(deviceVoiceCalls, 0, 'OpenAI balance errors never select a phone voice');
 
 });
