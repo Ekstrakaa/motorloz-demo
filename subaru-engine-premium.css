@@ -1,0 +1,138 @@
+/* Subaru boxer showcase: more breathing room, scale and restrained motion. */
+.subaru-section .japan-brand-pair {
+  margin: 21px 0 25px !important;
+}
+
+.subaru-section figure.engine-sketch {
+  position: relative !important;
+  isolation: isolate !important;
+  display: grid !important;
+  grid-template-rows: minmax(0, 1fr) auto !important;
+  align-items: center !important;
+  justify-items: center !important;
+  width: min(100%, 620px) !important;
+  height: clamp(260px, 31vw, 340px) !important;
+  margin: 17px auto 23px !important;
+  overflow: visible !important;
+  background: radial-gradient(ellipse at 50% 48%, rgba(55, 172, 185, .12), transparent 56%);
+}
+
+.subaru-section .engine-sketch img {
+  position: relative !important;
+  z-index: 1 !important;
+  grid-row: 1 !important;
+  align-self: center !important;
+  justify-self: center !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  object-fit: contain !important;
+  transform-origin: 50% 56% !important;
+  filter: drop-shadow(0 20px 17px rgba(18, 42, 45, .22)) drop-shadow(0 4px 4px rgba(17, 45, 49, .14)) !important;
+  will-change: transform, filter;
+}
+
+/* The soft ground shadow anchors the drawing; the orbit adds just a hint of motion. */
+.subaru-section .engine-sketch::before {
+  content: "" !important;
+  position: absolute !important;
+  z-index: 0 !important;
+  left: 50% !important;
+  top: 70% !important;
+  width: 69% !important;
+  height: 18% !important;
+  transform: translate(-50%, -50%) !important;
+  border-radius: 50% !important;
+  background: radial-gradient(ellipse, rgba(16, 41, 45, .24), rgba(17, 56, 62, .09) 46%, transparent 76%) !important;
+  filter: blur(11px) !important;
+  opacity: .8 !important;
+}
+
+.subaru-section .engine-sketch::after {
+  content: "" !important;
+  position: absolute !important;
+  z-index: 0 !important;
+  left: 50% !important;
+  top: 46% !important;
+  width: 88% !important;
+  height: 65% !important;
+  transform: translate(-50%, -50%) rotate(-7deg) !important;
+  border: 1px dashed rgba(34, 142, 154, .25) !important;
+  border-radius: 50% !important;
+  background: radial-gradient(circle at 11% 23%, rgba(25, 157, 170, .82) 0 2px, transparent 3px) !important;
+  box-shadow: 0 0 0 9px rgba(38, 158, 169, .025), inset 0 0 24px rgba(45, 150, 162, .035) !important;
+  opacity: .8 !important;
+}
+
+.subaru-section .engine-sketch.is-revving img {
+  animation: boxer-premium-idle 4.2s ease-in-out infinite !important;
+}
+
+.subaru-section .engine-sketch.is-revving::before {
+  animation: boxer-premium-shadow 4.2s ease-in-out infinite !important;
+}
+
+.subaru-section .engine-sketch.is-revving::after {
+  animation: boxer-premium-orbit 28s linear infinite !important;
+}
+
+.subaru-section .engine-sketch figcaption {
+  position: relative !important;
+  z-index: 2 !important;
+  grid-row: 2 !important;
+  margin: 12px 0 0 !important;
+  color: #4b666a !important;
+  font-size: 9px !important;
+  letter-spacing: .16em !important;
+}
+
+.subaru-section .japan-heading h2 {
+  margin: 26px 0 15px !important;
+}
+
+@keyframes boxer-premium-idle {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(0) scale(1.12); }
+  50% { transform: translate3d(0, -3px, 0) rotate(.12deg) scale(1.15); }
+}
+
+@keyframes boxer-premium-shadow {
+  0%, 100% { opacity: .73; transform: translate(-50%, -50%) scaleX(.98); }
+  50% { opacity: .88; transform: translate(-50%, -50%) scaleX(1.04); }
+}
+
+@keyframes boxer-premium-orbit {
+  to { transform: translate(-50%, -50%) rotate(353deg); }
+}
+
+@media (max-width: 760px) {
+  .subaru-section .japan-brand-pair {
+    margin: 20px 0 22px !important;
+  }
+
+  .subaru-section figure.engine-sketch {
+    width: min(100%, 550px) !important;
+    height: clamp(255px, 66vw, 315px) !important;
+    margin: 16px auto 22px !important;
+  }
+
+  .subaru-section .engine-sketch::after {
+    width: 91% !important;
+    height: 61% !important;
+  }
+
+  .subaru-section .japan-heading h2 {
+    margin-top: 24px !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .subaru-section .engine-sketch.is-revving img,
+  .subaru-section .engine-sketch.is-revving::before,
+  .subaru-section .engine-sketch.is-revving::after {
+    animation: none !important;
+  }
+
+  .subaru-section .engine-sketch img {
+    transform: scale(1.12) !important;
+  }
+}
