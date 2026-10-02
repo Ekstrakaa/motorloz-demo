@@ -99,6 +99,17 @@ test('the condition and start already answered cannot be requested a second time
   assert.equal(body.reply,'Lo anoté.');
 });
 
+test('the workshop confirms the date and the ready response points to the visible button',async()=>{
+  const {body}=await chat([{role:'user',content:'Ana, Subaru Impreza, 200 mil km, golpeteo al acelerar desde ayer, puede esperar. Quiero coordinar.'}],{
+    facts:facts({name:'Ana',vehicle:'Subaru Impreza',mileage:'200 mil',issue:'Golpeteo',circumstances:'Al acelerar desde ayer',urgency:'Puede esperar'}),offerWhatsApp:true,
+    reply:'Gracias por contarme, Ana. Para coordinar la revisión, ¿podés confirmarme un día y horario que te convenga para acercarte al taller?'
+  });
+  assert.equal(body.handoffReady,true);
+  assert.doesNotMatch(body.reply,/confirmarme|te convenga/);
+  assert.match(body.reply,/botón de WhatsApp/);
+  assert.match(body.reply,/taller te confirma día y horario/);
+});
+
 test('serves the selected Cedar voice without requiring Gemini for narration', async () => {
   process.env.OPENAI_API_KEY = 'test-key';
   const geminiKey = process.env.GEMINI_API_KEY;
