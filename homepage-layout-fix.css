@@ -6,96 +6,6 @@
   background-size: 240px 164px !important;
 }
 
-/* The customer car rail belongs directly after reviews and loops without touch hover traps. */
-.customer-gallery {
-  overflow: hidden;
-  padding: clamp(34px, 5vw, 70px) 0 clamp(40px, 5vw, 72px);
-  color: #172326;
-  background: #e9eeeb url("assets/service-tile-pattern.svg") repeat;
-}
-.customer-gallery-heading {
-  display: flex;
-  align-items: end;
-  justify-content: space-between;
-  gap: 28px;
-  width: calc(100% - 56px);
-  max-width: 1320px;
-  margin: 0 auto 24px;
-}
-.customer-gallery-heading .eyebrow {
-  margin: 0 0 12px;
-  color: #437277;
-  font: 600 9px var(--mono, monospace);
-  letter-spacing: .15em;
-}
-.customer-gallery-heading h3 {
-  color: #152326;
-  font-size: clamp(30px, 4vw, 48px);
-  line-height: 1.05;
-  letter-spacing: -.045em;
-}
-.customer-gallery-heading h3 em { color: #168e9e; font-style: normal; }
-.customer-gallery-heading>p {
-  max-width: 32ch;
-  color: #596a6d;
-  font-size: 13px;
-}
-.customer-gallery-lane {
-  width: 100%;
-  overflow: hidden;
-}
-.customer-gallery-lane + .customer-gallery-lane { margin-top: 12px; }
-.customer-gallery-track {
-  display: flex;
-  width: max-content;
-  animation: customer-gallery-travel 95s linear infinite;
-  will-change: transform;
-}
-.customer-gallery-opposite .customer-gallery-track { animation-direction: reverse; animation-duration: 115s; }
-.customer-gallery-group {
-  display: flex;
-  flex: none;
-  gap: 12px;
-  padding: 0 6px;
-}
-.customer-gallery-photo {
-  flex: 0 0 clamp(172px, 19vw, 248px);
-  width: clamp(172px, 19vw, 248px);
-  aspect-ratio: 1.42;
-  overflow: hidden;
-  border: 1px solid rgba(49, 82, 82, .18);
-  border-radius: 10px;
-  background: #dfe6e3;
-  box-shadow: 0 8px 22px rgba(31, 58, 60, .11);
-}
-.customer-gallery-photo img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-@keyframes customer-gallery-travel { to { transform: translateX(-50%); } }
-@media (hover: hover) and (pointer: fine) {
-  .customer-gallery:hover .customer-gallery-track { animation-play-state: paused; }
-}
-@media (max-width: 760px) {
-  .customer-gallery-heading {
-    display: block;
-    width: calc(100% - 40px);
-    margin-bottom: 20px;
-  }
-  .customer-gallery-heading>p { margin-top: 10px; font-size: 12px; }
-  .customer-gallery-group { gap: 9px; padding-inline: 5px; }
-  .customer-gallery-photo {
-    flex-basis: 164px;
-    width: 164px;
-    border-radius: 8px;
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .customer-gallery-track { animation: none; }
-}
-
 /* Make the official Hyundai role readable at a glance without another image plate. */
 .hyundai-signature .hyundai-badge {
   align-items: center;
@@ -106,6 +16,3 @@
 }
 .hyundai-signature .hyundai-badge span { color: #fff; font-size: 15px !important; }
 .hyundai-signature .hyundai-badge i { color: #f0f4f3; font-size: 9px; }
-@media (max-width: 760px) {
-  .customer-gallery-heading { width: calc(100% - 40px); }
-}
