@@ -9,11 +9,11 @@
   const label = document.querySelector('#hero-photo-label');
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
   const defaults = [
-    { type: 'video', src: 'assets/clips/hyundai-home.mp4', poster: 'assets/clips/hyundai-home.jpg', duration: 10000, playbackRate: .5, label: 'HYUNDAI, EN MOVIMIENTO' },
-    { type: 'video', src: 'assets/cinema-workshop-10s.mp4', poster: 'assets/salon-panoramica-optimized.webp', duration: 10000, label: 'EL TALLER, EN MOVIMIENTO' },
+    { type: 'video', src: 'assets/cinema-hyundai-natural.mp4', poster: 'assets/clips/hyundai-home.jpg', duration: 15000, label: 'HYUNDAI, EN MOVIMIENTO' },
+    { type: 'video', src: 'assets/cinema-workshop-natural.mp4', poster: 'assets/salon-panoramica-optimized.webp', duration: 10000, label: 'EL TALLER, EN MOVIMIENTO' },
     { type: 'image', src: 'assets/hero-herramientas.webp', focus: '48% 48%', zoomStart: 1.025, zoomEnd: 1.07, duration: 3000, label: 'HERRAMIENTAS, DIAGNÓSTICO Y OFICIO' },
     { type: 'video', src: 'assets/motorloz-subaru-loop.mp4', poster: 'assets/hero-subaru.webp', duration: 10000, label: 'MECÁNICA, DE CERCA' },
-    { type: 'video', src: 'assets/clips/subaru-home.mp4', poster: 'assets/clips/subaru-home.jpg', duration: 10000, playbackRate: .5, label: 'SUBARU, EN MOVIMIENTO' },
+    { type: 'video', src: 'assets/cinema-subaru-natural.mp4', poster: 'assets/clips/subaru-home.jpg', duration: 10000, label: 'SUBARU, EN MOVIMIENTO' },
     { type: 'image', src: 'assets/hero-subaru-azul.webp?v=privacy1', focus: '50% 52%', zoomStart: 1.015, zoomEnd: 1.055, duration: 3000, label: 'SUBARU, EN EL CORAZÓN' }
   ];
   let sequence = defaults;

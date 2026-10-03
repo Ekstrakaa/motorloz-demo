@@ -1,11 +1,11 @@
 'use strict';
 (() => {
   const defaults = [
-    {name:'Hyundai en movimiento',type:'video',src:'assets/clips/hyundai-home.mp4',thumb:'assets/clips/hyundai-home.jpg',duration:10,label:'HYUNDAI · EN MOVIMIENTO'},
-    {name:'El taller en movimiento',type:'video',src:'assets/cinema-workshop-10s.mp4',thumb:'assets/salon-panoramica-optimized.webp',duration:10,label:'EL TALLER · EN MOVIMIENTO'},
+    {name:'Hyundai en movimiento',type:'video',src:'assets/cinema-hyundai-natural.mp4',thumb:'assets/clips/hyundai-home.jpg',duration:15,label:'HYUNDAI · EN MOVIMIENTO'},
+    {name:'El taller en movimiento',type:'video',src:'assets/cinema-workshop-natural.mp4',thumb:'assets/salon-panoramica-optimized.webp',duration:10,label:'EL TALLER · EN MOVIMIENTO'},
     {name:'Herramientas y oficio',type:'image',src:'assets/hero-herramientas.webp',thumb:'assets/hero-herramientas.webp',duration:3,label:'HERRAMIENTAS · DIAGNÓSTICO · OFICIO'},
     {name:'Mecánica de cerca',type:'video',src:'assets/motorloz-subaru-loop.mp4',thumb:'assets/hero-subaru.webp',duration:10,label:'MECÁNICA · DE CERCA'},
-    {name:'Subaru en movimiento',type:'video',src:'assets/clips/subaru-home.mp4',thumb:'assets/clips/subaru-home.jpg',duration:10,label:'SUBARU · EN MOVIMIENTO'},
+    {name:'Subaru en movimiento',type:'video',src:'assets/cinema-subaru-natural.mp4',thumb:'assets/clips/subaru-home.jpg',duration:10,label:'SUBARU · EN MOVIMIENTO'},
     {name:'Subaru en el corazón',type:'image',src:'assets/hero-subaru-azul.webp',thumb:'assets/hero-subaru-azul.webp',duration:3,label:'SUBARU · EN EL CORAZÓN'}
   ];
   const key = 'motorloz-home-sequence-draft-v1';
@@ -21,7 +21,7 @@
     const saved = JSON.parse(localStorage.getItem(key));
     scenes = Array.isArray(saved) && saved.length ? saved : clone(defaults);
   } catch { scenes = clone(defaults); }
-  const updatedSources = {'assets/cinema-workshop.mp4':'assets/cinema-workshop-10s.mp4','assets/cinema-engine.mp4':'assets/motorloz-subaru-loop.mp4'};
+  const updatedSources = {'assets/clips/hyundai-home.mp4':'assets/cinema-hyundai-natural.mp4','assets/cinema-workshop.mp4':'assets/cinema-workshop-natural.mp4','assets/cinema-workshop-10s.mp4':'assets/cinema-workshop-natural.mp4','assets/cinema-engine.mp4':'assets/motorloz-subaru-loop.mp4','assets/clips/subaru-home.mp4':'assets/cinema-subaru-natural.mp4'};
   scenes = scenes.filter(scene => scene.src !== 'assets/hero-bruno.png').map(scene => ({...scene,src:updatedSources[scene.src] || scene.src})).map((scene, i) => ({
     ...(defaults.find(item => item.src === scene.src) || defaults[i] || {}),
     ...scene,
