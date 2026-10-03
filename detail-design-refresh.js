@@ -56,13 +56,6 @@
       index = (index + 1) % images.length;
       images[index].classList.add('is-active');
       images[index].removeAttribute('aria-hidden');
-      root.querySelectorAll('iframe[data-carousel-src]').forEach(frame => {
-        if (images[index].contains(frame)) {
-          if (frame.src !== frame.dataset.carouselSrc) frame.src = frame.dataset.carouselSrc;
-        } else if (frame.hasAttribute('src') && frame.src !== 'about:blank') {
-          frame.src = 'about:blank';
-        }
-      });
       update?.(index, images.length);
     }
     function start() {
@@ -87,6 +80,8 @@
     if (label) label.textContent = ['SUBARU · DETALLE', 'SUBARU · ATENCIÓN MULTIMARCA', 'SUBARU · EN EL TALLER'][i];
     if (count) count.textContent = `${String(i + 1).padStart(2, '0')} / ${String(n).padStart(2, '0')}`;
   });
+  const hyundaiGallery = document.querySelector('[data-hyundai-carousel]');
+  hyundaiGallery?.querySelectorAll('iframe, video').forEach(media => media.remove());
   rotateImages('[data-hyundai-carousel]', '.hyundai-image', 5200, (i, n) => {
     const count = document.querySelector('[data-hyundai-carousel] .hyundai-image.is-active .hyundai-image-index b');
     if (count) count.textContent = `${String(i + 1).padStart(2, '0')} / ${String(n).padStart(2, '0')}`;
