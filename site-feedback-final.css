@@ -8,11 +8,25 @@
 .people-ev-mark { display: block; width: clamp(170px, 18vw, 240px); height: auto; object-fit: contain; margin: 22px auto 0; filter: drop-shadow(0 13px 18px rgba(0,0,0,.35)) drop-shadow(0 0 14px rgba(27,182,197,.18)); }
 
 .subaru-section .japan-gallery { align-items: center !important; }
+.subaru-section .japan-brand-pair { gap: 22px !important; }
+.subaru-section .japan-flag { flex: none !important; width: 84px !important; height: 57px !important; }
+.subaru-section .japan-flag i { width: 20px !important; height: 20px !important; }
+.subaru-section .subaru-lockup img { width: 154px !important; height: auto !important; max-height: none !important; filter: none !important; }
 .subaru-section .subaru-feature { min-width: 0; width: 100%; max-width: 660px; margin: 0; justify-self: end; }
-.subaru-feature-video { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; background: #071418; border: 1px solid rgba(116,209,215,.25); border-radius: 13px; box-shadow: 0 22px 55px rgba(0,0,0,.22); }
+.subaru-feature-video { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; background: #071418; border: 0 !important; border-radius: 0 !important; box-shadow: none !important; }
 .subaru-feature figcaption { display: block; margin-top: 12px; color: #146c77; font: 700 9px/1.4 var(--mono); letter-spacing: .16em; }
+.hyundai-copy .hyundai-service-action::after { content: none !important; display: none !important; }
+.hero-cinema .cinema-single-video { animation: none !important; transform: none !important; transition: none !important; }
+.brand-lineup .brand-wordmark img[src*="subaru-logo-color"] { width: 132px !important; height: 76px !important; max-width: none !important; max-height: none !important; filter: none !important; }
+.brand-lineup:hover .brand-lineup-track, .brand-lineup:focus-within .brand-lineup-track { animation-play-state: running !important; }
+
+.appointment.wizard-ready .appointment-steps { display: grid !important; gap: 10px !important; width: min(100%, 420px) !important; margin: 28px auto 0 !important; padding: 0 !important; border: 0 !important; border-radius: 0 !important; background: none !important; box-shadow: none !important; overflow: visible !important; }
+.appointment.wizard-ready .appointment-steps li { position: relative; display: grid !important; grid-template-columns: 40px minmax(0,1fr) !important; align-items: center !important; gap: 14px !important; min-height: 64px !important; margin: 0 !important; padding: 10px 15px !important; border: 1px solid rgba(95,207,216,.34) !important; border-radius: 13px !important; background: linear-gradient(110deg,rgba(11,67,75,.96),rgba(11,35,40,.96) 72%) !important; box-shadow: 0 9px 23px rgba(0,0,0,.2), inset 0 1px rgba(222,255,255,.1) !important; color: #f2ffff !important; font-size: 13px !important; font-weight: 650 !important; letter-spacing: -.01em; line-height: 1.35 !important; }
+.appointment.wizard-ready .appointment-steps li::before { content: ""; position: absolute; inset: 12px auto 12px 0; width: 3px; border-radius: 0 3px 3px 0; background: #65dce6; box-shadow: 0 0 13px rgba(94,221,230,.5); }
+.appointment.wizard-ready .appointment-steps li span { display: grid !important; place-items: center !important; width: 39px !important; height: 39px !important; border: 1px solid rgba(130,236,242,.45) !important; border-radius: 10px !important; background: linear-gradient(145deg,rgba(88,209,220,.24),rgba(56,151,163,.07)) !important; box-shadow: inset 0 1px rgba(255,255,255,.12) !important; color: #a3f5f6 !important; font: 800 12px/1 var(--mono) !important; }
 
 .workshop-gallery { min-width: 0; width: 100%; }
+.workshop-swipe-hint { display: none; }
 .workshop-photo-rail { display: flex; gap: 13px; overflow-x: auto; overscroll-behavior-inline: contain; scroll-snap-type: x mandatory; scroll-behavior: smooth; scrollbar-width: thin; scrollbar-color: rgba(22,146,162,.55) rgba(14,55,61,.12); padding: 4px 3px 15px; }
 .workshop-photo-rail:focus-visible { outline: 2px solid #1ab6c4; outline-offset: 2px; }
 .workshop-photo-card { position: relative; flex: 0 0 min(82%, 510px); min-width: 0; margin: 0; overflow: hidden; scroll-snap-align: center; border: 1px solid rgba(17,77,83,.16); border-radius: 11px; background: #132629; box-shadow: 0 13px 30px rgba(18,45,47,.12); }
@@ -26,29 +40,73 @@
 
 .location-heading-icon { display: block !important; width: 83px !important; height: 83px !important; margin: 0 auto 18px !important; background: url('assets/motorloz-icon-atlas-optimized.webp') 66.6667% 100% / 400% 400% no-repeat; filter: drop-shadow(0 8px 17px rgba(14,105,117,.24)); }
 
+.brand-intro-studio { width: min(530px, 72vw) !important; }
+.brand-intro-lockup.brand-intro-original { width: min(465px, 66vw) !important; animation: motorloz-intro-mark 2.8s cubic-bezier(.18,.7,.22,1) both !important; }
+.brand-intro-studio::before { animation: motorloz-intro-glow 2.8s ease-in-out both; }
+@keyframes motorloz-intro-mark {
+  0% { opacity: 0; transform: translateY(12px) scale(.92); filter: blur(3px) brightness(.8); }
+  35% { opacity: 1; transform: translateY(0) scale(1.012); filter: blur(0) brightness(1); }
+  68% { transform: translateY(-3px) scale(1.04); filter: brightness(1.14); }
+  100% { opacity: 1; transform: translateY(0) scale(1); filter: brightness(1); }
+}
+@keyframes motorloz-intro-glow {
+  0% { opacity: 0; transform: scale(.8); }
+  45% { opacity: .55; transform: scale(1); }
+  73% { opacity: .8; transform: scale(1.08); }
+  100% { opacity: .45; transform: scale(1); }
+}
+
+#services-track .service-title-row .service-icon {
+  transform-origin: 50% 55%;
+  animation: service-illustration-breathe 3.4s ease-in-out infinite !important;
+}
+#services-track .service-card:nth-child(3n+2) .service-icon { animation-delay: -1.1s !important; }
+#services-track .service-card:nth-child(3n) .service-icon { animation-delay: -2.2s !important; }
+@keyframes service-illustration-breathe {
+  0%, 100% { transform: translateY(0) scale(1); filter: drop-shadow(0 7px 9px rgba(12,52,63,.15)); }
+  50% { transform: translateY(-8px) scale(1.1); filter: drop-shadow(0 15px 16px rgba(10,89,105,.27)) drop-shadow(0 0 12px rgba(24,190,205,.31)); }
+}
+
 @media (max-width: 760px) {
+  .brand-intro-studio { width: min(340px, 80vw) !important; }
+  .brand-intro-lockup.brand-intro-original { width: min(290px, 72vw) !important; }
   .hero-copy { padding-bottom: max(112px, 13svh) !important; }
   .hero-scroll-cue { bottom: 18px !important; }
   .hyundai-signature .hyundai-copy { width: calc(100% - 40px) !important; max-width: 560px !important; margin: 0 auto !important; text-align: center !important; }
   .hyundai-signature .hyundai-copy .hyundai-emblem { width: fit-content !important; margin: 0 auto 20px !important; }
   .hyundai-signature .hyundai-copy .hyundai-badge { justify-content: center !important; }
-  .hyundai-signature .hyundai-copy h2 { max-width: none !important; margin-inline: auto !important; }
-  .hyundai-signature .hyundai-copy > p:not(.eyebrow) { max-width: 43ch !important; margin-inline: auto !important; }
+  .hyundai-signature .hyundai-copy h2 { max-width: none !important; margin-inline: auto !important; text-align: center !important; }
+  .hyundai-signature .hyundai-copy > p:not(.eyebrow) { max-width: 43ch !important; margin-inline: auto !important; text-align: center !important; }
+  .hyundai-signature .hyundai-copy > .eyebrow { text-align: center !important; }
+  .hyundai-signature .hyundai-copy > a.text-link { justify-content: center !important; text-align: center !important; }
   .hyundai-signature .hyundai-copy .hyundai-source { text-align: center !important; }
   .hyundai-signature .hyundai-gallery .hyundai-image > video { object-fit: cover !important; }
+  .electric-mobility-content > div:first-child,
+  .electric-mobility-copy { width: 100%; text-align: center !important; }
+  .electric-mobility-content h2 { max-width: 12ch !important; margin-inline: auto !important; text-align: center !important; }
+  .electric-mobility-copy p { max-width: 44ch !important; margin-inline: auto !important; text-align: center !important; }
+  #contenido .electric-mobility-copy a.text-link { justify-content: center !important; }
   .subaru-section .japan-gallery { display: grid !important; grid-template-columns: minmax(0,1fr) !important; }
   .subaru-section .japan-heading { grid-column: 1 !important; }
-  .subaru-section .subaru-feature { grid-column: 1 !important; max-width: none !important; justify-self: stretch !important; margin-top: 22px !important; }
+  .subaru-section .subaru-feature { grid-column: 1 !important; width: 100vw !important; max-width: none !important; margin: 22px 0 0 calc(50% - 50vw) !important; justify-self: start !important; }
   .subaru-feature-video { aspect-ratio: 16 / 9; }
-  .workshop-photo-card { flex-basis: min(88%, 440px); }
+  .subaru-feature figcaption { margin-left: 22px; }
+  .brand-lineup .brand-wordmark img[src*="subaru-logo-color"] { width: 108px !important; height: 65px !important; }
+  .workshop-swipe-hint { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: fit-content; margin: 0 0 14px auto; padding: 8px 10px 8px 13px; border: 1px solid rgba(7,133,150,.28); border-radius: 999px; background: rgba(226,246,245,.84); color: #08697a; font: 800 9px/1 var(--mono); letter-spacing: .08em; }
+  .workshop-swipe-hint span { font-size: 18px; line-height: .8; font-weight: 400; }
+  .workshop-photo-rail { scroll-padding-inline: 3px; }
+  .workshop-photo-card { flex-basis: min(78%, 390px); scroll-snap-align: start; }
   .workshop-photo-card img { aspect-ratio: 4 / 3; }
-  .workshop-rail-footer { font-size: 8px; }
+  .workshop-rail-footer { font-size: 9px; }
+  .workshop-rail-footer button { width: 44px; height: 44px; }
   .people-ev-mark { width: clamp(175px, 54vw, 230px); margin: 26px auto 0; }
-  .appointment.wizard-ready .appointment-steps { width: min(100%, 355px) !important; margin: 24px auto 0 !important; padding: 8px 17px !important; border: 1px solid rgba(50,126,133,.23) !important; border-radius: 15px !important; background: rgba(244,251,249,.35) !important; box-shadow: 0 11px 35px rgba(8,57,64,.08); }
-  .appointment.wizard-ready .appointment-steps li { display: grid !important; grid-template-columns: 29px minmax(0,1fr) !important; align-items: center !important; gap: 11px !important; min-height: 48px !important; padding: 8px 0 !important; text-align: left !important; line-height: 1.4 !important; }
-  .appointment.wizard-ready .appointment-steps li span { display: grid !important; place-items: center !important; width: 27px !important; height: 27px !important; border: 1px solid rgba(22,150,163,.32) !important; border-radius: 50% !important; background: rgba(28,174,188,.08) !important; font-size: 9px !important; }
+  .appointment.wizard-ready .appointment-steps { width: min(100%, 355px) !important; margin-top: 23px !important; }
+  .appointment.wizard-ready .appointment-steps li { font-size: 12px !important; }
 }
 @media (prefers-reduced-motion: reduce) {
+  .brand-intro-lockup.brand-intro-original,.brand-intro-studio::before { animation: none !important; }
   .hyundai-signature .hyundai-copy .hyundai-emblem.is-intro-visible img { animation: none !important; }
+  #services-track .service-title-row .service-icon { animation: none !important; transform: none !important; }
   .workshop-photo-rail { scroll-behavior: auto; }
+  .brand-lineup .brand-lineup-track { animation: none !important; }
 }

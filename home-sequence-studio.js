@@ -2,9 +2,9 @@
 (() => {
   const defaults = [
     {name:'Hyundai en movimiento',type:'video',src:'assets/clips/hyundai-home.mp4',thumb:'assets/clips/hyundai-home.jpg',duration:10,label:'HYUNDAI · EN MOVIMIENTO'},
-    {name:'El taller en movimiento',type:'video',src:'assets/cinema-workshop.mp4',thumb:'assets/salon-panoramica-optimized.webp',duration:10,label:'EL TALLER · EN MOVIMIENTO'},
+    {name:'El taller en movimiento',type:'video',src:'assets/cinema-workshop-10s.mp4',thumb:'assets/salon-panoramica-optimized.webp',duration:10,label:'EL TALLER · EN MOVIMIENTO'},
     {name:'Herramientas y oficio',type:'image',src:'assets/hero-herramientas.webp',thumb:'assets/hero-herramientas.webp',duration:3,label:'HERRAMIENTAS · DIAGNÓSTICO · OFICIO'},
-    {name:'Mecánica de cerca',type:'video',src:'assets/cinema-engine.mp4',thumb:'assets/hero-subaru.webp',duration:10,label:'MECÁNICA · DE CERCA'},
+    {name:'Mecánica de cerca',type:'video',src:'assets/motorloz-subaru-loop.mp4',thumb:'assets/hero-subaru.webp',duration:10,label:'MECÁNICA · DE CERCA'},
     {name:'Subaru en movimiento',type:'video',src:'assets/clips/subaru-home.mp4',thumb:'assets/clips/subaru-home.jpg',duration:10,label:'SUBARU · EN MOVIMIENTO'},
     {name:'Subaru en el corazón',type:'image',src:'assets/hero-subaru-azul.webp',thumb:'assets/hero-subaru-azul.webp',duration:3,label:'SUBARU · EN EL CORAZÓN'}
   ];
@@ -21,7 +21,8 @@
     const saved = JSON.parse(localStorage.getItem(key));
     scenes = Array.isArray(saved) && saved.length ? saved : clone(defaults);
   } catch { scenes = clone(defaults); }
-  scenes = scenes.filter(scene => scene.src !== 'assets/hero-bruno.png').map((scene, i) => ({
+  const updatedSources = {'assets/cinema-workshop.mp4':'assets/cinema-workshop-10s.mp4','assets/cinema-engine.mp4':'assets/motorloz-subaru-loop.mp4'};
+  scenes = scenes.filter(scene => scene.src !== 'assets/hero-bruno.png').map(scene => ({...scene,src:updatedSources[scene.src] || scene.src})).map((scene, i) => ({
     ...(defaults.find(item => item.src === scene.src) || defaults[i] || {}),
     ...scene,
     duration: clamp(scene.duration || (scene.type === 'video' ? 10 : 3), 1, 30),
@@ -96,15 +97,13 @@
     $('trim-end').value = range.end;
     $('trim-start-value').textContent = `${decimal(range.start)} s`;
     $('trim-end-value').textContent = `${decimal(range.end)} s`;
-    const repeat = scene.duration > range.end - range.start + .1;
-    $('source-duration').textContent = `Archivo: ${decimal(range.fileLength)} s. ${repeat ? `Se repite hasta completar ${scene.duration} s.` : 'El tiempo en pantalla manda.'}`;
+    const rate = (range.end - range.start) / scene.duration;
+    $('source-duration').textContent = `Archivo: ${decimal(range.fileLength)} s. Se reproduce una sola vez${rate < 1 ? ', a velocidad ajustada' : ''}.`;
   }
 
-  function replayFragment(scene) {
-    if (scenes[selected] !== scene || !videoReady || (!playing && video.paused)) return;
-    const {start} = selectedRange(scene);
-    video.currentTime = start;
-    if (video.paused) video.play().catch(() => {});
+  function setPreviewRate(scene) {
+    const range = selectedRange(scene);
+    video.playbackRate = clamp((range.end - range.start) / scene.duration, .25, 4);
   }
 
   function showScene(autoPlay = false) {
@@ -122,7 +121,7 @@
     $('selected-title').textContent = scene.name;
     $('duration').value = scene.duration;
     $('duration-number').value = scene.duration;
-    $('duration-hint').textContent = scene.type === 'video' ? 'El clip corto se repite hasta completar este tiempo.' : 'La foto cambia al terminar este tiempo.';
+    $('duration-hint').textContent = scene.type === 'video' ? 'Cada clip se muestra una vez, sin reiniciarse.' : 'La foto cambia al terminar este tiempo.';
     $('transition').value = String(scene.transition);
     $('focus-x').value = scene.focusX;
     $('focus-y').value = scene.focusY;
@@ -147,6 +146,8 @@
       updateTrimLabels(scene, range);
       videoReady = true;
       video.currentTime = range.start;
+      video.loop = false;
+      setPreviewRate(scene);
       if (autoPlay && playing) {
         video.play().then(() => { if (token === sceneToken) { video.classList.add('visible'); image.classList.remove('visible'); } })
           .catch(() => toast('El navegador bloqueó la vista previa. Tocá reproducir de nuevo.'));
@@ -155,9 +156,9 @@
     video.onloadedmetadata = onMetadata;
     video.ontimeupdate = () => {
       if (token !== sceneToken || !videoReady) return;
-      if (video.currentTime >= selectedRange(scene).end - .06) replayFragment(scene);
+      if (video.currentTime >= selectedRange(scene).end - .06) video.pause();
     };
-    video.onended = () => replayFragment(scene);
+    video.onended = () => video.pause();
     video.onerror = () => { if (token === sceneToken) $('source-duration').textContent = 'No se pudo cargar este archivo.'; };
     if (video.dataset.src !== scene.src) {
       video.dataset.src = scene.src;
@@ -217,7 +218,7 @@
     scenes[selected].duration = clamp(Math.round(Number(value)), 1, 30);
     $('duration-number').value = scenes[selected].duration;
     $('duration').value = scenes[selected].duration;
-    if (videoReady) updateTrimLabels(scenes[selected], selectedRange(scenes[selected]));
+    if (videoReady) { updateTrimLabels(scenes[selected], selectedRange(scenes[selected])); setPreviewRate(scenes[selected]); }
     save();
     renderList();
     if (playing) advanceRun();
@@ -244,6 +245,7 @@
       scene[edge === 'start' ? 'trimStart' : 'trimEnd'] = Number(event.target.value);
       updateTrimLabels(scene, selectedRange(scene));
       video.currentTime = selectedRange(scene).start;
+      setPreviewRate(scene);
       save();
     });
   }

@@ -59,6 +59,10 @@
         if (!shouldPlay) { video.pause(); return; }
         video.muted = true;
         video.playsInline = true;
+        if (rootSelector === '[data-hyundai-carousel]') {
+          video.loop = false;
+          video.playbackRate = .49;
+        }
         video.play().catch(() => {});
       });
     }
@@ -68,6 +72,8 @@
       index = (index + 1) % slides.length;
       slides[index].classList.add('is-active');
       slides[index].removeAttribute('aria-hidden');
+      const incomingVideo = slides[index].tagName === 'VIDEO' ? slides[index] : slides[index].querySelector('video');
+      if (incomingVideo) incomingVideo.currentTime = 0;
       update?.(index, slides.length);
       syncVideo();
     }
@@ -115,7 +121,7 @@
     }, { threshold: .35 });
     emblemObserver.observe(hyundaiEmblem);
   }
-  rotateImages('[data-hyundai-carousel]', '.hyundai-image', slide => slide.classList.contains('hyundai-video-slide') ? 11000 : 3000, (i, n) => {
+  rotateImages('[data-hyundai-carousel]', '.hyundai-image', slide => slide.classList.contains('hyundai-video-slide') ? 10000 : 3000, (i, n) => {
     const count = document.querySelector('[data-hyundai-carousel] .hyundai-image.is-active .hyundai-image-index b');
     if (count) count.textContent = `${String(i + 1).padStart(2, '0')} / ${String(n).padStart(2, '0')}`;
   });

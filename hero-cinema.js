@@ -9,11 +9,11 @@
   const label = document.querySelector('#hero-photo-label');
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
   const defaults = [
-    { type: 'video', src: 'assets/clips/hyundai-home.mp4', poster: 'assets/clips/hyundai-home.jpg', duration: 10000, label: 'HYUNDAI, EN MOVIMIENTO' },
-    { type: 'video', src: 'assets/cinema-workshop.mp4', poster: 'assets/salon-panoramica-optimized.webp', duration: 10000, label: 'EL TALLER, EN MOVIMIENTO' },
+    { type: 'video', src: 'assets/clips/hyundai-home.mp4', poster: 'assets/clips/hyundai-home.jpg', duration: 10000, playbackRate: .5, label: 'HYUNDAI, EN MOVIMIENTO' },
+    { type: 'video', src: 'assets/cinema-workshop-10s.mp4', poster: 'assets/salon-panoramica-optimized.webp', duration: 10000, label: 'EL TALLER, EN MOVIMIENTO' },
     { type: 'image', src: 'assets/hero-herramientas.webp', focus: '48% 48%', zoomStart: 1.025, zoomEnd: 1.07, duration: 3000, label: 'HERRAMIENTAS, DIAGNÓSTICO Y OFICIO' },
-    { type: 'video', src: 'assets/cinema-engine.mp4', poster: 'assets/hero-subaru.webp', duration: 10000, label: 'MECÁNICA, DE CERCA' },
-    { type: 'video', src: 'assets/clips/subaru-home.mp4', poster: 'assets/clips/subaru-home.jpg', duration: 10000, label: 'SUBARU, EN MOVIMIENTO' },
+    { type: 'video', src: 'assets/motorloz-subaru-loop.mp4', poster: 'assets/hero-subaru.webp', duration: 10000, label: 'MECÁNICA, DE CERCA' },
+    { type: 'video', src: 'assets/clips/subaru-home.mp4', poster: 'assets/clips/subaru-home.jpg', duration: 10000, playbackRate: .5, label: 'SUBARU, EN MOVIMIENTO' },
     { type: 'image', src: 'assets/hero-subaru-azul.webp?v=privacy1', focus: '50% 52%', zoomStart: 1.015, zoomEnd: 1.055, duration: 3000, label: 'SUBARU, EN EL CORAZÓN' }
   ];
   let sequence = defaults;
@@ -45,7 +45,6 @@
   let transitioning = false;
   let player = null;
   let playerSource = '';
-  let replaying = false;
   const requestedScene = Number(new URLSearchParams(location.search).get('scene'));
   if (Number.isInteger(requestedScene) && requestedScene >= 1 && requestedScene <= sequence.length) index = requestedScene - 1;
 
@@ -102,15 +101,6 @@
     return visible && frames[active].classList.contains('is-current') && sequence[index].type === 'video' && !reducedMotion.matches;
   }
 
-  function repeatFragment() {
-    if (!shouldPlay() || replaying) return;
-    replaying = true;
-    const item = sequence[index];
-    const start = Math.max(0, Math.min(item.start || 0, Math.max(0, video.duration - .15)));
-    video.currentTime = start;
-    Promise.resolve(video.play()).catch(() => {}).finally(() => { replaying = false; });
-  }
-
   function syncVideo(item = sequence[index]) {
     if (reducedMotion.matches || item.type !== 'video') {
       video.classList.remove('is-visible');
@@ -123,10 +113,12 @@
         shouldPlay,
         onPlaying: () => video.classList.toggle('is-visible', shouldPlay())
       });
-      video.addEventListener('ended', repeatFragment);
+      // Each clip has one uninterrupted pass. Rewinding short assets inside a
+      // longer scene looked like a stall, particularly on mobile Safari.
+      video.addEventListener('ended', () => { if (shouldPlay()) advance(); });
       video.addEventListener('timeupdate', () => {
         const item = sequence[index];
-        if (shouldPlay() && item.end && video.currentTime >= item.end - .06) repeatFragment();
+        if (shouldPlay() && item.end && video.currentTime >= item.end - .06) advance();
       });
       video.addEventListener('loadedmetadata', () => {
         if (shouldPlay() && sequence[index].start) video.currentTime = sequence[index].start;
