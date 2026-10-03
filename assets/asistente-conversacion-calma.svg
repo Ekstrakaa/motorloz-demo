@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <title>Conversación y escucha</title>
+  <defs>
+    <linearGradient id="line" x1="88" y1="96" x2="420" y2="418" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#E5F8F8"/>
+      <stop offset="1" stop-color="#66D1D9"/>
+    </linearGradient>
+  </defs>
+  <path d="M116 123h280a57 57 0 0 1 57 57v143a57 57 0 0 1-57 57H226l-99 63v-63h-11a57 57 0 0 1-57-57V180a57 57 0 0 1 57-57Z" stroke="url(#line)" stroke-width="18" stroke-linejoin="round"/>
+  <path d="M160 250h20m32 0h20m32 0h20" stroke="#77DDE2" stroke-width="19" stroke-linecap="round"/>
+  <path d="M320 224c15 14 15 38 0 52m25-77c29 28 29 74 0 102" stroke="#8CE6E9" stroke-width="13" stroke-linecap="round"/>
+</svg>

@@ -7,6 +7,31 @@
   if (!viewport || !track) return;
   const cards = [...track.querySelectorAll('.service-card')];
   cards.forEach((card, index) => {
+    const serviceId = card.querySelector('.service-card-copy > span');
+    const serviceMatch = serviceId?.textContent.trim().match(/^(\d+)\s*\/\s*(.+)$/);
+    if (serviceId && serviceMatch && !serviceId.querySelector('.service-index')) {
+      const originalLabel = serviceId.textContent.trim();
+      serviceId.setAttribute('aria-label', originalLabel);
+      const number = document.createElement('b');
+      number.className = 'service-index';
+      number.textContent = serviceMatch[1];
+      const slash = document.createElement('i');
+      slash.textContent = '/';
+      const category = document.createElement('strong');
+      category.textContent = serviceMatch[2];
+      serviceId.replaceChildren(number, slash, category);
+    }
+    if (!card.querySelector('.service-photo-meta')) {
+      const photoMeta = document.createElement('div');
+      photoMeta.className = 'service-photo-meta';
+      photoMeta.setAttribute('aria-hidden', 'true');
+      const label = document.createElement('span');
+      label.textContent = 'SERVICIOS';
+      const number = document.createElement('b');
+      number.textContent = String(index + 1).padStart(2, '0');
+      photoMeta.append(label, number);
+      card.append(photoMeta);
+    }
     const title = card.querySelector('.service-card-copy h3');
     if (!title || card.querySelector('.service-title-row')) return;
     const row = document.createElement('div');

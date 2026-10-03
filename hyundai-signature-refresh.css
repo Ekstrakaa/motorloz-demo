@@ -200,9 +200,9 @@
 #assistant-launcher .assistant-launcher-avatar { border: 0 !important; border-radius: 0 !important; background: transparent !important; box-shadow: none !important; }
 #assistant-launcher .assistant-launcher-avatar img { display: block !important; width: 100% !important; height: 100% !important; object-fit: contain !important; filter: drop-shadow(0 3px 7px rgba(52, 205, 215, .34)) !important; }
 #assistant-launcher .assistant-launcher-avatar::before { content: none !important; background: none !important; }
-.assistant-header .assistant-header-logo img { content: url("assets/asistente-3d-headset-premium-512.png?v=20261002-headset3d1") !important; }
+.assistant-header .assistant-header-logo img { content: url("assets/asistente-conversacion-calma.svg?v=20261003-1") !important; }
 .assistant-message-assistant:not(.assistant-message-welcome)::before,
-.assistant-message-welcome::before { background-image: url("assets/asistente-3d-headset-premium-512.png?v=20261002-headset3d1") !important; background-size: contain !important; }
+.assistant-message-welcome::before { background-image: url("assets/asistente-conversacion-calma.svg?v=20261003-1") !important; background-size: contain !important; }
 
 @media (max-width: 760px) {
   .hyundai-signature.section { padding: 34px 0 31px !important; }

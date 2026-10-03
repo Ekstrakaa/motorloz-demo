@@ -1,0 +1,21 @@
+/* Gentle footer wordmark breathing; preserve the original logo geometry. */
+footer .footer-brand .brand-art-original {
+  transform-origin: 50% 50%;
+  scale: 1;
+  animation: footer-logo-breathe 5.8s ease-in-out infinite;
+}
+@keyframes footer-logo-breathe {
+  0%, 100% { scale: 1; }
+  50% { scale: 1.018; }
+}
+@media (prefers-reduced-motion: reduce) {
+  footer .footer-brand .brand-art-original { animation: none; scale: 1; }
+}
+
+/* Keep the floating assistant mark calm on wider screens too. */
+@media (min-width: 761px) {
+  #assistant-launcher .assistant-launcher-avatar {
+    background-image: url("assets/asistente-conversacion-calma.svg?v=20261003-1") !important;
+    background-size: 82% auto !important;
+  }
+}

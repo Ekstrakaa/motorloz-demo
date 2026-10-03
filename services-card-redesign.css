@@ -1,0 +1,348 @@
+/* Bright, technical service cards based on the suspension reference. */
+.customer-gallery {
+  position: relative !important;
+  left: 50% !important;
+  width: 100vw !important;
+  max-width: none !important;
+  margin: clamp(40px, 5.5vw, 72px) 0 0 !important;
+  padding: clamp(26px, 3.4vw, 42px) 0 clamp(38px, 5vw, 62px) !important;
+  transform: translateX(-50%) !important;
+  overflow: hidden !important;
+  border: 0 !important;
+}
+.customer-gallery-heading {
+  width: min(1100px, calc(100% - 40px)) !important;
+  margin-inline: auto !important;
+  padding-inline: 0 !important;
+}
+.customer-gallery-lane { width: 100vw !important; overflow: hidden !important; }
+.customer-gallery-track,
+.customer-gallery-group { min-width: 0; }
+.customer-gallery-group { gap: clamp(10px, 1.25vw, 18px) !important; }
+.customer-gallery-photo {
+  flex-basis: clamp(178px, 18vw, 250px) !important;
+  width: clamp(178px, 18vw, 250px) !important;
+  aspect-ratio: 1.08 !important;
+  border-radius: 12px !important;
+}
+@media (max-width: 760px) {
+  .customer-gallery { margin-top: 32px !important; padding-block: 24px 38px !important; }
+  .customer-gallery-heading { width: calc(100% - 36px) !important; margin-bottom: 17px !important; }
+  .customer-gallery-lane { width: 100vw !important; }
+  .customer-gallery-photo { flex-basis: 178px !important; width: 178px !important; aspect-ratio: 1.08 !important; }
+}
+@media (max-width: 380px) {
+  .customer-gallery-photo { flex-basis: 158px !important; width: 158px !important; }
+}
+
+#services-track .service-card {
+  position: relative !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-self: stretch !important;
+  height: auto !important;
+  min-height: 0 !important;
+  aspect-ratio: auto !important;
+  overflow: hidden !important;
+  border: 1px solid #dde8ed !important;
+  border-radius: 25px !important;
+  background: #fff !important;
+  box-shadow: 0 12px 30px rgba(24, 57, 68, .085), 0 2px 6px rgba(24, 57, 68, .035) !important;
+  transition: transform .28s ease, box-shadow .28s ease, border-color .28s ease !important;
+}
+#services-track .service-card:hover {
+  transform: translateY(-3px) !important;
+  border-color: #c9e3e9 !important;
+  box-shadow: 0 18px 38px rgba(24, 57, 68, .12), 0 3px 8px rgba(24, 57, 68, .045) !important;
+}
+#services-track .service-card::before {
+  position: absolute !important;
+  z-index: 1 !important;
+  inset: 0 0 auto !important;
+  display: block !important;
+  width: 100% !important;
+  aspect-ratio: 1.72 / 1 !important;
+  content: "" !important;
+  pointer-events: none !important;
+  background: linear-gradient(125deg, rgba(0, 188, 235, .10), transparent 30% 77%, rgba(8, 124, 185, .08)) !important;
+}
+#services-track .service-card::after { content: none !important; display: none !important; }
+#services-track .service-card > img {
+  position: relative !important;
+  inset: auto !important;
+  z-index: 0 !important;
+  display: block !important;
+  flex: 0 0 auto !important;
+  width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 1.72 / 1 !important;
+  object-fit: cover !important;
+  object-position: center !important;
+  filter: none !important;
+  transform: none !important;
+  border-radius: 24px 24px 0 0 !important;
+}
+#services-track .service-photo-meta {
+  position: absolute !important;
+  z-index: 2 !important;
+  inset: 0 0 auto !important;
+  display: block !important;
+  width: 100% !important;
+  aspect-ratio: 1.72 / 1 !important;
+  pointer-events: none !important;
+}
+#services-track .service-photo-meta > span {
+  position: absolute;
+  bottom: 17px;
+  left: 22px;
+  color: #f5fbfc;
+  font: 700 9px/1 var(--mono, monospace);
+  letter-spacing: .22em;
+  text-shadow: 0 1px 8px rgba(9, 34, 41, .5);
+}
+#services-track .service-photo-meta > b {
+  position: absolute;
+  top: 10px;
+  right: 18px;
+  color: rgba(235, 250, 251, .38);
+  font: 800 clamp(66px, 8vw, 104px)/1 var(--body, sans-serif);
+  letter-spacing: -.08em;
+  text-shadow: 0 2px 18px rgba(8, 32, 39, .12);
+}
+#services-track .service-photo-meta::after {
+  position: absolute;
+  bottom: 9px;
+  left: 22px;
+  width: 38px;
+  height: 2px;
+  content: "";
+  background: #00bceb;
+}
+#services-track .service-card-copy {
+  position: relative !important;
+  inset: auto !important;
+  z-index: 2 !important;
+  display: flex !important;
+  flex: 1 1 auto !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important;
+  gap: 0 !important;
+  padding: clamp(18px, 2.2vw, 25px) !important;
+  color: #17242c !important;
+  background: #fff !important;
+}
+#services-track .service-card-copy > span:first-child {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 0 13px !important;
+  border: 0 !important;
+  color: #60727c !important;
+  font: 600 10px/1.2 var(--mono, monospace) !important;
+  letter-spacing: .13em !important;
+}
+#services-track .service-index { color: #08a9d1 !important; font-size: 14px !important; font-weight: 800 !important; }
+#services-track .service-card-copy > span:first-child > i { color: #9aabb2 !important; font-style: normal !important; }
+#services-track .service-card-copy > span:first-child > strong { color: #485b64 !important; font-weight: 700 !important; }
+#services-track .service-card-copy > span:first-child::after {
+  flex: 1 1 auto;
+  height: 1px;
+  content: "";
+  background: linear-gradient(90deg, #dce8ed, rgba(220, 232, 237, 0));
+}
+#services-track .service-title-row {
+  position: relative !important;
+  display: grid !important;
+  grid-template-columns: clamp(82px, 23%, 112px) minmax(0, 1fr) !important;
+  align-items: center !important;
+  justify-content: stretch !important;
+  gap: clamp(13px, 2vw, 22px) !important;
+  width: 100% !important;
+  min-height: 116px !important;
+  margin: 0 0 14px !important;
+  padding: 4px 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+}
+#services-track .service-title-row::before {
+  position: absolute;
+  z-index: 0;
+  top: 6px;
+  bottom: 6px;
+  left: 0;
+  width: clamp(82px, 23%, 112px);
+  content: "";
+  background: linear-gradient(128deg, transparent 13%, rgba(0, 188, 235, .10) 14% 71%, transparent 72%);
+  clip-path: polygon(14% 0, 100% 0, 84% 100%, 0 100%);
+  pointer-events: none;
+}
+#services-track .service-title-row::after { content: none !important; display: none !important; }
+#services-track .service-title-row .service-icon {
+  position: relative !important;
+  z-index: 1 !important;
+  box-sizing: border-box !important;
+  display: block !important;
+  flex: none !important;
+  width: 100% !important;
+  height: 112px !important;
+  min-height: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background-color: transparent !important;
+  background-size: 400% 300% !important;
+  box-shadow: none !important;
+  filter: drop-shadow(0 7px 9px rgba(12, 52, 63, .13)) !important;
+  animation: service-icon-breathe 5.2s ease-in-out infinite !important;
+}
+#services-track .service-title-row h3 {
+  position: relative !important;
+  z-index: 1 !important;
+  align-self: center !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 0 0 13px !important;
+  color: #17242c !important;
+  font: 760 clamp(25px, 3vw, 36px)/1.02 var(--body, sans-serif) !important;
+  letter-spacing: -.045em !important;
+  line-height: 1.05 !important;
+  text-align: left !important;
+  text-wrap: balance !important;
+  white-space: normal !important;
+}
+#services-track .service-title-row h3::after {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 54px;
+  height: 3px;
+  content: "";
+  border-radius: 4px;
+  background: linear-gradient(90deg, #00bceb, rgba(0, 188, 235, .35));
+}
+#services-track .service-card-copy > p {
+  max-width: 48ch !important;
+  min-height: 0 !important;
+  margin: 0 0 17px !important;
+  color: #60727c !important;
+  font-size: 14px !important;
+  line-height: 1.65 !important;
+}
+#services-track .service-card-copy > ul {
+  position: relative !important;
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  align-content: start !important;
+  gap: 8px !important;
+  width: 100% !important;
+  min-height: 0 !important;
+  margin: auto 0 0 !important;
+  padding: 14px !important;
+  border: 1px solid #e5edf1 !important;
+  border-radius: 20px !important;
+  background: linear-gradient(145deg, #f7fafb, #f2f7f9) !important;
+  box-shadow: inset 0 1px 2px rgba(31, 79, 93, .025) !important;
+  color: #17242c !important;
+  font-size: 12px !important;
+}
+#services-track .service-card-copy > ul::before {
+  grid-column: 1 / -1 !important;
+  display: block !important;
+  margin: 0 0 3px !important;
+  padding: 0 0 10px !important;
+  color: #60727c !important;
+  font: 700 9px/1.3 var(--mono, monospace) !important;
+  letter-spacing: .16em !important;
+  background: linear-gradient(90deg, #00bceb, #bdebf2) no-repeat 125px 50% / 38px 2px !important;
+}
+#services-track .service-card-copy > ul > li {
+  display: flex !important;
+  min-width: 0 !important;
+  min-height: 102px !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 7px !important;
+  padding: 10px 6px 9px !important;
+  border: 1px solid #e7eef2 !important;
+  border-radius: 16px !important;
+  background: #fff !important;
+  box-shadow: 0 3px 9px rgba(25, 60, 72, .035) !important;
+  color: #263943 !important;
+  font-size: 12px !important;
+  line-height: 1.35 !important;
+  text-align: center !important;
+}
+#services-track .service-card-copy > ul > li::before {
+  position: static !important;
+  display: block !important;
+  flex: 0 0 24px !important;
+  width: 24px !important;
+  height: 24px !important;
+  margin: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background-color: transparent !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  background-size: contain !important;
+  content: "" !important;
+}
+#services-track .service-card-copy > ul > li:nth-child(1)::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23087cb9' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='4' y='4' width='16' height='16' rx='4'/%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3Cpath d='M12 2v2m0 16v2M2 12h2m16 0h2'/%3E%3C/svg%3E") !important;
+}
+#services-track .service-card-copy > ul > li:nth-child(2)::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2300a9d0' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 7h6m4 0h6M4 17h3m4 0h9'/%3E%3Ccircle cx='12' cy='7' r='2'/%3E%3Ccircle cx='9' cy='17' r='2'/%3E%3C/svg%3E") !important;
+}
+#services-track .service-card-copy > ul > li:nth-child(3)::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23087cb9' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='10.5' cy='10.5' r='6.5'/%3E%3Cpath d='m15.5 15.5 5 5M8 10.5h5'/%3E%3C/svg%3E") !important;
+}
+/* Suspension-specific component marks follow the supplied spring / joint / inspection reference. */
+#services-track .service-card:nth-child(3) .service-card-copy > ul > li:nth-child(1)::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2300a9d0' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 2v2l-4 2 8 3-8 3 8 3-8 3 4 2v2'/%3E%3C/svg%3E") !important;
+}
+#services-track .service-card:nth-child(3) .service-card-copy > ul > li:nth-child(2)::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23087cb9' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='6' r='3'/%3E%3Cpath d='M12 9v5m-5 7 2-7h6l2 7M8 18h8'/%3E%3C/svg%3E") !important;
+}
+#services-track .service-card-copy > ul > li::marker { content: "" !important; }
+#services-track .service-card-copy > a[data-service] {
+  align-self: flex-start !important;
+  margin-top: 13px !important;
+  color: #087cb9 !important;
+}
+@media (max-width: 760px) {
+  #services-track .service-card { border-radius: 24px !important; }
+  #services-track .service-card > img,
+  #services-track .service-card::before,
+  #services-track .service-photo-meta { border-radius: 23px 23px 0 0 !important; }
+  #services-track .service-card-copy { padding: 18px 17px 17px !important; }
+  #services-track .service-photo-meta > span { bottom: 15px; left: 17px; font-size: 8px; }
+  #services-track .service-photo-meta > b { top: 9px; right: 15px; font-size: clamp(58px, 16vw, 78px); }
+  #services-track .service-photo-meta::after { bottom: 8px; left: 17px; width: 32px; }
+  #services-track .service-title-row {
+    grid-template-columns: 82px minmax(0, 1fr) !important;
+    gap: 13px !important;
+    min-height: 95px !important;
+    margin-bottom: 12px !important;
+  }
+  #services-track .service-title-row::before { width: 82px; }
+  #services-track .service-title-row .service-icon { height: 94px !important; }
+  #services-track .service-title-row h3 { font-size: clamp(23px, 6.1vw, 28px) !important; }
+  #services-track .service-card-copy > p { margin-bottom: 15px !important; font-size: 13px !important; }
+  #services-track .service-card-copy > ul { gap: 6px !important; padding: 11px !important; border-radius: 18px !important; }
+  #services-track .service-card-copy > ul::before { background-position: 122px 50% !important; }
+  #services-track .service-card-copy > ul > li { min-height: 100px !important; padding: 8px 4px !important; border-radius: 14px !important; font-size: 11px !important; }
+}
+@media (max-width: 360px) {
+  #services-track .service-card-copy > ul { gap: 5px !important; padding: 9px !important; }
+  #services-track .service-card-copy > ul > li { font-size: 10px !important; }
+  #services-track .service-title-row { grid-template-columns: 72px minmax(0, 1fr) !important; }
+  #services-track .service-title-row::before { width: 72px; }
+  #services-track .service-title-row .service-icon { height: 84px !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #services-track .service-card,
+  #services-track .service-title-row .service-icon { transition: none !important; animation: none !important; }
+}
