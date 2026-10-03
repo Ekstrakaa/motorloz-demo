@@ -1,0 +1,65 @@
+.electric-mobility {
+  padding-block: clamp(58px, 7vw, 104px) !important;
+  color: #152326 !important;
+}
+.electric-mobility .section-label { color: #52666a !important; }
+.electric-mobility .eyebrow {
+  margin-bottom: 15px;
+  color: #168c9d;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .15em;
+}
+.electric-mobility-content {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(280px, .75fr);
+  align-items: end;
+  gap: clamp(34px, 8vw, 132px);
+  max-width: 1180px;
+  margin: clamp(34px, 5vw, 68px) auto 0;
+}
+.electric-mobility h2 {
+  color: #152326;
+  font-size: clamp(48px, 7.2vw, 96px);
+  line-height: .98;
+  letter-spacing: -.065em;
+}
+.electric-mobility h2 em { color: #2bb4c2; }
+.electric-mobility-copy { padding-bottom: 7px; }
+.electric-mobility-copy p {
+  max-width: 44ch;
+  color: #52666a;
+  font-size: clamp(14px, 1.15vw, 17px);
+  line-height: 1.8;
+}
+.electric-mobility-copy .text-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 23px;
+  color: #087f91;
+  font-size: 12px;
+  font-weight: 700;
+}
+.electric-mobility-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 30px;
+  max-width: 1180px;
+  margin: clamp(36px, 5vw, 62px) auto 0;
+  color: #52666a;
+  font: 700 9px/1.5 var(--mono, monospace);
+  letter-spacing: .13em;
+}
+.electric-mobility-tags span { white-space: nowrap; }
+@media (max-width: 760px) {
+  .electric-mobility { padding-block: 54px 62px !important; }
+  .electric-mobility-content {
+    grid-template-columns: 1fr;
+    gap: 24px;
+    margin-top: 35px;
+  }
+  .electric-mobility h2 { font-size: clamp(46px, 12vw, 66px); }
+  .electric-mobility-copy p { font-size: 13px; }
+  .electric-mobility-tags { gap: 11px 18px; margin-top: 31px; font-size: 8px; }
+}

@@ -143,7 +143,7 @@
     paper.addEventListener('pointermove', event => {
       if (frame) cancelAnimationFrame(frame);
       frame = requestAnimationFrame(() => {
-        const lightSurface = event.target.closest('.intro,.services,.reviews,.location,.subaru-section,.hyundai-section,.reference-bridge,.contact-bridge,.customer-gallery');
+        const lightSurface = event.target.closest('.intro,.services,.reviews,.location,.subaru-section,.hyundai-section,.reference-bridge,.contact-bridge,.customer-gallery,.electric-mobility');
         if (!lightSurface) { frame = 0; return; }
         const rect = paper.getBoundingClientRect();
         const x = event.clientX - rect.left;

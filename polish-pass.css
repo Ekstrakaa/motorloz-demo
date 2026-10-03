@@ -168,7 +168,7 @@ main#contenido>.background-tile-trace {
 }
 main#contenido>.background-tile-trace.is-active {opacity:1}
 main#contenido>:not(.background-tile-trace) {position:relative;z-index:1}
-.intro,.services,.reviews,.location,.subaru-section,.hyundai-section,.reference-bridge,.contact-bridge,.customer-gallery {
+.intro,.services,.reviews,.location,.subaru-section,.hyundai-section,.reference-bridge,.contact-bridge,.customer-gallery,.electric-mobility {
   background-color:transparent!important;background-image:none!important;
 }
 
