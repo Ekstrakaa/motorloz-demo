@@ -61,7 +61,7 @@
         video.playsInline = true;
         if (rootSelector === '[data-hyundai-carousel]') {
           video.loop = false;
-          video.playbackRate = .49;
+          video.playbackRate = video.defaultPlaybackRate = 1;
         }
         video.play().catch(() => {});
       });
@@ -121,7 +121,7 @@
     }, { threshold: .35 });
     emblemObserver.observe(hyundaiEmblem);
   }
-  rotateImages('[data-hyundai-carousel]', '.hyundai-image', slide => slide.classList.contains('hyundai-video-slide') ? 10000 : 3000, (i, n) => {
+  rotateImages('[data-hyundai-carousel]', '.hyundai-image', slide => slide.classList.contains('hyundai-video-slide') ? 5000 : 3000, (i, n) => {
     const count = document.querySelector('[data-hyundai-carousel] .hyundai-image.is-active .hyundai-image-index b');
     if (count) count.textContent = `${String(i + 1).padStart(2, '0')} / ${String(n).padStart(2, '0')}`;
   });

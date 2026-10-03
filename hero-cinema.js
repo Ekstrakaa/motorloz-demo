@@ -10,7 +10,7 @@
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
   const defaults = [
     { type: 'video', src: 'assets/cinema-hyundai-natural.mp4', poster: 'assets/clips/hyundai-home.jpg', duration: 15000, label: 'HYUNDAI, EN MOVIMIENTO' },
-    { type: 'video', src: 'assets/cinema-workshop-natural.mp4', poster: 'assets/salon-panoramica-optimized.webp', duration: 10000, label: 'EL TALLER, EN MOVIMIENTO' },
+    { type: 'video', src: 'assets/cinema-workshop-panorama.mp4', poster: 'assets/salon-panoramica-optimized.webp', duration: 3800, label: 'EL TALLER, EN MOVIMIENTO' },
     { type: 'image', src: 'assets/hero-herramientas.webp', focus: '48% 48%', zoomStart: 1.025, zoomEnd: 1.07, duration: 3000, label: 'HERRAMIENTAS, DIAGNÓSTICO Y OFICIO' },
     { type: 'video', src: 'assets/motorloz-subaru-loop.mp4', poster: 'assets/hero-subaru.webp', duration: 10000, label: 'MECÁNICA, DE CERCA' },
     { type: 'video', src: 'assets/cinema-subaru-natural.mp4', poster: 'assets/clips/subaru-home.jpg', duration: 10000, label: 'SUBARU, EN MOVIMIENTO' },
