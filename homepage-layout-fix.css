@@ -1,12 +1,5 @@
-/* Keep the original tiled workshop texture behind the services area. */
-.services.section {
-  background-color: #e9eeeb !important;
-  background-image: url("assets/service-tile-pattern.svg") !important;
-  background-repeat: repeat !important;
-  background-size: 240px 164px !important;
-}
-
 /* Make the official Hyundai role readable at a glance without another image plate. */
+.customer-gallery { background: transparent !important; }
 .hyundai-signature .hyundai-badge {
   align-items: center;
   gap: 12px;
