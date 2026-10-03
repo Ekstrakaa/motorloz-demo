@@ -5,7 +5,9 @@ window.MOTORLOZ_VIDEO = function(video, { source, shouldPlay, onPlaying = () => 
   let pending = false;
   let blocked = false;
   let attached = false;
+  let currentSource = source;
   video.muted = video.defaultMuted = true;
+  video.controls = false;
   video.playsInline = true;
   video.autoplay = true;
   video.preload = 'auto';
@@ -13,6 +15,8 @@ window.MOTORLOZ_VIDEO = function(video, { source, shouldPlay, onPlaying = () => 
   video.setAttribute('playsinline', '');
   video.setAttribute('webkit-playsinline', '');
   video.setAttribute('autoplay', '');
+  video.removeAttribute('controls');
+  video.setAttribute('disablepictureinpicture', '');
   const wanted = () => !disposed && !document.hidden && !document.documentElement?.classList.contains('assistant-chat-open') && shouldPlay();
   function reveal() {
     if (!wanted()) return;
@@ -22,7 +26,7 @@ window.MOTORLOZ_VIDEO = function(video, { source, shouldPlay, onPlaying = () => 
     if (!wanted() || pending || blocked) return;
     if (!attached) {
       attached = true;
-      video.src = source;
+      video.src = currentSource;
       video.load();
     }
     pending = true;
@@ -50,6 +54,17 @@ window.MOTORLOZ_VIDEO = function(video, { source, shouldPlay, onPlaying = () => 
   function resumeUnexpectedPause() {
     if (wanted() && !video.ended && !blocked) play();
   }
+  function setSource(nextSource, playbackRate = 1) {
+    if (disposed || !nextSource || currentSource === nextSource) return;
+    currentSource = nextSource;
+    blocked = false;
+    attached = false;
+    video.playbackRate = video.defaultPlaybackRate = playbackRate;
+    video.pause();
+    video.removeAttribute('src');
+    video.load();
+    if (wanted()) play();
+  }
   video.addEventListener('playing', playing);
   video.addEventListener('canplay', play);
   video.addEventListener('error', reveal);
@@ -60,6 +75,7 @@ window.MOTORLOZ_VIDEO = function(video, { source, shouldPlay, onPlaying = () => 
   window.addEventListener?.('motorloz:chat-visibility', sync);
   return {
     sync,
+    setSource,
     dispose() {
       disposed = true;
       video.removeEventListener('playing', playing);

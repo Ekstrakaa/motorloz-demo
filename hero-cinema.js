@@ -8,67 +8,34 @@
   const counter = document.querySelector('#hero-counter');
   const label = document.querySelector('#hero-photo-label');
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
-  const sequence = [
-    {
-      type: 'video',
-      src: 'assets/clips/hyundai-home.mp4',
-      poster: 'assets/clips/hyundai-home.jpg',
-      duration: 5200,
-      label: 'HYUNDAI, EN MOVIMIENTO'
-    },
-    {
-      type: 'video',
-      src: 'assets/cinema-workshop.mp4',
-      poster: 'assets/salon-panoramica-optimized.webp',
-      start: 0,
-      playbackRate: .72,
-      duration: 3900,
-      label: 'EL TALLER, EN MOVIMIENTO'
-    },
-    {
-      type: 'image',
-      src: 'assets/hero-herramientas.webp',
-      focus: '48% 48%',
-      zoomStart: 1.025,
-      zoomEnd: 1.07,
-      duration: 5000,
-      label: 'HERRAMIENTAS, DIAGNÓSTICO Y OFICIO'
-    },
-    {
-      type: 'video',
-      src: 'assets/cinema-engine.mp4',
-      poster: 'assets/hero-subaru.webp',
-      start: 0,
-      playbackRate: .78,
-      duration: 8500,
-      label: 'MECÁNICA, DE CERCA'
-    },
-    {
-      type: 'image',
-      src: 'assets/hero-bruno.png',
-      focus: '50% 49%',
-      zoomStart: 1.025,
-      zoomEnd: 1.065,
-      duration: 5000,
-      label: 'BRUNO · DIAGNÓSTICO EN EL TALLER'
-    },
-    {
-      type: 'video',
-      src: 'assets/clips/subaru-home.mp4',
-      poster: 'assets/clips/subaru-home.jpg',
-      duration: 5200,
-      label: 'SUBARU, EN MOVIMIENTO'
-    },
-    {
-      type: 'image',
-      src: 'assets/hero-subaru-azul.webp?v=privacy1',
-      focus: '50% 52%',
-      zoomStart: 1.015,
-      zoomEnd: 1.055,
-      duration: 5000,
-      label: 'SUBARU, EN EL CORAZÓN'
-    },
+  const defaults = [
+    { type: 'video', src: 'assets/clips/hyundai-home.mp4', poster: 'assets/clips/hyundai-home.jpg', duration: 10000, label: 'HYUNDAI, EN MOVIMIENTO' },
+    { type: 'video', src: 'assets/cinema-workshop.mp4', poster: 'assets/salon-panoramica-optimized.webp', duration: 10000, label: 'EL TALLER, EN MOVIMIENTO' },
+    { type: 'image', src: 'assets/hero-herramientas.webp', focus: '48% 48%', zoomStart: 1.025, zoomEnd: 1.07, duration: 3000, label: 'HERRAMIENTAS, DIAGNÓSTICO Y OFICIO' },
+    { type: 'video', src: 'assets/cinema-engine.mp4', poster: 'assets/hero-subaru.webp', duration: 10000, label: 'MECÁNICA, DE CERCA' },
+    { type: 'video', src: 'assets/clips/subaru-home.mp4', poster: 'assets/clips/subaru-home.jpg', duration: 10000, label: 'SUBARU, EN MOVIMIENTO' },
+    { type: 'image', src: 'assets/hero-subaru-azul.webp?v=privacy1', focus: '50% 52%', zoomStart: 1.015, zoomEnd: 1.055, duration: 3000, label: 'SUBARU, EN EL CORAZÓN' }
   ];
+  let sequence = defaults;
+  if (new URLSearchParams(location.search).has('montaje')) {
+    try {
+      const draft = JSON.parse(localStorage.getItem('motorloz-home-sequence-draft-v1'));
+      if (Array.isArray(draft) && draft.length) {
+        const allowed = new Map(defaults.map(item => [item.src.split('?')[0], item]));
+        const preview = draft.map(scene => {
+          const item = allowed.get(scene.src?.split('?')[0]);
+          if (!item || scene.type !== item.type) return null;
+          const duration = Math.min(30, Math.max(1, Number(scene.duration) || (item.type === 'video' ? 10 : 3)));
+          return {...item, duration: duration * 1000,
+            focus: `${Math.min(100,Math.max(0,Number(scene.focusX) || 50))}% ${Math.min(100,Math.max(0,Number(scene.focusY) || 50))}%`,
+            start: Math.max(0,Number(scene.trimStart) || 0),
+            end: scene.trimEnd == null ? null : Math.max(0,Number(scene.trimEnd) || 0),
+            transition: Math.max(0,Math.min(1.5,Number(scene.transition) || 0))};
+        }).filter(Boolean);
+        if (preview.length) sequence = preview;
+      }
+    } catch { /* A saved draft is optional; the published sequence stays available. */ }
+  }
 
   let index = 0;
   let active = 0;
@@ -76,12 +43,26 @@
   let visible = true;
   let transitionToken = 0;
   let transitioning = false;
-  const players = new Map();
-
+  let player = null;
+  let playerSource = '';
+  let replaying = false;
   const requestedScene = Number(new URLSearchParams(location.search).get('scene'));
-  if (Number.isInteger(requestedScene) && requestedScene >= 1 && requestedScene <= sequence.length) {
-    index = requestedScene - 1;
-  }
+  if (Number.isInteger(requestedScene) && requestedScene >= 1 && requestedScene <= sequence.length) index = requestedScene - 1;
+
+  const video = document.createElement('video');
+  video.className = 'cinema-media cinema-single-video';
+  video.muted = video.defaultMuted = true;
+  video.controls = false;
+  video.playsInline = true;
+  video.autoplay = true;
+  video.preload = 'auto';
+  video.tabIndex = -1;
+  video.setAttribute('muted', '');
+  video.setAttribute('playsinline', '');
+  video.setAttribute('webkit-playsinline', '');
+  video.setAttribute('autoplay', '');
+  video.removeAttribute('controls');
+  root.append(video);
 
   function updateMeta() {
     const scene = sequence[index];
@@ -91,19 +72,13 @@
     root.dataset.currentKind = scene.type;
   }
 
-  function stopFrame(frame) {
-    players.get(frame)?.dispose();
-    players.delete(frame);
-    frame.querySelectorAll('video').forEach(video => {
-      video.pause();
-      video.removeAttribute('src');
-      video.load();
-    });
+  function clearFrame(frame) {
+    frame.querySelectorAll('img').forEach(image => image.remove());
+    frame.replaceChildren();
   }
 
   function render(frame, item) {
-    stopFrame(frame);
-    frame.replaceChildren();
+    clearFrame(frame);
     frame.dataset.kind = item.type;
     frame.style.backgroundImage = item.type === 'image' ? `url("${item.src}")` : `url("${item.poster}")`;
     frame.style.backgroundPosition = item.focus || 'center';
@@ -118,39 +93,58 @@
       image.alt = '';
       image.decoding = 'async';
       frame.append(image);
+    } else {
+      video.poster = item.poster;
+    }
+  }
+
+  function shouldPlay() {
+    return visible && frames[active].classList.contains('is-current') && sequence[index].type === 'video' && !reducedMotion.matches;
+  }
+
+  function repeatFragment() {
+    if (!shouldPlay() || replaying) return;
+    replaying = true;
+    const item = sequence[index];
+    const start = Math.max(0, Math.min(item.start || 0, Math.max(0, video.duration - .15)));
+    video.currentTime = start;
+    Promise.resolve(video.play()).catch(() => {}).finally(() => { replaying = false; });
+  }
+
+  function syncVideo(item = sequence[index]) {
+    if (reducedMotion.matches || item.type !== 'video') {
+      video.classList.remove('is-visible');
+      player?.sync();
       return;
     }
-
-    const video = document.createElement('video');
-    video.className = 'cinema-media';
-    video.poster = item.poster;
-    video.muted = true;
-    video.defaultMuted = true;
-    video.playsInline = true;
-    video.preload = 'auto';
-    video.setAttribute('muted', '');
-    video.setAttribute('playsinline', '');
-    video.tabIndex = -1;
-    video.playbackRate = item.playbackRate || 1;
-    video.defaultPlaybackRate = item.playbackRate || 1;
-    video.addEventListener('ended', () => {
-      if (frame.classList.contains('is-current')) advance();
-    });
-    frame.append(video);
-    const player = window.MOTORLOZ_VIDEO(video, {
-      host: root.parentElement, source: item.src,
-      shouldPlay: () => visible && frame.classList.contains('is-current') && !reducedMotion.matches
-    });
-    players.set(frame, player);
-    player.sync();
+    if (!player) {
+      player = window.MOTORLOZ_VIDEO(video, {
+        source: item.src,
+        shouldPlay,
+        onPlaying: () => video.classList.toggle('is-visible', shouldPlay())
+      });
+      video.addEventListener('ended', repeatFragment);
+      video.addEventListener('timeupdate', () => {
+        const item = sequence[index];
+        if (shouldPlay() && item.end && video.currentTime >= item.end - .06) repeatFragment();
+      });
+      video.addEventListener('loadedmetadata', () => {
+        if (shouldPlay() && sequence[index].start) video.currentTime = sequence[index].start;
+      });
+      playerSource = item.src;
+    } else if (playerSource !== item.src) {
+      playerSource = item.src;
+      video.classList.remove('is-visible');
+      player.setSource(item.src, item.playbackRate || 1);
+    }
+    video.playbackRate = video.defaultPlaybackRate = item.playbackRate || 1;
+    if (shouldPlay()) player.sync();
   }
 
   function schedule() {
     clearTimeout(timer);
     if (!visible || document.hidden || reducedMotion.matches) return;
-    // Normal end advances on its own; this fallback keeps the sequence fluid if autoplay is blocked.
-    const fallback = sequence[index].type === 'video' ? 2400 : 0;
-    timer = window.setTimeout(advance, sequence[index].duration + fallback);
+    timer = window.setTimeout(advance, sequence[index].duration);
   }
 
   function advance(step = 1) {
@@ -162,6 +156,7 @@
     const incoming = active === 0 ? 1 : 0;
     const outgoing = active;
     render(frames[incoming], sequence[nextIndex]);
+    root.style.setProperty('--scene-fade', `${sequence[index].transition ?? 1.25}s`);
     frames[incoming].setAttribute('aria-hidden', 'true');
 
     requestAnimationFrame(() => requestAnimationFrame(() => {
@@ -171,31 +166,27 @@
       frames[outgoing].classList.remove('is-current');
       frames[outgoing].setAttribute('aria-hidden', 'true');
       window.setTimeout(() => {
-        if (token === transitionToken && !frames[outgoing].classList.contains('is-current')) stopFrame(frames[outgoing]);
+        if (token === transitionToken && !frames[outgoing].classList.contains('is-current')) clearFrame(frames[outgoing]);
       }, 1500);
       active = incoming;
       index = nextIndex;
       updateMeta();
       transitioning = false;
-      players.forEach(player => player.sync());
+      syncVideo(sequence[index]);
       schedule();
     }));
   }
 
   render(frames[0], sequence[index]);
   updateMeta();
+  if (sequence[index].type === 'video' && !reducedMotion.matches) syncVideo(sequence[index]);
   schedule();
 
-  reducedMotion.addEventListener?.('change', () => { render(frames[active], sequence[index]); schedule(); });
-
+  reducedMotion.addEventListener?.('change', () => { render(frames[active], sequence[index]); syncVideo(sequence[index]); schedule(); });
   new IntersectionObserver(entries => {
     visible = entries[0].isIntersecting;
-    players.forEach(player => player.sync());
+    syncVideo(sequence[index]);
     schedule();
   }, { threshold: .12 }).observe(root);
-
-  document.addEventListener('visibilitychange', () => {
-    players.forEach(player => player.sync());
-    schedule();
-  });
+  document.addEventListener('visibilitychange', () => { syncVideo(sequence[index]); schedule(); });
 })();

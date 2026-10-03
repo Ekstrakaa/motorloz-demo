@@ -72,18 +72,25 @@
       syncVideo();
     }
     function start() {
-      clearInterval(root._refreshTimer);
-      root._refreshTimer = setInterval(advance, interval);
+      clearTimeout(root._refreshTimer);
+      const scheduleNext = () => {
+        const delay = typeof interval === 'function' ? interval(slides[index]) : interval;
+        root._refreshTimer = setTimeout(() => {
+          advance();
+          scheduleNext();
+        }, delay);
+      };
+      scheduleNext();
     }
     const observer = new IntersectionObserver(entries => {
       visible = entries[0].isIntersecting;
       if (visible) start();
-      else clearInterval(root._refreshTimer);
+      else clearTimeout(root._refreshTimer);
       syncVideo();
     }, { threshold: .12 });
     observer.observe(root);
     document.addEventListener('visibilitychange', () => {
-      if (document.hidden) clearInterval(root._refreshTimer);
+      if (document.hidden) clearTimeout(root._refreshTimer);
       else if (root.getBoundingClientRect().bottom > 0 && root.getBoundingClientRect().top < innerHeight) {
         visible = true;
         start();
@@ -108,7 +115,7 @@
     }, { threshold: .35 });
     emblemObserver.observe(hyundaiEmblem);
   }
-  rotateImages('[data-hyundai-carousel]', '.hyundai-image', 5200, (i, n) => {
+  rotateImages('[data-hyundai-carousel]', '.hyundai-image', slide => slide.classList.contains('hyundai-video-slide') ? 11000 : 3000, (i, n) => {
     const count = document.querySelector('[data-hyundai-carousel] .hyundai-image.is-active .hyundai-image-index b');
     if (count) count.textContent = `${String(i + 1).padStart(2, '0')} / ${String(n).padStart(2, '0')}`;
   });

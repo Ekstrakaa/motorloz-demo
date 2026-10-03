@@ -2,10 +2,12 @@
 .hero{position:relative!important;display:block!important;isolation:isolate;height:100svh!important;min-height:780px!important;max-height:1120px!important;overflow:hidden!important;padding:0!important;background:#071217!important;color:#f1f3f2!important;grid-template-columns:none!important}
 .hero:before{display:none!important}
 .hero-cinema{position:absolute!important;inset:0!important;z-index:0!important;width:auto!important;height:auto!important;overflow:hidden!important;background:#061116!important}
-.cinema-frame{position:absolute!important;inset:0!important;overflow:hidden!important;border-radius:0!important;box-shadow:none!important;opacity:0;transition:opacity 1.35s cubic-bezier(.45,.05,.2,1)!important;background-position:center!important;background-size:cover!important;isolation:isolate}
+.cinema-frame{position:absolute!important;inset:0!important;overflow:hidden!important;border-radius:0!important;box-shadow:none!important;opacity:0;transition:opacity var(--scene-fade,1.25s) cubic-bezier(.45,.05,.2,1)!important;background-position:center!important;background-size:cover!important;isolation:isolate}
 .cinema-frame.is-current{opacity:1!important;z-index:1!important}
 .cinema-frame:before{content:"";position:absolute;inset:-6%;z-index:-1;background-image:inherit;background-position:center;background-size:cover;filter:blur(26px) brightness(.58) saturate(.92);transform:scale(1.08)}
 .cinema-media{position:absolute!important;inset:0!important;display:block!important;width:100%!important;height:100%!important;object-fit:cover!important;object-position:var(--cinema-focus,50% 50%)!important;filter:saturate(.94) contrast(1.02)!important}
+.cinema-single-video{z-index:2!important;opacity:0!important;pointer-events:none!important;transition:opacity .8s cubic-bezier(.2,.75,.25,1)!important}
+.cinema-single-video.is-visible{opacity:1!important}
 .cinema-frame[data-kind="image"] .cinema-media{animation:cinema-photo-drift 5.5s cubic-bezier(.2,.65,.25,1) both}
 .cinema-grain{position:absolute;inset:-40%;z-index:3;pointer-events:none;opacity:.035;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.72'/%3E%3C/svg%3E");animation:cinema-grain-shift .32s steps(2) infinite}
 .hero-cinema:before,.hero-cinema:after{display:none!important}
