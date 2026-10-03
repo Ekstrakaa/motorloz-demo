@@ -32,10 +32,9 @@
   inset: 0 0 auto;
   height: 335px;
   background:
-    linear-gradient(90deg, rgba(2, 20, 25, .97) 0%, rgba(3, 23, 28, .91) 37%, rgba(4, 21, 26, .38) 75%, rgba(4, 19, 23, .32)),
-    linear-gradient(0deg, #06171c 0%, rgba(5, 24, 29, .25) 64%, rgba(2, 17, 22, .06)),
-    url("assets/hero-ferrari.webp") 70% 64% / cover no-repeat;
-  opacity: .9;
+    radial-gradient(ellipse at 84% 20%, rgba(0, 188, 222, .13), transparent 34%),
+    linear-gradient(110deg, rgba(2, 20, 25, .42), transparent 76%);
+  opacity: .8;
   pointer-events: none;
 }
 .appointment-intro {
@@ -71,11 +70,52 @@
   font-size: 14px !important;
   line-height: 1.55 !important;
 }
-.appointment-steps,
-.appointment-office { display: none !important; }
-#appointment-form {
+.appointment-steps {
+  display: block !important;
+  max-width: 640px;
+  margin: 24px 0 0 !important;
+  padding: 0 18px !important;
+  border: 1px solid rgba(134, 193, 202, .2) !important;
+  border-radius: 14px !important;
+  background: rgba(6, 23, 28, .48) !important;
+  list-style: none !important;
+}
+.appointment-steps li {
+  display: flex !important;
+  align-items: center !important;
+  gap: 16px !important;
+  min-height: 47px !important;
+  margin: 0 !important;
+  color: #d7e3e6 !important;
+  font-size: 14px !important;
+}
+.appointment-steps li + li { border-top: 1px solid rgba(134, 193, 202, .16) !important; }
+.appointment-steps li span { color: #36d8e4 !important; font: 700 12px/1 var(--mono, monospace) !important; }
+.appointment-office {
+  display: block !important;
   grid-column: 1 !important;
   grid-row: 2 !important;
+  width: min(640px, calc(100% - 116px)) !important;
+  margin: 0 58px 0 !important;
+}
+.appointment-office img {
+  display: block !important;
+  width: 100% !important;
+  aspect-ratio: 1.72 !important;
+  object-fit: cover !important;
+  object-position: center 54% !important;
+  border: 1px solid rgba(165, 221, 226, .24) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 16px 34px rgba(0, 6, 9, .28) !important;
+}
+.appointment-office figcaption {
+  margin-top: 8px !important;
+  color: #b5ccd2 !important;
+  font-size: 11px !important;
+}
+#appointment-form {
+  grid-column: 1 !important;
+  grid-row: 3 !important;
   width: 100% !important;
   max-width: none !important;
   margin: 0 !important;
@@ -251,11 +291,10 @@
     border-radius: 22px !important;
   }
   .appointment-grid::before {
-    height: 208px;
+    height: 260px;
     background:
-      linear-gradient(90deg, rgba(2, 20, 25, .94), rgba(3, 23, 28, .76) 58%, rgba(4, 21, 26, .44)),
-      linear-gradient(0deg, #06171c 0%, rgba(5, 24, 29, .12) 65%),
-      url("assets/hero-ferrari.webp") 69% 64% / cover no-repeat;
+      radial-gradient(ellipse at 88% 15%, rgba(0, 188, 222, .14), transparent 38%),
+      linear-gradient(110deg, rgba(2, 20, 25, .3), transparent 82%);
   }
   .appointment.wizard-ready .appointment-intro {
     display: block !important;
@@ -274,8 +313,22 @@
     line-height: 1.02 !important;
   }
   .appointment-intro > p:not(.eyebrow) { max-width: 34ch !important; font-size: 12px !important; line-height: 1.45 !important; }
-  .appointment.wizard-ready .appointment-steps,
-  .appointment.wizard-ready .appointment-office { display: none !important; }
+  .appointment.wizard-ready .appointment-steps {
+    max-width: none !important;
+    margin-top: 17px !important;
+    padding-inline: 13px !important;
+  }
+  .appointment.wizard-ready .appointment-steps li {
+    min-height: 42px !important;
+    gap: 12px !important;
+    font-size: 11px !important;
+  }
+  .appointment.wizard-ready .appointment-office {
+    width: calc(100% - 42px) !important;
+    margin: 0 21px 0 !important;
+  }
+  .appointment-office img { aspect-ratio: 1.55 !important; }
+  .appointment-office figcaption { font-size: 10px !important; }
   .appointment.wizard-ready #appointment-form {
     display: flex !important;
     flex-direction: column !important;
