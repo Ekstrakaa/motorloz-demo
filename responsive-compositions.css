@@ -1,0 +1,192 @@
+/* Balanced desktop layouts; the existing single-column phone flow stays intact. */
+@media (min-width: 761px) {
+  .intro-feature,
+  .intro-proof-row,
+  .hyundai-inner,
+  .hyundai-proof-strip,
+  .electric-mobility-content,
+  .electric-mobility-tags,
+  .films-heading,
+  .films-grid,
+  .films-social,
+  .customer-gallery-heading {
+    width: min(100%, 1360px) !important;
+    margin-inline: auto !important;
+  }
+
+  .intro-feature { grid-template-columns: minmax(0, 1.08fr) minmax(320px, .72fr) !important; gap: clamp(40px, 6vw, 86px) !important; }
+  .intro-feature-image img { height: clamp(360px, 35vw, 540px) !important; }
+
+  /* Subaru gets one editorial text/photo pair instead of a viewport-wide photo row. */
+  .subaru-section .japan-gallery {
+    display: grid !important;
+    grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr) !important;
+    align-items: center !important;
+    gap: clamp(34px, 5vw, 76px) !important;
+    width: min(100%, 1360px) !important;
+    margin: 0 auto !important;
+  }
+  .subaru-section .japan-heading { grid-column: auto !important; min-width: 0; }
+  .subaru-section .subaru-photo-carousel {
+    grid-column: auto !important;
+    width: 100% !important;
+    max-width: 660px !important;
+    margin: 0 !important;
+    justify-self: end;
+  }
+  .subaru-carousel-stage { aspect-ratio: 1.24 !important; max-height: min(58svh, 560px); border: 1px solid rgba(20, 50, 55, .12); border-radius: 14px; }
+  .subaru-carousel-stage img { max-height: 100% !important; }
+
+  /* Hyundai photos rotate in the same frame, with the entire supplied image visible. */
+  .hyundai-signature .hyundai-inner {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1.08fr) minmax(320px, .92fr) !important;
+    align-items: center !important;
+    gap: clamp(38px, 5.5vw, 82px) !important;
+    width: min(100%, 1360px) !important;
+  }
+  .hyundai-signature .hyundai-gallery {
+    position: relative;
+    width: 100% !important;
+    aspect-ratio: 16 / 9;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden;
+    border: 1px solid rgba(227, 238, 238, .17);
+    border-radius: 14px;
+    background: #11191b;
+    box-shadow: 0 24px 58px rgba(0, 0, 0, .3);
+  }
+  .hyundai-signature .hyundai-gallery .hyundai-image {
+    position: absolute;
+    inset: 0;
+    width: 100% !important;
+    height: 100% !important;
+    aspect-ratio: auto !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    opacity: 0;
+    transition: opacity .8s ease;
+    pointer-events: none;
+  }
+  .hyundai-signature .hyundai-gallery .hyundai-image.is-active { opacity: 1; }
+  .hyundai-signature .hyundai-gallery .hyundai-film-slide > img { position: absolute; inset: 0; object-fit: cover !important; }
+  .hyundai-signature .hyundai-gallery .hyundai-film-slide > iframe { position: absolute; z-index: 2; inset: 0; width: 100%; height: 100%; border: 0; }
+  .hyundai-signature .hyundai-gallery .hyundai-film-slide .hyundai-image-index { z-index: 3; }
+  .hyundai-signature .hyundai-gallery .hyundai-image > img {
+    width: 100% !important;
+    height: 100% !important;
+    aspect-ratio: auto !important;
+    object-fit: contain !important;
+    clip-path: none !important;
+    animation: none !important;
+  }
+  .hyundai-signature .hyundai-gallery .hyundai-image::before { background: linear-gradient(180deg, rgba(4,9,11,.42), transparent 27%, transparent 72%, rgba(4,9,11,.35)); }
+  .hyundai-signature .hyundai-copy { max-width: 620px !important; margin: 0 !important; }
+  .hyundai-signature .hyundai-proof-strip { width: min(100%, 1360px) !important; margin: clamp(28px, 4vw, 54px) auto 0 !important; }
+
+  /* Electric mobility pairs its story with the complete technical illustration. */
+  .electric-mobility.section {
+    display: grid !important;
+    grid-template-columns: minmax(0, .86fr) minmax(0, 1.14fr) !important;
+    column-gap: clamp(40px, 6vw, 90px) !important;
+    align-items: center !important;
+  }
+  .electric-mobility > .section-label { grid-column: 1 / -1; width: 100%; }
+  .electric-mobility-content { display: block !important; min-width: 0; margin: 0 !important; }
+  .electric-mobility-copy { margin-top: 24px; }
+  .electric-mobility-copy p { max-width: 48ch; }
+  .electric-visual { grid-column: 2; grid-row: 2 / span 2; align-self: center; width: 100% !important; max-width: 760px; margin: 0 !important; overflow: hidden; border: 1px solid rgba(27, 61, 66, .12); border-radius: 14px; background: #f2f5f3; }
+  .electric-visual img { width: 100%; height: auto; object-fit: contain; filter: none; }
+  .electric-mobility-tags { grid-column: 1 / -1; width: 100%; margin-top: 34px !important; }
+
+  /* Keep diagnosis copy attached to a medium-sized image inside one centered composition. */
+  .diagnostic-story {
+    grid-template-columns: minmax(0, .82fr) minmax(0, 1.18fr) !important;
+    align-items: center !important;
+    gap: clamp(34px, 5vw, 72px) !important;
+    width: 100%;
+    max-width: 1500px;
+    margin-inline: auto;
+    padding: clamp(70px, 7vw, 104px) var(--pad, 28px) !important;
+  }
+  .diagnostic-story-copy { max-width: 560px !important; padding: clamp(24px, 3vw, 42px) !important; border: 1px solid rgba(137, 205, 210, .16); border-radius: 14px; background: linear-gradient(145deg, rgba(20, 46, 50, .72), rgba(11, 23, 25, .48)); }
+  .diagnostic-story-copy h2 { font-size: clamp(42px, 4.2vw, 64px) !important; }
+  .diagnostic-story-copy > p:not(.eyebrow) { font-size: 14px !important; }
+  .diagnostic-mosaic { width: 100% !important; max-width: 740px !important; margin: 0 !important; justify-self: end; }
+  .diagnostic-feature-stage { aspect-ratio: 1.12 !important; max-height: min(56svh, 570px); border: 1px solid rgba(137, 205, 210, .15); border-radius: 14px; }
+  .diagnostic-feature-stage img { max-height: 100% !important; }
+
+  /* The film heading and clip cards share a centered measure on wide monitors. */
+  .films-heading { max-width: 900px !important; }
+  .films-heading h2 { font-size: clamp(44px, 5vw, 70px) !important; }
+  .films-grid { width: min(100%, 760px) !important; max-width: 760px !important; }
+  .films-grid .film-card { height: auto !important; min-height: 0 !important; }
+  .films-grid .film-card > video { align-self: center !important; width: auto !important; height: min(46svh, 460px) !important; max-width: 100% !important; aspect-ratio: 9 / 16 !important; object-fit: contain !important; }
+  .films-social { width: min(100%, 900px) !important; }
+
+  /* Actual Google reviews are centered within the same reading width as the page. */
+  #review-carousel:not([hidden]) {
+    position: static !important;
+    left: auto !important;
+    width: min(100%, 1360px) !important;
+    max-width: 1360px !important;
+    margin: clamp(28px, 4vw, 48px) auto 0 !important;
+  }
+  .google-review-bar { justify-content: center !important; padding: 18px 0 !important; text-align: center; }
+  .google-review-bar .review-section-title { justify-items: center; }
+  .review-window { padding: 3px 0 14px !important; }
+
+  .customer-gallery { width: 100%; }
+  .customer-gallery-heading { grid-template-columns: minmax(0, 1fr) auto !important; justify-items: center; text-align: center; }
+  .customer-gallery-heading > div { grid-column: 1 / -1; }
+  .customer-gallery-heading > p { grid-column: 1 / -1; max-width: 48ch !important; margin: 0 auto !important; text-align: center; }
+}
+
+@media (max-width: 760px) {
+  /* Preserve the vertical phone story, while showing each Hyundai photo in turn. */
+  .hyundai-signature.section { overflow: visible !important; }
+  .hyundai-signature .hyundai-gallery {
+    position: relative;
+    width: 100vw !important;
+    max-width: none !important;
+    margin-inline: 0 !important;
+    padding: 0 !important;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border-radius: 0;
+    background: #11191b;
+  }
+  .hyundai-signature .hyundai-gallery .hyundai-image {
+    position: absolute;
+    inset: 0;
+    width: 100% !important;
+    height: 100% !important;
+    aspect-ratio: auto !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    opacity: 0;
+    transition: opacity .8s ease;
+    pointer-events: none;
+  }
+  .hyundai-signature .hyundai-gallery .hyundai-image.is-active { opacity: 1; }
+  .hyundai-signature .hyundai-gallery .hyundai-film-slide > img { position: absolute; inset: 0; object-fit: cover !important; }
+  .hyundai-signature .hyundai-gallery .hyundai-film-slide > iframe { position: absolute; z-index: 2; inset: 0; width: 100%; height: 100%; border: 0; }
+  .hyundai-signature .hyundai-gallery .hyundai-film-slide .hyundai-image-index { z-index: 3; }
+  .hyundai-signature .hyundai-gallery .hyundai-image > img {
+    width: 100% !important;
+    height: 100% !important;
+    aspect-ratio: auto !important;
+    object-fit: contain !important;
+    clip-path: none !important;
+    animation: none !important;
+  }
+  .electric-mobility.section { display: block !important; }
+  .electric-visual { width: 100% !important; margin: 22px auto 0 !important; overflow: hidden; }
+  .electric-visual img { width: 100% !important; height: auto !important; object-fit: contain !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hyundai-signature .hyundai-image { transition: none !important; }
+}

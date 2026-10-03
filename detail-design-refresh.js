@@ -50,28 +50,34 @@
     let index = 0;
     const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (reduced) return;
+    function advance() {
+      images[index].classList.remove('is-active');
+      images[index].setAttribute('aria-hidden', 'true');
+      index = (index + 1) % images.length;
+      images[index].classList.add('is-active');
+      images[index].removeAttribute('aria-hidden');
+      root.querySelectorAll('iframe[data-carousel-src]').forEach(frame => {
+        if (images[index].contains(frame)) {
+          if (frame.src !== frame.dataset.carouselSrc) frame.src = frame.dataset.carouselSrc;
+        } else if (frame.hasAttribute('src') && frame.src !== 'about:blank') {
+          frame.src = 'about:blank';
+        }
+      });
+      update?.(index, images.length);
+    }
+    function start() {
+      clearInterval(root._refreshTimer);
+      root._refreshTimer = setInterval(advance, interval);
+    }
     const observer = new IntersectionObserver(entries => {
       if (!entries[0].isIntersecting) return;
-      clearInterval(root._refreshTimer);
-      root._refreshTimer = setInterval(() => {
-        images[index].classList.remove('is-active');
-        images[index].setAttribute('aria-hidden', 'true');
-        index = (index + 1) % images.length;
-        images[index].classList.add('is-active');
-        images[index].removeAttribute('aria-hidden');
-        update?.(index, images.length);
-      }, interval);
+      start();
     }, { threshold: .12 });
     observer.observe(root);
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) clearInterval(root._refreshTimer);
       else if (root.getBoundingClientRect().bottom > 0 && root.getBoundingClientRect().top < innerHeight) {
-        clearInterval(root._refreshTimer);
-        root._refreshTimer = setInterval(() => {
-          images[index].classList.remove('is-active'); images[index].setAttribute('aria-hidden', 'true');
-          index = (index + 1) % images.length; images[index].classList.add('is-active'); images[index].removeAttribute('aria-hidden');
-          update?.(index, images.length);
-        }, interval);
+        start();
       }
     });
   }
@@ -79,6 +85,12 @@
     const label = document.querySelector('.subaru-carousel-caption span:first-child');
     const count = document.querySelector('[data-carousel-index]');
     if (label) label.textContent = ['SUBARU · DETALLE', 'SUBARU · ATENCIÓN MULTIMARCA', 'SUBARU · EN EL TALLER'][i];
+    if (count) count.textContent = `${String(i + 1).padStart(2, '0')} / ${String(n).padStart(2, '0')}`;
+  });
+  rotateImages('[data-hyundai-carousel]', '.hyundai-image', 5200, (i, n) => {
+    const label = document.querySelector('[data-hyundai-caption]');
+    const count = document.querySelector('[data-hyundai-carousel] .hyundai-image.is-active .hyundai-image-index b');
+    if (label) label.textContent = i === 2 ? 'HYUNDAI WORLDWIDE · FILM' : 'HYUNDAI · SERVICIO OFICIAL';
     if (count) count.textContent = `${String(i + 1).padStart(2, '0')} / ${String(n).padStart(2, '0')}`;
   });
   const diagLabels = ['ATENCIÓN TOYOTA GR', 'DETALLE · TOYOTA GR', 'CORVETTE · TALLER', 'MOTOR PORSCHE · REVISIÓN'];
