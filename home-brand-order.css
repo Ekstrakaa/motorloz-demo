@@ -58,14 +58,6 @@
   background: linear-gradient(145deg, #f3f6f4, #e7eeeb) !important;
   color: #152326 !important;
 }
-.customer-gallery::before {
-  content: "";
-  position: absolute;
-  inset: 0 0 auto;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(21, 116, 127, .25), transparent);
-}
-
 @media (max-width: 760px) {
   .hero-signal { gap: 8px !important; }
   .hero-hyundai-link { min-height: 27px !important; font-size: 8px !important; }

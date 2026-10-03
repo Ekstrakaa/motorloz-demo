@@ -1,6 +1,6 @@
 /* Final, responsive sizing for the client lockup and the assistant's headset mark. */
 .header .brand-art-original {
-  width: clamp(108px, 10.5vw, 140px) !important;
+  width: clamp(100px, 9.7vw, 128px) !important;
   max-width: 100% !important;
   max-height: 51px !important;
   height: auto !important;
@@ -102,7 +102,7 @@ footer .footer-brand .brand-art-original {
 
 @media (max-width: 760px) {
   .header .brand-art-original {
-    width: clamp(96px, 26vw, 106px) !important;
+    width: clamp(90px, 24vw, 98px) !important;
     max-height: 46px !important;
   }
   footer .footer-brand {
