@@ -51,10 +51,11 @@
   transition: transform .28s ease, box-shadow .28s ease, border-color .28s ease !important;
 }
 .services-carousel {
-  width: min(100%, 1488px) !important;
-  max-width: 1488px !important;
+  width: 100% !important;
+  max-width: 1800px !important;
   margin-inline: auto !important;
 }
+.services.section { padding-inline: clamp(22px, 3vw, 48px) !important; }
 .services-viewport {
   width: 100% !important;
   max-width: none !important;
@@ -175,7 +176,7 @@
 #services-track .service-title-row {
   position: relative !important;
   display: grid !important;
-  grid-template-columns: minmax(124px, 39%) minmax(0, 1fr) !important;
+  grid-template-columns: minmax(150px, 42%) minmax(0, 1fr) !important;
   align-items: center !important;
   justify-content: stretch !important;
   gap: clamp(13px, 2vw, 22px) !important;
@@ -193,7 +194,7 @@
   top: 6px;
   bottom: 6px;
   left: 0;
-  width: min(39%, 180px);
+  width: min(42%, 204px);
   content: "";
   background: linear-gradient(128deg, transparent 13%, rgba(0, 188, 235, .10) 14% 71%, transparent 72%);
   clip-path: polygon(14% 0, 100% 0, 84% 100%, 0 100%);
@@ -206,18 +207,29 @@
   box-sizing: border-box !important;
   display: block !important;
   flex: none !important;
-  width: min(100%, 180px) !important;
+  width: min(100%, 204px) !important;
   height: auto !important;
   aspect-ratio: 1 !important;
   min-height: 0 !important;
   border: 0 !important;
   border-radius: 0 !important;
   background-color: transparent !important;
-  background-size: 400% 400% !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  background-size: contain !important;
   box-shadow: none !important;
   filter: drop-shadow(0 7px 9px rgba(12, 52, 63, .13)) !important;
   animation: service-icon-breathe 5.2s ease-in-out infinite !important;
 }
+#services-track .service-title-row .service-icon[data-icon-index="0"] { background-image: url("assets/service-illustration-01.webp") !important; }
+#services-track .service-title-row .service-icon[data-icon-index="1"] { background-image: url("assets/service-illustration-02.webp") !important; }
+#services-track .service-title-row .service-icon[data-icon-index="2"] { background-image: url("assets/service-illustration-03.webp") !important; }
+#services-track .service-title-row .service-icon[data-icon-index="3"] { background-image: url("assets/service-illustration-04.webp") !important; }
+#services-track .service-title-row .service-icon[data-icon-index="4"] { background-image: url("assets/service-illustration-05.webp") !important; }
+#services-track .service-title-row .service-icon[data-icon-index="5"] { background-image: url("assets/service-illustration-06.webp") !important; }
+#services-track .service-title-row .service-icon[data-icon-index="6"] { background-image: url("assets/service-illustration-07.webp") !important; }
+#services-track .service-title-row .service-icon[data-icon-index="7"] { background-image: url("assets/service-illustration-08.webp") !important; }
+#services-track .service-title-row .service-icon[data-icon-index="8"] { background-image: url("assets/service-illustration-09.webp") !important; }
 #services-track .service-title-row h3 {
   position: relative !important;
   z-index: 1 !important;
@@ -226,7 +238,7 @@
   margin: 0 !important;
   padding: 0 0 13px !important;
   color: #17242c !important;
-  font: 760 clamp(25px, 3vw, 36px)/1.02 var(--body, sans-serif) !important;
+  font: 760 clamp(30px, 3vw, 42px)/1.02 var(--body, sans-serif) !important;
   letter-spacing: -.045em !important;
   line-height: 1.05 !important;
   text-align: left !important;
@@ -248,7 +260,7 @@
   min-height: 0 !important;
   margin: 0 0 17px !important;
   color: #60727c !important;
-  font-size: 14px !important;
+  font-size: 16px !important;
   line-height: 1.65 !important;
 }
 #services-track .service-card-copy > ul {
@@ -281,7 +293,7 @@
 #services-track .service-card-copy > ul > li {
   display: flex !important;
   min-width: 0 !important;
-  min-height: 102px !important;
+  min-height: 148px !important;
   flex-direction: column !important;
   align-items: center !important;
   justify-content: center !important;
@@ -292,16 +304,16 @@
   background: #fff !important;
   box-shadow: 0 3px 9px rgba(25, 60, 72, .035) !important;
   color: #263943 !important;
-  font-size: 12px !important;
+  font-size: 14px !important;
   line-height: 1.35 !important;
   text-align: center !important;
 }
 #services-track .service-card-copy > ul > li::before {
   position: static !important;
   display: block !important;
-  flex: 0 0 24px !important;
-  width: 24px !important;
-  height: 24px !important;
+  flex: 0 0 32px !important;
+  width: 32px !important;
+  height: 32px !important;
   margin: 0 !important;
   border: 0 !important;
   border-radius: 0 !important;
@@ -351,18 +363,18 @@
   #services-track .service-photo-meta > b { top: 9px; right: 15px; font-size: clamp(58px, 16vw, 78px); }
   #services-track .service-photo-meta::after { bottom: 8px; left: 17px; width: 32px; }
   #services-track .service-title-row {
-    grid-template-columns: minmax(104px, 37%) minmax(0, 1fr) !important;
+    grid-template-columns: minmax(112px, 38%) minmax(0, 1fr) !important;
     gap: 15px !important;
     min-height: 0 !important;
     margin-bottom: 12px !important;
   }
-  #services-track .service-title-row::before { width: 37%; }
+  #services-track .service-title-row::before { width: 38%; }
   #services-track .service-title-row .service-icon { width: 100% !important; max-width: 148px !important; }
   #services-track .service-title-row h3 { font-size: clamp(23px, 6.1vw, 28px) !important; }
   #services-track .service-card-copy > p { margin-bottom: 15px !important; font-size: 13px !important; }
   #services-track .service-card-copy > ul { gap: 6px !important; padding: 11px !important; border-radius: 18px !important; }
   #services-track .service-card-copy > ul::before { background-position: 122px 50% !important; }
-  #services-track .service-card-copy > ul > li { min-height: 100px !important; padding: 8px 4px !important; border-radius: 14px !important; font-size: 11px !important; }
+  #services-track .service-card-copy > ul > li { min-height: 112px !important; padding: 8px 4px !important; border-radius: 14px !important; font-size: 12px !important; }
 }
 @media (max-width: 360px) {
   #services-track .service-card-copy > ul { gap: 5px !important; padding: 9px !important; }
