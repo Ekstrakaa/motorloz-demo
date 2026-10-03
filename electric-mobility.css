@@ -57,6 +57,99 @@
   letter-spacing: .13em;
 }
 .electric-mobility-tags span { white-space: nowrap; }
+.electric-visual {
+  position: relative;
+  width: min(100%, 1240px);
+  margin: clamp(22px, 3vw, 38px) auto 0;
+  overflow: visible;
+}
+.electric-visual svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.electric-visual .ev-car-body {
+  fill: rgba(255,255,255,.22);
+  stroke: url(#ev-metal);
+  stroke-width: 2.4;
+  stroke-linejoin: round;
+}
+.electric-visual .ev-glass {
+  fill: rgba(38,69,73,.055);
+  stroke: rgba(58,82,85,.45);
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+}
+.electric-visual .ev-detail,
+.electric-visual .ev-spoke {
+  fill: none;
+  stroke: rgba(56,78,81,.48);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.electric-visual .ev-wheel {
+  fill: none;
+  stroke: #263b3e;
+  stroke-width: 7;
+  stroke-linecap: round;
+}
+.electric-visual .ev-wheel-hub {
+  fill: rgba(245,248,246,.78);
+  stroke: #597174;
+  stroke-width: 1.5;
+}
+.electric-visual .ev-battery rect,
+.electric-visual .ev-inverter rect {
+  fill: rgba(35,171,183,.09);
+  stroke: #318e98;
+  stroke-width: 1.5;
+}
+.electric-visual .ev-battery path:not(:last-child),
+.electric-visual .ev-inverter path {
+  fill: none;
+  stroke: rgba(49,142,152,.48);
+  stroke-width: 1;
+}
+.electric-visual .ev-battery path:last-child {
+  fill: #1598a5;
+  filter: drop-shadow(0 0 5px rgba(25,166,177,.38));
+}
+.electric-visual .ev-motor circle:first-child {
+  fill: rgba(35,171,183,.08);
+  stroke: #258d98;
+  stroke-width: 1.5;
+}
+.electric-visual .ev-motor circle:nth-child(2),
+.electric-visual .ev-motor path {
+  fill: none;
+  stroke: #258d98;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+}
+.electric-visual .ev-energy-path {
+  fill: none;
+  stroke: url(#ev-current);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-dasharray: 7 9;
+  animation: ev-current-flow 2.8s linear infinite;
+}
+.electric-visual .ev-node {
+  fill: #25aeba;
+  filter: drop-shadow(0 0 5px rgba(37,174,186,.7));
+  animation: ev-node-pulse 2.2s ease-in-out infinite;
+}
+.electric-visual .ev-label,
+.electric-visual .ev-voltage {
+  fill: #4e6669;
+  font: 700 10px/1 var(--mono, monospace);
+  letter-spacing: 1.2px;
+}
+.electric-visual .ev-voltage { fill: #168c9d; letter-spacing: 1px; }
+@keyframes ev-current-flow { to { stroke-dashoffset: -32; } }
+@keyframes ev-node-pulse { 50% { opacity: .48; } }
 @media (max-width: 760px) {
   .electric-mobility { padding-block: 54px 62px !important; }
   .electric-mobility-content {
@@ -66,5 +159,12 @@
   }
   .electric-mobility h2 { font-size: clamp(40px, 10.6vw, 56px); }
   .electric-mobility-copy p { font-size: 13px; }
+  .electric-visual { width: 140%; margin: 22px 0 0 -20%; overflow: hidden; }
+  .electric-visual .ev-label,
+  .electric-visual .ev-voltage { display: none; }
   .electric-mobility-tags { gap: 11px 18px; margin-top: 31px; font-size: 8px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .electric-visual .ev-energy-path,
+  .electric-visual .ev-node { animation: none; }
 }
