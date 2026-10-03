@@ -88,9 +88,7 @@
     if (count) count.textContent = `${String(i + 1).padStart(2, '0')} / ${String(n).padStart(2, '0')}`;
   });
   rotateImages('[data-hyundai-carousel]', '.hyundai-image', 5200, (i, n) => {
-    const label = document.querySelector('[data-hyundai-caption]');
     const count = document.querySelector('[data-hyundai-carousel] .hyundai-image.is-active .hyundai-image-index b');
-    if (label) label.textContent = i === 2 ? 'HYUNDAI WORLDWIDE · FILM' : 'HYUNDAI · SERVICIO OFICIAL';
     if (count) count.textContent = `${String(i + 1).padStart(2, '0')} / ${String(n).padStart(2, '0')}`;
   });
   const diagLabels = ['ATENCIÓN TOYOTA GR', 'DETALLE · TOYOTA GR', 'CORVETTE · TALLER', 'MOTOR PORSCHE · REVISIÓN'];
