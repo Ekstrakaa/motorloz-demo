@@ -11,6 +11,13 @@
   const sequence = [
     {
       type: 'video',
+      src: 'assets/clips/hyundai-home.mp4',
+      poster: 'assets/clips/hyundai-home.jpg',
+      duration: 5200,
+      label: 'HYUNDAI, EN MOVIMIENTO'
+    },
+    {
+      type: 'video',
       src: 'assets/cinema-workshop.mp4',
       poster: 'assets/salon-panoramica-optimized.webp',
       start: 0,
@@ -46,6 +53,13 @@
       label: 'BRUNO · DIAGNÓSTICO EN EL TALLER'
     },
     {
+      type: 'video',
+      src: 'assets/clips/subaru-home.mp4',
+      poster: 'assets/clips/subaru-home.jpg',
+      duration: 5200,
+      label: 'SUBARU, EN MOVIMIENTO'
+    },
+    {
       type: 'image',
       src: 'assets/hero-subaru-azul.webp?v=privacy1',
       focus: '50% 52%',
@@ -54,15 +68,6 @@
       duration: 5000,
       label: 'SUBARU, EN EL CORAZÓN'
     },
-    {
-      type: 'image',
-      src: 'assets/hyundai-servicio-optimized.webp',
-      focus: '50% 55%',
-      zoomStart: 1.01,
-      zoomEnd: 1.045,
-      duration: 5000,
-      label: 'LOZANO & OLIVA · SERVICIO OFICIAL HYUNDAI'
-    }
   ];
 
   let index = 0;
@@ -134,8 +139,7 @@
     frame.append(video);
     const player = window.MOTORLOZ_VIDEO(video, {
       host: root.parentElement, source: item.src,
-      shouldPlay: () => visible && frame.classList.contains('is-current') && !reducedMotion.matches,
-      onBlocked: () => clearTimeout(timer)
+      shouldPlay: () => visible && frame.classList.contains('is-current') && !reducedMotion.matches
     });
     players.set(frame, player);
     player.sync();
@@ -143,9 +147,10 @@
 
   function schedule() {
     clearTimeout(timer);
-    // Advance video scenes only when the actual clip ends, after buffering.
-    if (!visible || document.hidden || reducedMotion.matches || sequence[index].type === 'video') return;
-    timer = window.setTimeout(advance, sequence[index].duration);
+    if (!visible || document.hidden || reducedMotion.matches) return;
+    // Normal end advances on its own; this fallback keeps the sequence fluid if autoplay is blocked.
+    const fallback = sequence[index].type === 'video' ? 2400 : 0;
+    timer = window.setTimeout(advance, sequence[index].duration + fallback);
   }
 
   function advance(step = 1) {

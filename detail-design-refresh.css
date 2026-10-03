@@ -112,9 +112,11 @@
 .subaru-section .subaru-photo-carousel { grid-column:1/-1!important;width:100%!important;max-width:none!important;margin:0!important; }
 .subaru-carousel-stage { position:relative!important;width:100%!important;aspect-ratio:1.35!important;overflow:hidden!important;background:#e2e9e7!important; }
 .subaru-carousel-stage img { position:absolute!important;inset:0!important;display:block!important;width:100%!important;height:100%!important;max-height:72svh!important;object-fit:contain!important;opacity:0!important;transition:opacity .65s ease!important; }
+.subaru-carousel-stage video { position:absolute!important;inset:0!important;display:block!important;width:100%!important;height:100%!important;max-height:72svh!important;object-fit:contain!important;opacity:0!important;transition:opacity .65s ease!important; }
 .subaru-carousel-stage img.is-active { opacity:1!important; }
+.subaru-carousel-stage video.is-active { opacity:1!important; }
 .subaru-carousel-caption { display:flex!important;justify-content:space-between!important;gap:12px!important;margin-top:9px!important;color:#53676a!important;font:9px/1.4 var(--mono)!important;letter-spacing:.1em!important; }
-@media(prefers-reduced-motion:reduce) { .subaru-carousel-stage img { transition:none!important; } }
+@media(prefers-reduced-motion:reduce) { .subaru-carousel-stage img,.subaru-carousel-stage video { transition:none!important; } }
 @media(max-width:760px) { .subaru-carousel-stage { aspect-ratio:1.03!important; } }
 
 /* Let the Hyundai photo reach the viewport edges on mobile; copy remains inset. */
@@ -123,6 +125,7 @@
   .hyundai-inner { display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:21px!important;width:100%!important; }
   .hyundai-image { width:100vw!important;max-width:none!important;margin-inline:calc(50% - 50vw)!important;aspect-ratio:1.18!important; }
   .hyundai-image img { width:100%!important;height:100%!important;aspect-ratio:auto!important;object-fit:cover!important;object-position:center 45%!important;clip-path:none!important; }
+  .hyundai-image video { position:absolute!important;inset:0!important;width:100%!important;height:100%!important;object-fit:cover!important;object-position:center!important; }
   .hyundai-copy { width:auto!important;margin-inline:20px!important; }
 }
 
@@ -465,8 +468,8 @@
 .service-icon.scroll-entry,.why-icon.scroll-entry { transform:translateY(13px) scale(.68) rotate(-7deg); }
 .scroll-entry.is-scroll-visible { opacity:1;transform:none; }
 .reviews-rating {
-  display:grid!important;grid-template-columns:auto auto!important;justify-content:start!important;align-items:center!important;
-  column-gap:14px!important;row-gap:7px!important;margin:17px 0 27px!important;
+  display:grid!important;grid-template-columns:auto auto!important;justify-content:center!important;justify-items:center!important;align-items:center!important;
+  width:max-content!important;max-width:100%!important;text-align:center!important;column-gap:14px!important;row-gap:7px!important;margin:17px auto 27px!important;
 }
 .reviews-rating>strong { font-size:clamp(35px,3.8vw,46px)!important;line-height:.95!important;font-weight:800!important;letter-spacing:-.055em!important; }
 .reviews-rating>.gold-stars { display:flex!important;align-items:center!important;gap:.025em!important;margin:0!important;font-size:clamp(31px,3.2vw,40px)!important;line-height:1!important;letter-spacing:0!important; }

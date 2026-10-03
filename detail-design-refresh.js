@@ -45,43 +45,69 @@
   function rotateImages(rootSelector, imageSelector, interval, update) {
     const root = document.querySelector(rootSelector);
     if (!root) return;
-    const images = [...root.querySelectorAll(imageSelector)];
-    if (images.length < 2) return;
+    const slides = [...root.querySelectorAll(imageSelector)];
+    if (slides.length < 2) return;
     let index = 0;
+    let visible = false;
     const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (reduced) return;
+    function syncVideo() {
+      slides.forEach((slide, slideIndex) => {
+        const video = slide.tagName === 'VIDEO' ? slide : slide.querySelector('video');
+        if (!video) return;
+        const shouldPlay = visible && slideIndex === index && !document.hidden;
+        if (!shouldPlay) { video.pause(); return; }
+        video.muted = true;
+        video.playsInline = true;
+        video.play().catch(() => {});
+      });
+    }
     function advance() {
-      images[index].classList.remove('is-active');
-      images[index].setAttribute('aria-hidden', 'true');
-      index = (index + 1) % images.length;
-      images[index].classList.add('is-active');
-      images[index].removeAttribute('aria-hidden');
-      update?.(index, images.length);
+      slides[index].classList.remove('is-active');
+      slides[index].setAttribute('aria-hidden', 'true');
+      index = (index + 1) % slides.length;
+      slides[index].classList.add('is-active');
+      slides[index].removeAttribute('aria-hidden');
+      update?.(index, slides.length);
+      syncVideo();
     }
     function start() {
       clearInterval(root._refreshTimer);
       root._refreshTimer = setInterval(advance, interval);
     }
     const observer = new IntersectionObserver(entries => {
-      if (!entries[0].isIntersecting) return;
-      start();
+      visible = entries[0].isIntersecting;
+      if (visible) start();
+      else clearInterval(root._refreshTimer);
+      syncVideo();
     }, { threshold: .12 });
     observer.observe(root);
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) clearInterval(root._refreshTimer);
       else if (root.getBoundingClientRect().bottom > 0 && root.getBoundingClientRect().top < innerHeight) {
+        visible = true;
         start();
       }
+      syncVideo();
     });
   }
-  rotateImages('[data-subaru-carousel]', '.subaru-carousel-stage img', 4800, (i, n) => {
+  rotateImages('[data-subaru-carousel]', '.subaru-carousel-stage img, .subaru-carousel-stage video', 4800, (i, n) => {
     const label = document.querySelector('.subaru-carousel-caption span:first-child');
     const count = document.querySelector('[data-carousel-index]');
-    if (label) label.textContent = ['SUBARU · DETALLE', 'SUBARU · ATENCIÓN MULTIMARCA', 'SUBARU · EN EL TALLER'][i];
+    if (label) label.textContent = ['SUBARU · DETALLE', 'SUBARU · ATENCIÓN MULTIMARCA', 'SUBARU · EN EL TALLER', 'SUBARU · EN MOVIMIENTO'][i];
     if (count) count.textContent = `${String(i + 1).padStart(2, '0')} / ${String(n).padStart(2, '0')}`;
   });
   const hyundaiGallery = document.querySelector('[data-hyundai-carousel]');
-  hyundaiGallery?.querySelectorAll('iframe, video').forEach(media => media.remove());
+  hyundaiGallery?.querySelectorAll('iframe').forEach(media => media.remove());
+  const hyundaiEmblem = document.querySelector('.hyundai-signature .hyundai-emblem');
+  if (hyundaiEmblem && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const emblemObserver = new IntersectionObserver(entries => {
+      if (!entries[0].isIntersecting) return;
+      hyundaiEmblem.classList.add('is-intro-visible');
+      emblemObserver.disconnect();
+    }, { threshold: .35 });
+    emblemObserver.observe(hyundaiEmblem);
+  }
   rotateImages('[data-hyundai-carousel]', '.hyundai-image', 5200, (i, n) => {
     const count = document.querySelector('[data-hyundai-carousel] .hyundai-image.is-active .hyundai-image-index b');
     if (count) count.textContent = `${String(i + 1).padStart(2, '0')} / ${String(n).padStart(2, '0')}`;

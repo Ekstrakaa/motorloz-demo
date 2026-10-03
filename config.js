@@ -5,7 +5,7 @@ window.MOTORLOZ = {
   maps: 'https://www.google.com/maps?cid=1195299316977408559',
   directions: 'https://www.google.com/maps/dir/?api=1&destination=-34.8808783,-56.0864906',
   // Clips locales autorizados; se reproducen sin audio y se pausan fuera de pantalla.
-  clips: { engine: 'assets/motorloz-subaru-silent.mp4', tools: 'assets/motorloz-stock-silent.mp4' },
+  clips: { engine: 'assets/motorloz-subaru-loop.mp4', tools: 'assets/motorloz-stock-silent.mp4' },
   reviews: [
     {name:'Catalina Vejo',text:'Muy profesional, rápido y honesto.',rating:5,url:'https://www.google.com/maps?cid=1195299316977408559',excerpt:false},
     {name:'Laura Quereilhac',text:'Excelente servicio!! Muy profesionales en su trabajo. Utilizan buenos repuestos.',rating:5,url:'https://www.google.com/maps?cid=1195299316977408559',excerpt:true},
