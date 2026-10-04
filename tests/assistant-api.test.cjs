@@ -242,6 +242,48 @@ test('the photographed wording cannot end at “I have all the details” withou
   assert.match(accepted.body.reply,/Revisar en WhatsApp/);
 });
 
+test('accepting an evaluation leads from name and car to a clear WhatsApp next step',async()=>{
+  const messages=[
+    {role:'user',content:'Mi Subaru larga humo blanco. ¿Lo puedo llevar a ustedes?'},
+    {role:'assistant',content:'¿Querés que te ayude con una evaluación cuando puedas traerlo?'},
+    {role:'user',content:'si'},
+    {role:'assistant',content:'Si me decís nombre y modelo, lo armamos.'},
+    {role:'user',content:'emanuel leoni subaru inpreza'}
+  ];
+  const full=facts({name:'emanuel leoni',vehicle:'Subaru Impreza',issue:'Humo blanco'});
+  const {body}=await chat(messages,{
+    facts:full,coordinationIntent:'none',
+    reply:'Emanuel, gracias por la info. Cuando quieras, podés traer tu Subaru Impreza a nuestro taller y lo revisamos.'
+  });
+  assert.equal(body.handoffReady,false);
+  assert.match(body.reply,/Gracias, Emanuel/);
+  assert.match(body.reply,/tu Subaru Impreza/);
+  assert.match(body.reply,/¿Querés que prepare la solicitud para coordinar la revisión por WhatsApp\?/);
+  assert.doesNotMatch(body.reply,/cuando quieras|pod[eé]s traer/i);
+
+  const accepted=await chat([...messages,{role:'assistant',content:body.reply},{role:'user',content:'sí'}],{
+    facts:full,coordinationIntent:'none',reply:'Ya tengo toda la información.'
+  });
+  assert.equal(accepted.body.handoffReady,true);
+  assert.match(accepted.body.reply,/Listo, Emanuel/);
+  assert.match(accepted.body.reply,/Revisar en WhatsApp/);
+  assert.match(accepted.body.reply,/taller te confirma día y horario/);
+});
+
+test('accepting a workshop evaluation asks for missing essentials without promising a walk-in',async()=>{
+  const {body}=await chat([
+    {role:'user',content:'Mi auto larga humo blanco.'},
+    {role:'assistant',content:'¿Querés que lo evaluemos en nuestro taller cuando puedas traerlo?'},
+    {role:'user',content:'Sí'}
+  ],{
+    facts:facts({issue:'Humo blanco'}),coordinationIntent:'none',
+    reply:'Podés traerlo cuando te quede cómodo. ¿Cuál es el modelo?'
+  });
+  assert.equal(body.handoffReady,false);
+  assert.match(body.reply,/marca y modelo/i);
+  assert.doesNotMatch(body.reply,/cuando te quede c[oó]modo|cuando quieras/i);
+});
+
 test('an explicit request to prepare can continue with mileage marked as not provided',async()=>{
   const messages=[
     {role:'user',content:'Mi Subaru Impreza vibra al acelerar desde ayer. Quiero coordinar una revisión.'},
