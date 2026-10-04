@@ -94,6 +94,16 @@ test('a direct request to bring the car gets a direct answer before an intake qu
   assert.match(body.reply,/¿Cómo te llamás/);
 });
 
+test('asking us to review a car leads naturally to the next coordination step',async()=>{
+  const {body}=await chat([{role:'user',content:'Hola, tengo un Subaru Impreza y escucho un ruido al frenar. ¿Me ayudan a revisarlo?'}],{
+    reply:'Claro, lo revisamos en nuestro taller para ver qué puede estar pasando con ese ruido al frenar.',
+    coordinationIntent:'interested',facts:facts({vehicle:'Subaru Impreza',issue:'Ruido al frenar'})
+  });
+  assert.match(body.reply,/nuestro taller/);
+  assert.match(body.reply,/¿Cómo te llamás/);
+  assert.equal(body.handoffReady,false);
+});
+
 test('a direct yes from the model is not repeated when the customer asks to visit',async()=>{
   const {body}=await chat([
     {role:'user',content:'Mi BMW Serie 3 hace ruido al frenar.'},
