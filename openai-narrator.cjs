@@ -1,4 +1,4 @@
-const selected = require('./voice-styles.cjs')[3];
+const selected = require('./voice-styles.cjs')[1];
 const instructions = `${selected.instructions}\nEl taller MOTORLOZ se pronuncia Motor Los, dos palabras, nunca Motorola. Respetá el contenido del mensaje y su intención: en saludos y explicaciones comunes hablá con cercanía; expresá preocupación moderada solo si el texto describe un problema.`;
 
 async function request(text, format, signal) {

@@ -110,3 +110,22 @@
   .workshop-photo-rail { scroll-behavior: auto; }
   .brand-lineup .brand-lineup-track { animation: none !important; }
 }
+
+.subaru-section .japan-flag { width: 100px !important; height: 68px !important; }
+.subaru-section .japan-flag i { width: 24px !important; height: 24px !important; }
+.hyundai-signature .hyundai-proof-strip { grid-template-columns: 260px minmax(0,1fr) auto !important; gap: 28px !important; }
+.hyundai-signature .hyundai-proof-photo { width: 260px !important; height: 205px !important; }
+.hyundai-signature .hyundai-proof-strip > div { gap: 9px; }
+.hyundai-signature .hyundai-proof-strip .eyebrow { font-size: 10px; line-height: 1.5; }
+.hyundai-signature .hyundai-proof-strip strong { font-size: 16px; line-height: 1.45; }
+.hyundai-signature .hyundai-proof-location { font-size: 8px; }
+
+@media (max-width: 760px) {
+  .subaru-section .japan-flag { width: 92px !important; height: 62px !important; }
+  .subaru-section .japan-flag i { width: 22px !important; height: 22px !important; }
+  .hyundai-signature .hyundai-proof-strip { grid-template-columns: minmax(120px,38%) minmax(0,1fr) !important; gap: 14px !important; }
+  .hyundai-signature .hyundai-proof-photo { width: 100% !important; height: clamp(126px,37vw,160px) !important; }
+  .hyundai-signature .hyundai-proof-strip .eyebrow { font-size: 8px; }
+  .hyundai-signature .hyundai-proof-strip strong { font-size: 12px; }
+  .hyundai-signature .hyundai-proof-location { grid-column: 1 / -1; font-size: 7px; }
+}

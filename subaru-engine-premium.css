@@ -65,11 +65,11 @@
 }
 
 .subaru-section .engine-sketch.is-revving img {
-  animation: boxer-premium-idle 4.2s ease-in-out infinite !important;
+  animation: boxer-premium-idle 5.2s ease-in-out infinite !important;
 }
 
 .subaru-section .engine-sketch.is-revving::before {
-  animation: boxer-premium-shadow 4.2s ease-in-out infinite !important;
+  animation: boxer-premium-shadow 5.2s ease-in-out infinite !important;
 }
 
 .subaru-section .engine-sketch.is-revving::after {
@@ -91,13 +91,17 @@
 }
 
 @keyframes boxer-premium-idle {
-  0%, 100% { transform: translate3d(0, 0, 0) rotate(0) scale(1.12); }
-  50% { transform: translate3d(0, -3px, 0) rotate(.12deg) scale(1.15); }
+  0%, 100% { transform: translate3d(0, 2px, 0) rotate(-.7deg) scale(1.08); }
+  24% { transform: translate3d(-4px, -4px, 0) rotate(.55deg) scale(1.12); }
+  42% { transform: translate3d(5px, -9px, 0) rotate(-.35deg) scale(1.16); }
+  60% { transform: translate3d(-3px, -5px, 0) rotate(.5deg) scale(1.13); }
+  78% { transform: translate3d(2px, -1px, 0) rotate(-.2deg) scale(1.1); }
 }
 
 @keyframes boxer-premium-shadow {
-  0%, 100% { opacity: .73; transform: translate(-50%, -50%) scaleX(.98); }
-  50% { opacity: .88; transform: translate(-50%, -50%) scaleX(1.04); }
+  0%, 100% { opacity: .76; transform: translate(-50%, -50%) scale(.96); }
+  42% { opacity: .52; transform: translate(-50%, -50%) scale(1.1); }
+  78% { opacity: .68; transform: translate(-50%, -50%) scale(1.02); }
 }
 
 @keyframes boxer-premium-orbit {
