@@ -612,7 +612,7 @@
     try {
       const response = await fetch('/api/assistant/summary', {
         method:'POST', headers:{ 'Content-Type':'application/json' },
-        body:JSON.stringify({ messages:history }), signal:controller.signal
+        body:JSON.stringify({ messages:history.slice(-24) }), signal:controller.signal
       });
       if (!response.ok) return fallback;
       const result = await response.json();
@@ -650,7 +650,7 @@
       const response = await fetch('/api/assistant/chat', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          messages: history,
+          messages: history.slice(-24),
           intake: (() => {
             const details = handoffDetails();
             return {

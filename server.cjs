@@ -49,6 +49,7 @@ const types = {
   '.css': 'text/css; charset=utf-8',
   '.js': 'text/javascript; charset=utf-8',
   '.png': 'image/png',
+  '.webp': 'image/webp',
   '.jpg': 'image/jpeg',
   '.jpeg': 'image/jpeg',
   '.svg': 'image/svg+xml',
@@ -118,9 +119,13 @@ const server = http.createServer((req, res) => {
   }
 
   const file = path.resolve(root, `.${pathname === '/' ? '/index.html' : pathname}`);
-  if (!file.startsWith(`${root}${path.sep}`)) {
-    res.writeHead(403);
-    res.end('Forbidden');
+  const relative = path.relative(root, file);
+  const extension = path.extname(file).toLowerCase();
+  const publicFile = ['.html', '.css', '.js', '.png', '.jpg', '.jpeg', '.svg', '.xml', '.txt', '.mp4', '.mp3', '.webm', '.webp', '.ico', '.woff', '.woff2'].includes(extension);
+  const privatePath = relative.split(path.sep).some(part => part.startsWith('.'));
+  if (relative.startsWith('..') || path.isAbsolute(relative) || privatePath || !publicFile) {
+    res.writeHead(404);
+    res.end('Not found');
     return;
   }
 

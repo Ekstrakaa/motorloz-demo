@@ -1,0 +1,25 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "routes": [
+    { "src": "/\\.(?:env(?:\\..*)?|git(?:/.*)?|vercel(?:/.*)?)", "status": 404 },
+    { "src": "/(?:openai-assistant|openai-narrator|voice-styles|server|prepare-seo)\\.cjs", "status": 404 },
+    { "src": "/(?:tests|qa-keyboard-frames)(?:/.*)?", "status": 404 },
+    { "src": "/(?:ASISTENTE-MOTORLOZ|REVISION-2026-10-02|ASSET-RIGHTS-CHECKLIST)\\.md", "status": 404 },
+    { "src": "/(?:ABRIR-DEMO\\.cmd|home-sequence-studio(?:\\.html|\\.js)?|fotos-no-usadas\\.html|pruebas-de-voz\\.html|asistente-demo\\.html)", "status": 404 },
+    { "src": "/assets/voice-styles(?:/.*)?", "status": 404 },
+    { "src": "/api/assistant/(?:chat|summary|speech|speech-stream|status)\\.js", "status": 404 }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "Content-Security-Policy", "value": "default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self' 'sha256-Gaa5u2S6PRKy6RDg7oSOoP5hiWLzZh96ZrLKapgr1zk=' 'sha256-Ee1GgA/2KjEADy5S7A+SSE869Nz9aWyTjsEHL+0lH0g='; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://upload.wikimedia.org; media-src 'self' blob:; connect-src 'self'; font-src 'self' data:; frame-src https://maps.google.com; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+        { "key": "Permissions-Policy", "value": "camera=(), geolocation=(), payment=(), usb=()" },
+        { "key": "X-Permitted-Cross-Domain-Policies", "value": "none" }
+      ]
+    }
+  ]
+}

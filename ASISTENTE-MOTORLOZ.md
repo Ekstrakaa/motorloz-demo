@@ -1,28 +1,21 @@
-# Guía breve del asistente MOTORLOZ
+# Operación del asistente MOTORLOZ
 
-## Qué hace hoy
+## Qué hace
 
-El chat usa `gemini-3.5-flash-lite` para conversar. Al preparar una consulta por fallas, ese modelo redacta una síntesis de **lo dicho por el cliente**. Para servicios simples, como un cambio de aceite, la web arma una síntesis inmediata sin otra llamada a Gemini. La voz usa siempre `gemini-3.8-flash-lite-tts` con la voz `Algieba`. Una clave de API da acceso a los modelos, pero **no los entrena**.
+El chat responde como recepción del taller en español rioplatense. Usa la API de OpenAI desde una función del servidor; la clave no se envía al navegador. Ayuda a describir el vehículo y el motivo de consulta y, si el cliente lo pide, prepara un mensaje para que la persona lo revise y envíe por WhatsApp. No confirma turnos, precios ni diagnósticos. La voz usa una llamada aparte de síntesis de audio; si falla, queda la respuesta escrita.
 
-El asistente es la recepción inicial: escucha, pregunta por el auto, los síntomas o el mantenimiento solicitado, y prepara el mensaje. No confirma turnos, horarios, precios ni diagnósticos. Puede explicar que Pablo, dueño del taller, o Bruno, del equipo, revisarán el caso, sin prometer su disponibilidad. WhatsApp es el último paso; el equipo del taller revisa la consulta y confirma la coordinación. El número del cliente no se pide en la web: WhatsApp identifica al remitente.
+La conversación se conserva temporalmente en la pestaña del visitante. El sitio no guarda una agenda ni una base de clientes. La API puede conservar registros de seguridad según las políticas de OpenAI: no afirmar que el proveedor no retiene ningún dato. La web muestra un aviso para no compartir contraseñas, códigos ni datos de pago.
 
-La invitación a abrir WhatsApp aparece después de una conversación útil: el cliente mencionó el vehículo, explicó un problema concreto o servicio y dio su nombre. El mensaje se arma con esos datos sin presentar otro formulario en el chat. La persona lo revisa en WhatsApp antes de enviarlo y el taller confirma día y horario. El formulario independiente de la página sigue siendo otra forma de preparar una consulta. Si faltan datos exactos, el taller los confirma después. El micrófono de la web transcribe en el navegador y envía texto, nunca una nota de voz. La bienvenida se muestra escrita para reservar el cupo de voz para las respuestas al cliente.
+## Configuración
 
-## Cómo mejorar sus respuestas
+- `OPENAI_API_KEY`: clave privada de un proyecto del cliente, guardada solo en las variables del servidor de Vercel.
+- `OPENAI_CHAT_MODEL`: por defecto `gpt-4.1-mini`.
+- La voz se configura en `openai-narrator.cjs`. Revisar la vigencia del modelo de voz antes de renovaciones del servicio.
 
-1. Definir con el taller respuestas aprobadas: servicios reales, horarios, dirección, cómo reciben urgencias y qué promesas nunca deben hacerse.
-2. Reunir ejemplos **sin nombres, teléfonos ni matrículas**: lo que preguntó un cliente y cómo respondería bien la recepción. Incluir casos simples, complejos y urgentes.
-3. Ajustar las instrucciones de recepción en `SYSTEM_PROMPT`, dentro de `gemini-assistant.cjs`. La clave de API no se cambia para ajustar el estilo.
-4. Probar conversaciones de varios mensajes, tanto por fallas como por mantenimiento: el asistente debe recordar marca, modelo, año, kilometraje, síntomas o servicio y cuándo comenzó el problema; debe preguntar solo lo que falta y no empujar un turno después de un saludo.
-5. Revisar el mensaje en WhatsApp antes de enviarlo. Debe contener solamente hechos relatados por el cliente; el taller decide qué hacer y confirma el horario.
+La facturación de la API es independiente de la suscripción ChatGPT. Activar alertas de consumo, un presupuesto de proyecto y recarga automática con límite acordado. Medir el gasto real de texto y voz durante el primer mes antes de ofrecer una cuota fija.
 
-El chat conserva hasta 20 mensajes recientes como contexto para Gemini y recupera la conversación en la misma pestaña si se recarga. La web no tiene una agenda ni una base de clientes. La conversación no se envía al taller: solo llega el mensaje que la persona decide enviar por WhatsApp.
+## Seguridad y mantenimiento
 
-## Configuración técnica
+El servidor valida el formato, tamaño y origen de las solicitudes; limita consultas por IP dentro de cada instancia; no muestra la clave ni las instrucciones internas; y descarta respuestas que piden credenciales. Estas medidas reducen abuso, pero no garantizan que un endpoint público nunca reciba ataques. Configurar protección y límites de tráfico en el proveedor de hosting para el API, vigilar el consumo del proyecto y rotar la clave si se expone.
 
-- `GEMINI_API_KEY`: acceso privado a la API; nunca va en el navegador.
-- `GEMINI_CHAT_MODEL`: modelo de conversación (por defecto `gemini-3.5-flash-lite`).
-- `GEMINI_SUMMARY_MODEL`: modelo para la síntesis de recepción (por defecto `gemini-3.5-flash-lite`).
-- La voz y el modelo de lectura están fijados en el servidor para que no cambien entre respuestas ni dispositivos.
-
-Cambiar estas variables o las instrucciones requiere publicar una nueva versión y volver a probar el chat. El ajuste fino del modelo por la API de Gemini no está disponible actualmente; para este caso se mejora con instrucciones, ejemplos y pruebas. La disponibilidad gratuita depende de los cupos de Gemini: no garantiza voz continua ni tiempos de respuesta constantes. Si falla la voz fijada, la respuesta queda escrita; no se sustituye por la voz del navegador.
+Para mejorar las respuestas, reunir ejemplos anonimizados aprobados por el taller, probar síntomas habituales y urgencias, y ajustar el prompt del servidor. Después de cualquier cambio, repetir las pruebas y confirmar que WhatsApp se abre con datos relatados por el visitante, sin inventar hechos.
