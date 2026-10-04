@@ -207,7 +207,7 @@ async function handle(req, res, action) {
         reply = reply.replace(/^\s*(?:para preparar (?:la )?(?:solicitud|servicio),?\s*)?me falta un dato\s*[:.]?\s*/iu, '').trim();
         if (!/\?/.test(reply) || !asksMissing.test(reply)) reply = question;
       }
-      if (asksToVisitUs(latestUser) && !dangerousToDrive(latestUser) && !/pod[eé]s traerlo a nuestro taller/i.test(reply)) {
+      if (asksToVisitUs(latestUser) && !dangerousToDrive(latestUser) && !/^(?:s[ií]|claro|por supuesto)[,.!\s]/i.test(reply) && !/pod[eé]s traerlo a nuestro taller/i.test(reply)) {
         reply = `Sí, podés traerlo a nuestro taller para revisarlo. ${reply}`;
       } else if (history.filter(item => item.role === 'user').length === 1 && !dangerousToDrive(latestUser)) {
         reply = `Dale, te ayudo a coordinarlo con nuestro taller. ${reply}`;

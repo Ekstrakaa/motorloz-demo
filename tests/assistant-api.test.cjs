@@ -94,6 +94,19 @@ test('a direct request to bring the car gets a direct answer before an intake qu
   assert.match(body.reply,/¿Cómo te llamás/);
 });
 
+test('a direct yes from the model is not repeated when the customer asks to visit',async()=>{
+  const {body}=await chat([
+    {role:'user',content:'Mi BMW Serie 3 hace ruido al frenar.'},
+    {role:'assistant',content:'Lo revisamos acá.'},
+    {role:'user',content:'¿Lo puedo llevar a ustedes?'}
+  ],{
+    reply:'Sí, podés traerlo sin problema. ¿Cómo te llamás?',coordinationIntent:'interested',
+    facts:facts({vehicle:'BMW Serie 3',issue:'Ruido al frenar'})
+  });
+  assert.equal((body.reply.match(/\bS[ií], pod[eé]s traerlo/g)||[]).length,1);
+  assert.match(body.reply,/¿Cómo te llamás/);
+});
+
 test('a new technical question interrupts intake and receives an answer first',async()=>{
   const {body}=await chat([
     {role:'user',content:'Quiero coordinar una revisión por una vibración en mi Subaru.'},
