@@ -1,0 +1,118 @@
+/* Let the two original vertical clips be the feature, without surrounding cards. */
+.films-grid {
+  grid-template-columns: repeat(2, minmax(0, 280px)) !important;
+  justify-content: center !important;
+  gap: clamp(22px, 5vw, 76px) !important;
+  width: min(100%, 700px) !important;
+  max-width: 700px !important;
+  align-items: start !important;
+}
+.films-grid .film-card {
+  display: flex !important;
+  flex-direction: column !important;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  overflow: visible !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+.films-grid .film-card::before,
+.films-grid .film-card::after { display: none !important; content: none !important; }
+.films-grid .film-card > video {
+  display: block !important;
+  position: relative !important;
+  inset: auto !important;
+  width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 9 / 16 !important;
+  object-fit: contain !important;
+  border: 0 !important;
+  border-radius: 3px !important;
+  background: #050a0b !important;
+  transform: none !important;
+}
+.films-grid .film-card .film-caption {
+  display: flex !important;
+  flex: 0 0 auto !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  position: relative !important;
+  inset: auto !important;
+  width: 100% !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 14px 0 0 !important;
+  gap: 4px !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+.films-grid .film-card .film-caption small::after { content: none !important; display: none !important; }
+.films-grid .film-card .film-caption strong { min-height: 0 !important; font-size: clamp(17px, 1.9vw, 22px) !important; }
+.films-grid .film-card .film-caption > a {
+  display: inline-flex !important;
+  justify-content: flex-start !important;
+  align-items: center !important;
+  align-self: flex-start !important;
+  width: auto !important;
+  min-height: 0 !important;
+  margin: 4px 0 0 !important;
+  padding: 0 0 2px !important;
+  border: 0 !important;
+  border-bottom: 1px solid currentColor !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: #82d5da !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  text-decoration: none !important;
+  animation: none !important;
+}
+.films-grid .film-card .film-caption > a::after,
+.films-grid .film-card .film-caption > a > span { display: none !important; content: none !important; }
+.films-grid .film-card .film-caption > a:hover { color: #d7f8f7 !important; }
+
+/* A restrained floating motion gives the electric platform some presence. */
+.electric-visual img { animation: electric-platform-float 6.8s ease-in-out infinite; }
+@keyframes electric-platform-float {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -8px, 0); }
+}
+
+/* The desktop location mark belongs to the title, not the middle of its column. */
+@media (min-width: 761px) {
+  .location-top h2 .location-heading-icon {
+    width: 70px !important;
+    height: 70px !important;
+    margin: 0 0 13px !important;
+  }
+}
+
+/* Say which option is selected in words as well as with a checkmark. */
+#appointment-form .priority-choice label > span { min-height: 112px !important; }
+#appointment-form .priority-choice label > span small::after {
+  content: "TOCÁ PARA ELEGIR";
+  display: block;
+  margin-top: 10px;
+  color: #88aeb2;
+  font: 800 9px/1.2 var(--mono, monospace);
+  letter-spacing: .09em;
+}
+#appointment-form .priority-choice input:checked + span small::after {
+  content: "SELECCIONADA";
+  color: #aefaf7;
+}
+@media (max-width: 760px) {
+  .films-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 11px !important; width: 100% !important; }
+  .films-grid .film-card .film-caption { padding: 10px 0 0 !important; }
+  .films-grid .film-card .film-caption strong { font-size: clamp(13px, 3.6vw, 17px) !important; }
+  .films-grid .film-card .film-caption > a { font-size: 10px !important; }
+  #appointment-form .priority-choice label > span { min-height: 98px !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .electric-visual img { animation: none !important; }
+}

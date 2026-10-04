@@ -20,7 +20,7 @@
   const voicePlayer = new Audio();
   const AudioContextClass = window.AudioContext || window.webkitAudioContext;
   const speechCache = new Map();
-  const welcomeText = 'Hola, soy tu asistente de MOTORLOZ. Contame qué notaste en el auto para poder ayudarte y guiarte de la mejor manera, o qué mantenimiento o servicio estás buscando. Si podés, decime la marca, el modelo y el kilometraje para entender mejor de qué estamos hablando. Podés escribir o tocar el micrófono; al terminar, tocá Terminar y enviar.';
+  const welcomeText = 'Hola, soy tu asistente de MOTORLOZ. Contame qué notaste en el auto o qué servicio necesitás, y lo vemos juntos.';
   const conversationKey = 'motorloz-assistant-conversation-v1';
   let history = [];
   let conversationFacts = null;
@@ -355,7 +355,7 @@
       heading.append(brand);
       const description = document.createElement('p');
       description.className = 'assistant-welcome-description';
-      description.textContent = 'Contame qué notaste en el auto para poder ayudarte y guiarte de la mejor manera, o qué mantenimiento o servicio estás buscando. Si podés, decime la marca, el modelo y el kilometraje para entender mejor de qué estamos hablando.';
+      description.textContent = 'Contame qué notaste en el auto o qué servicio necesitás, y lo vemos juntos.';
       const voiceTip = document.createElement('div');
       voiceTip.className = 'assistant-welcome-voice';
       voiceTip.textContent = '⌁  Podés escribir o tocar el micrófono. Al terminar, tocá “Terminar y enviar”.';
@@ -512,12 +512,12 @@
       confirmedHandoff = typeof handoff === 'boolean' ? handoff : null;
       for (const item of restored) bubble(item.content, item.role);
       lastSpokenText = restored.filter(item => item.role === 'assistant').at(-1)?.content || welcomeText;
-      maybeShowBooking();
+      maybeShowBooking(confirmedHandoff === true);
     } catch {}
   }
 
   function maybeShowBooking(force = false) {
-    if (confirmedHandoff === false) { reservationPrompt.hidden = true; return; }
+    if (confirmedHandoff !== true) { reservationPrompt.hidden = true; return; }
     if (bookingDismissed) {
       if (!/\b(?:turno|reservar|agendar|coordinar)\b/i.test(history.at(-2)?.content || '')) return;
       bookingDismissed = false;
@@ -669,14 +669,14 @@
       if (result.facts && typeof result.facts === 'object') {
         conversationFacts = Object.fromEntries(['name','vehicle','year','mileage','issue','circumstances','urgency'].map(field => [field, typeof result.facts[field] === 'string' ? result.facts[field] : '']));
       }
-      confirmedHandoff = typeof result.handoffReady === 'boolean' ? result.handoffReady : null;
+      confirmedHandoff = result.handoffReady === true;
       history.push({ role: 'assistant', content: replyText });
       saveConversation();
       bubble(replyText, 'assistant');
       lastSpokenText = replyText;
       speakReply(replyText);
-      if (result.handoffReady === false) reservationPrompt.hidden = true;
-      else maybeShowBooking(Boolean(result.handoffReady));
+      if (!confirmedHandoff) reservationPrompt.hidden = true;
+      else maybeShowBooking(true);
     } catch (error) {
       pending.remove();
       if (version !== conversationVersion) return;

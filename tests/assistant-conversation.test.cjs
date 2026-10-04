@@ -64,7 +64,10 @@ test('the first greeting and successive replies speak in the same voice flow wit
     'Me llamo Ana': 'Gracias, Ana. Contame un poco más de la falla.',
     'Desde que pasé un pozo vibra la caja y se enciende la luz del motor al acelerar': 'Entiendo. Esa combinación merece revisión; Pablo o Bruno pueden evaluar el auto. ¿Querés que preparemos la consulta para WhatsApp?',
     'Puede esperar una fecha, no es urgente': 'Perfecto, lo dejo como una consulta que puede esperar una fecha coordinada.',
-    'Prepará la consulta para WhatsApp': 'Claro, podés revisar el mensaje antes de enviarlo.',
+    'Prepará la consulta para WhatsApp': {
+      reply: 'Claro, podés revisar el mensaje antes de enviarlo.', handoffReady: true,
+      facts: { name:'Ana',vehicle:'Subaru',year:'',mileage:'200.000 km aprox.',issue:'Vibración al acelerar desde que pasó un pozo; luz del motor encendida',circumstances:'Desde que pasó un pozo',urgency:'Puede esperar una fecha coordinada' }
+    },
     '¿Y si falla la voz?': 'Te sigo respondiendo por escrito.',
     'Probá otra vez la voz': 'Ahora sí, te escucho.',
     '¿Qué pasó con el cupo?': 'El chat sigue disponible por texto.',
@@ -166,6 +169,9 @@ test('the first greeting and successive replies speak in the same voice flow wit
   get('#assistant-messages').clientHeight = 500;
   deferSummary = true;
   await send('Puede esperar una fecha, no es urgente');
+  assert.equal(get('#assistant-reservation-prompt').hidden, true, 'the WhatsApp option waits for explicit confirmation even when details are known');
+  await send('Prepará la consulta para WhatsApp');
+  assert.equal(get('#assistant-reservation-prompt').hidden, false, 'the WhatsApp option appears when the customer asks for it');
   assert.equal(get('#assistant-messages').scrollTop, 1400, 'new WhatsApp UI follows after layout');
   get('#assistant-messages').clientHeight = 320;
   resizeCallbacks.forEach(callback => callback());
@@ -179,9 +185,6 @@ test('the first greeting and successive replies speak in the same voice flow wit
   assert.equal(get('#assistant-messages').children.find(item => item.className === 'assistant-summary-card'), firstCard, 'summary updates in place');
   deferSummary = false;
 
-  assert.equal(get('#assistant-reservation-prompt').hidden, false, 'the WhatsApp option appears as soon as the last missing detail arrives after a turn request');
-  await send('Prepará la consulta para WhatsApp');
-  assert.equal(get('#assistant-reservation-prompt').hidden, false, 'the WhatsApp option appears when the customer asks for it');
   const summaryCards = get('#assistant-messages').children.filter(item => item.className === 'assistant-summary-card');
   assert.ok(summaryCards.length, 'the conversation renders a real-data consultation summary before WhatsApp');
   const summaryValues = summaryCards.at(-1).children[1].children.map(row => row.children[1].textContent);

@@ -57,6 +57,75 @@ test('first messages use OpenAI too, without generic hardcoded questions',async(
   assert.doesNotMatch(body.reply,/qué notaste exactamente/i);
 });
 
+test('first BMW reply sounds like our workshop without pretending to diagnose',async()=>{
+  const {body,request}=await chat([{role:'user',content:'Tengo un BMW Serie 3 y hace ruido al frenar despacio.'}],{
+    reply:'Puede haber varias causas; habría que revisarlo. ¿Desde cuándo pasa?',coordinationIntent:'none',
+    facts:facts({vehicle:'BMW Serie 3',issue:'Ruido al frenar despacio'})
+  });
+  assert.match(request.instructions,/Sos parte del equipo de MOTORLOZ/);
+  assert.match(body.reply,/¡Pa, qué nave ese BMW!/);
+  assert.match(body.reply,/¿Desde cuándo pasa\?/);
+  assert.doesNotMatch(body.reply,/reserv|WhatsApp/i);
+});
+
+test('symptom follow-up does not turn an unrequested model offer into a booking pitch',async()=>{
+  const {body}=await chat([
+    {role:'user',content:'Tengo un BMW Serie 3 y hace ruido al frenar despacio.'},
+    {role:'assistant',content:'¿Desde cuándo pasa?'},
+    {role:'user',content:'Desde hace dos días, solo al frenar suave.'}
+  ],{
+    reply:'Gracias, ese detalle sirve para orientarnos. Si querés, coordinamos una revisión. ¿Querés que prepare la consulta por WhatsApp?',
+    coordinationIntent:'interested',facts:facts({vehicle:'BMW Serie 3',issue:'Ruido al frenar',circumstances:'Desde hace dos días, al frenar suave'})
+  });
+  assert.equal(body.handoffReady,false);
+  assert.equal(body.reply,'Gracias, ese detalle sirve para orientarnos.');
+});
+
+test('a direct request to bring the car gets a direct answer before an intake question',async()=>{
+  const {body}=await chat([
+    {role:'user',content:'Mi BMW Serie 3 hace ruido al frenar.'},
+    {role:'assistant',content:'¿Desde cuándo lo notás?'},
+    {role:'user',content:'¿Lo puedo llevar a ustedes?'}
+  ],{
+    reply:'¿Cómo te llamás?',coordinationIntent:'interested',
+    facts:facts({vehicle:'BMW Serie 3',issue:'Ruido al frenar'})
+  });
+  assert.match(body.reply,/^Sí, podés traerlo a nuestro taller para revisarlo\./);
+  assert.match(body.reply,/¿Cómo te llamás/);
+});
+
+test('a new technical question interrupts intake and receives an answer first',async()=>{
+  const {body}=await chat([
+    {role:'user',content:'Quiero coordinar una revisión por una vibración en mi Subaru.'},
+    {role:'assistant',content:'¿Cómo te llamás?'},
+    {role:'user',content:'¿Puede ser peligroso seguir manejando así?'}
+  ],{
+    reply:'Sin revisarlo no puedo saber si es seguro circular. Si la vibración es fuerte, no lo manejes y pedí asistencia.',
+    coordinationIntent:'interested',facts:facts({vehicle:'Subaru',issue:'Vibración'})
+  });
+  assert.match(body.reply,/Sin revisarlo no puedo saber/);
+  assert.doesNotMatch(body.reply,/¿Cómo te llamás/);
+});
+
+test('a referral to another workshop is rewritten as an invitation to ours',async()=>{
+  const {body}=await chat([{role:'user',content:'Mi Subaru vibra al acelerar.'}],{
+    reply:'Lo mejor sería llevarlo a un taller especializado para revisarlo. ¿Desde cuándo pasa?',
+    coordinationIntent:'none',facts:facts({vehicle:'Subaru',issue:'Vibración al acelerar'})
+  });
+  assert.match(body.reply,/nuestro taller/);
+  assert.doesNotMatch(body.reply,/un taller especializado|otro taller/i);
+});
+
+test('dangerous symptoms get clear no-driving advice in the workshop voice',async()=>{
+  const {body}=await chat([{role:'user',content:'Mi Hyundai larga mucho humo y huele a nafta. ¿Puedo manejar hasta ahí?'}],{
+    reply:'Te recomiendo que lo lleves a un taller especializado. ¿Qué modelo es?',
+    coordinationIntent:'interested',facts:facts({vehicle:'Hyundai',issue:'Humo y olor a nafta'})
+  });
+  assert.match(body.reply,/^No lo manejes hasta acá/);
+  assert.match(body.reply,/asistencia para trasladarlo a nuestro taller/);
+  assert.doesNotMatch(body.reply,/un taller especializado|qué modelo/i);
+});
+
 test('short answers lead to an explicit confirmation before the WhatsApp control',async()=>{
   const messages=[{role:'user',content:'Quiero llevar mi Subaru Impreza por un ruido al acelerar.'},
     {role:'assistant',content:'¿Qué kilometraje tiene?'},{role:'user',content:'200 mil'},
@@ -79,7 +148,7 @@ test('missing data cannot be bypassed by frontend booleans or a premature model 
   const {body}=await chat([{role:'user',content:'Quiero un turno para mi Subaru.'}],{reply:'Podés tocar el botón de WhatsApp.',coordinationIntent:'confirmed',facts:facts({vehicle:'Subaru'})},{name:true,vehicle:true,mileage:true,issue:true,urgency:true});
   assert.equal(body.handoffReady,false);
   assert.doesNotMatch(body.reply,/botón de WhatsApp/i);
-  assert.match(body.reply,/kilometraje/i,'the next required detail is explicit');
+  assert.match(body.reply,/qu[eé] le notaste|qu[eé] trabajo/i,'the next essential detail is explicit');
 });
 
 test('consultation alone never creates a handoff, even when all data is known',async()=>{
@@ -171,8 +240,8 @@ test('a scheduling question keeps urgent driving advice visible',async()=>{
     facts:facts({vehicle:'Subaru Impreza',issue:'Falla de frenos'}),coordinationIntent:'none',
     reply:'No sigas conduciendo el auto y pedí asistencia. ¿Querés coordinar una revisión?'
   });
-  assert.match(body.reply,/No sigas conduciendo/);
-  assert.match(body.reply,/kilometraje/);
+  assert.match(body.reply,/No lo manejes hasta acá/);
+  assert.match(body.reply,/¿Está detenido ahora\?/);
   assert.equal(body.handoffReady,false);
 });
 
