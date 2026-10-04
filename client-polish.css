@@ -116,3 +116,74 @@
 @media (prefers-reduced-motion: reduce) {
   .electric-visual img { animation: none !important; }
 }
+
+/* A moving teal reflection gives the Hyundai chapter depth without touching its video. */
+.hyundai-signature.section { position: relative; isolation: isolate; }
+.hyundai-signature.section::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: -12%;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 54% 43% at 23% 62%, rgba(31, 135, 148, .29), transparent 75%),
+    radial-gradient(ellipse 43% 39% at 79% 24%, rgba(24, 102, 117, .23), transparent 78%);
+  animation: hyundai-ambient-drift 15s ease-in-out infinite alternate;
+  will-change: transform;
+}
+@keyframes hyundai-ambient-drift {
+  from { transform: translate3d(-5%, 3%, 0) scale(1); }
+  to { transform: translate3d(6%, -5%, 0) scale(1.08); }
+}
+
+/* Two real faces keep the chrome emblem legible through a full 3D turn. */
+.hyundai-signature .hyundai-copy { perspective: 900px; }
+.hyundai-signature .hyundai-copy .hyundai-emblem {
+  transform-style: preserve-3d;
+  transform-origin: center;
+  animation: none !important;
+}
+.hyundai-signature .hyundai-copy .hyundai-emblem.is-intro-visible {
+  animation: hyundai-emblem-turn 12s cubic-bezier(.45, 0, .23, 1) infinite !important;
+}
+.hyundai-signature .hyundai-copy .hyundai-emblem img {
+  backface-visibility: hidden;
+  animation: hyundai-chrome-shine 5s ease-in-out infinite !important;
+}
+.hyundai-signature .hyundai-copy .hyundai-emblem img:first-child { transform: translateZ(1px); }
+.hyundai-signature .hyundai-copy .hyundai-emblem img:nth-child(2) {
+  position: absolute;
+  inset: 0;
+  height: 100% !important;
+  object-fit: contain;
+  transform: rotateY(180deg) translateZ(1px);
+}
+@keyframes hyundai-emblem-turn {
+  0%, 9% { transform: rotateY(0deg) translateY(0); }
+  34% { transform: rotateY(180deg) translateY(-4px); }
+  54%, 100% { transform: rotateY(360deg) translateY(0); }
+}
+
+/* The same conversation symbol now has a beveled face and gentle depth motion. */
+#assistant-launcher.assistant-launcher {
+  border-color: rgba(171, 243, 245, .72) !important;
+  background: linear-gradient(145deg, #23727d 0%, #0d414b 42%, #071f26 100%) !important;
+  box-shadow: 0 15px 30px rgba(0, 18, 22, .38), inset 0 2px 2px rgba(232, 255, 255, .3), inset 0 -5px 8px rgba(0, 8, 13, .5), 0 0 0 3px rgba(19, 116, 127, .15) !important;
+}
+#assistant-launcher .assistant-launcher-avatar { overflow: visible !important; transform-style: preserve-3d; }
+#assistant-launcher .assistant-launcher-avatar img {
+  width: 79% !important;
+  height: 79% !important;
+  filter: drop-shadow(0 5px 3px rgba(0, 8, 12, .48)) !important;
+  animation: assistant-mark-depth 5.2s ease-in-out infinite !important;
+}
+@keyframes assistant-mark-depth {
+  0%, 100% { transform: translateY(0) rotateY(-8deg) rotateX(4deg); }
+  50% { transform: translateY(-2px) rotateY(8deg) rotateX(-3deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hyundai-signature.section::before,
+  .hyundai-signature .hyundai-copy .hyundai-emblem.is-intro-visible,
+  .hyundai-signature .hyundai-copy .hyundai-emblem img,
+  #assistant-launcher .assistant-launcher-avatar img { animation: none !important; }
+}
