@@ -1,11 +1,11 @@
 const selected = require('./voice-styles.cjs')[1];
-const instructions = `${selected.instructions}\nEl taller MOTORLOZ se pronuncia Motor Los, dos palabras, nunca Motorola. Respetá el contenido del mensaje y su intención: en saludos y explicaciones comunes hablá con cercanía; expresá preocupación moderada solo si el texto describe un problema.`;
+const instructions = `${selected.instructions}\nEl taller MOTORLOZ se pronuncia Motor Los, dos palabras, nunca Motorola. Respetá el contenido del mensaje y su intención: en saludos y explicaciones comunes hablá con cercanía y vivacidad; expresá preocupación moderada solo si el texto describe un problema. Mantené un ritmo conversado y fluido, sin silencios largos.`;
 
 async function request(text, format, signal) {
   const upstream = await fetch('https://api.openai.com/v1/audio/speech', {
     method: 'POST', signal,
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${process.env.OPENAI_API_KEY}` },
-    body: JSON.stringify({ model: selected.model, voice: selected.voice, input: text, instructions, response_format: format })
+    body: JSON.stringify({ model: selected.model, voice: selected.voice, input: text, instructions, speed: 1.14, response_format: format })
   });
   if (!upstream.ok) {
     const detail = await upstream.json().catch(() => ({}));

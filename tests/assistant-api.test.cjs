@@ -349,6 +349,7 @@ test('serves the selected warm voice without requiring Gemini for narration', as
     assert.equal(request.input, 'Hola, soy Motor Los, Pablo Lozano.');
     assert.match(request.instructions, /rioplatense cotidiano de Montevideo/);
     assert.match(request.instructions, /nunca Motorola/);
+    assert.equal(request.speed, 1.14);
     assert.equal(res.headers['X-Voice'], 'ash');
   } finally {
     global.fetch = previousFetch;

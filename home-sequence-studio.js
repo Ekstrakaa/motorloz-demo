@@ -1,7 +1,7 @@
 'use strict';
 (() => {
   const defaults = [
-    {name:'Hyundai en movimiento',type:'video',src:'assets/cinema-hyundai-natural.mp4',thumb:'assets/clips/hyundai-home.jpg',duration:15,label:'HYUNDAI · EN MOVIMIENTO'},
+    {name:'Hyundai en movimiento',type:'video',src:'assets/cinema-hyundai-natural.mp4',thumb:'assets/clips/hyundai-home.jpg',duration:9,trimEnd:9,label:'HYUNDAI · EN MOVIMIENTO'},
     {name:'El taller en movimiento',type:'video',src:'assets/cinema-workshop-panorama.mp4',thumb:'assets/salon-panoramica-optimized.webp',duration:3.8,label:'EL TALLER · EN MOVIMIENTO'},
     {name:'Herramientas y oficio',type:'image',src:'assets/hero-herramientas.webp',thumb:'assets/hero-herramientas.webp',duration:3,label:'HERRAMIENTAS · DIAGNÓSTICO · OFICIO'},
     {name:'Mecánica de cerca',type:'video',src:'assets/motorloz-subaru-loop.mp4',thumb:'assets/hero-subaru.webp',duration:10,label:'MECÁNICA · DE CERCA'},

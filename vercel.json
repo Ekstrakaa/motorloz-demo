@@ -15,7 +15,7 @@
       "headers": [
         { "key": "X-Content-Type-Options", "value": "nosniff" },
         { "key": "X-Frame-Options", "value": "DENY" },
-        { "key": "Content-Security-Policy", "value": "default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self' 'sha256-Gaa5u2S6PRKy6RDg7oSOoP5hiWLzZh96ZrLKapgr1zk=' 'sha256-Ee1GgA/2KjEADy5S7A+SSE869Nz9aWyTjsEHL+0lH0g='; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://upload.wikimedia.org; media-src 'self' blob:; connect-src 'self'; font-src 'self' data:; frame-src https://maps.google.com; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests" },
+        { "key": "Content-Security-Policy", "value": "default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self' 'sha256-Gaa5u2S6PRKy6RDg7oSOoP5hiWLzZh96ZrLKapgr1zk=' 'sha256-iNZmMW+x4spLnff1r8gP2NqQvp41dHurYctKo6txysY='; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://upload.wikimedia.org; media-src 'self' blob:; connect-src 'self'; font-src 'self' data:; frame-src https://maps.google.com; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests" },
         { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
         { "key": "Permissions-Policy", "value": "camera=(), geolocation=(), payment=(), usb=()" },
         { "key": "X-Permitted-Cross-Domain-Policies", "value": "none" }
