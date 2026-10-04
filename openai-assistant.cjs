@@ -236,7 +236,7 @@ async function handle(req, res, action) {
       if (/cuando quieras|cuando te quede c[oó]modo|sin (?:turno|reserva)/i.test(reply)) reply = question;
       if (asksToVisitUs(latestUser) && !dangerousToDrive(latestUser) && !/^(?:s[ií]|claro|por supuesto)[,.!\s]/i.test(reply) && !/pod[eé]s traerlo a nuestro taller/i.test(reply)) {
         reply = `Sí, podés traerlo a nuestro taller para revisarlo. ${reply}`;
-      } else if (history.filter(item => item.role === 'user').length === 1 && !dangerousToDrive(latestUser)) {
+      } else if (!asksToVisitUs(latestUser) && history.filter(item => item.role === 'user').length === 1 && !dangerousToDrive(latestUser)) {
         reply = `Dale, te ayudo a coordinarlo con nuestro taller. ${reply}`;
       }
     } else if (coordinating && complete && !handoffReady && !separateQuestion) {
