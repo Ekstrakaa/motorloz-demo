@@ -259,14 +259,8 @@
   filter: drop-shadow(0 12px 19px rgba(0,0,0,.52));
 }
 .hyundai-signature .hyundai-copy .hyundai-emblem::before {
-  content: "" !important;
-  display: block !important;
-  position: absolute;
-  inset: 0;
-  background: url("assets/hyundai-logo-chrome.svg") center / contain no-repeat;
-  transform: translateZ(-5px);
-  filter: brightness(.38);
-  backface-visibility: hidden;
+  content: none !important;
+  display: none !important;
 }
 .hyundai-signature .hyundai-copy .hyundai-emblem img:first-child { transform: translateZ(5px); }
 .hyundai-signature .hyundai-copy .hyundai-emblem img:nth-child(2) { transform: rotateY(180deg) translateZ(5px); }
