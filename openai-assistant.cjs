@@ -93,7 +93,8 @@ function requestsWorkshopService(history) {
     const text = item.content.trim().replace(/^[¿¡\s]+/, '');
     if (declinedCoordination([{ role: 'user', content: text }])) return false;
     if (/^(?:cu[aá]nto|qu[eé]|c[oó]mo|por qu[eé])\b|\b(?:quiero|necesito) saber\b|\b(?:precio|cu[aá]nto sale|qu[eé] incluye)\b/i.test(text)) continue;
-    if (/\b(?:cambi[oa]r?|hacer(?:le)?|hacen|hac[eé]s|necesito|preciso|quiero|busco|reparar|arreglar|revisar)\b.{0,50}\b(?:aceite|sceite|filtros?|alineaci[oó]n|balanceo|cubiertas?|neum[aá]ticos?|mantenimiento|service|servicio|revisi[oó]n|diagn[oó]stico|frenos?|pastillas?|bater[ií]a|embrague|suspensi[oó]n)\b/i.test(text)
+    if (/\b(?:quiero|necesito|preciso|busco|quisiera|me gustar[ií]a|tengo que)\b.{0,50}\b(?:cambi\w*|hacer(?:le)?|arregl\w*|repar\w*|revis\w*|cheque\w*|diagnostic\w*|aline\w*|balance\w*)\b/i.test(text)
+      || /\b(?:cambi[oa]r?|hacer(?:le)?|hacen|hac[eé]s|necesito|preciso|quiero|busco|reparar|arreglar|revisar)\b.{0,50}\b(?:aceite|sceite|filtros?|alineaci[oó]n|balanceo|cubiertas?|neum[aá]ticos?|mantenimiento|service|servicio|revisi[oó]n|diagn[oó]stico|frenos?|pastillas?|bater[ií]a|embrague|suspensi[oó]n|correa|distribuci[oó]n|buj[ií]as|alternador|aire acondicionado|direcci[oó]n|tren delantero|escape|inyectores?)\b/i.test(text)
       || /^(?:cambio (?:de )?(?:aceite|sceite|filtros?|pastillas?)|alineaci[oó]n|balanceo|mantenimiento|service|revisi[oó]n|diagn[oó]stico|reparaci[oó]n)\b/i.test(text)
       || /\b(?:quiero|necesito|preciso|pod[eé]s|pueden)\b.{0,50}\b(?:revisarlo|revisen|verlo|lo vean|mirarlo|miren el auto|chequearlo)\b/i.test(text)) return true;
   }

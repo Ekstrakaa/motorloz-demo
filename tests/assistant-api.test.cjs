@@ -276,6 +276,8 @@ test('other concrete services do not end with a statement when a name is missing
     ['Necesito cambiar las pastillas de freno.','Cambio de pastillas'],
     ['¿Me hacen cambio de aceite?','Cambio de aceite'],
     ['Revisión de frenos','Revisión de frenos'],
+    ['Necesito cambiar la correa de distribución.','Cambio de correa de distribución'],
+    ['Quiero que me arreglen el aire acondicionado.','Reparación del aire acondicionado'],
     ['Necesito que me revisen el auto.','Revisión general']
   ]) {
     const {body}=await chat([{role:'user',content:request},{role:'assistant',content:'¿Qué auto tenés?'},{role:'user',content:'Subaru Impreza'}],{
