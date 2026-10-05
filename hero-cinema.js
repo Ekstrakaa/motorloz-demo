@@ -3,14 +3,13 @@
 (() => {
   const root = document.querySelector('.hero-cinema');
   if (!root) return;
-
   const frames = [...root.querySelectorAll('.cinema-frame')];
   const counter = document.querySelector('#hero-counter');
   const label = document.querySelector('#hero-photo-label');
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
   const defaults = [
-    // The source revisits its opening shot after nine seconds; leave on the first pass.
-    { type: 'video', src: 'assets/cinema-hyundai-natural.mp4', poster: 'assets/clips/hyundai-home.jpg', duration: 9000, end: 9, label: 'HYUNDAI, EN MOVIMIENTO' },
+    // This source repeats its opening after nine seconds. Show one clean pass.
+    { type: 'video', src: 'assets/cinema-hyundai-natural.mp4', poster: 'assets/clips/hyundai-home.jpg', duration: 8700, end: 8.7, label: 'HYUNDAI, EN MOVIMIENTO' },
     { type: 'video', src: 'assets/cinema-workshop-panorama.mp4', poster: 'assets/salon-panoramica-optimized.webp', duration: 3800, label: 'EL TALLER, EN MOVIMIENTO' },
     { type: 'image', src: 'assets/hero-herramientas.webp', focus: '48% 48%', zoomStart: 1.025, zoomEnd: 1.07, duration: 3000, label: 'HERRAMIENTAS, DIAGNÓSTICO Y OFICIO' },
     { type: 'video', src: 'assets/motorloz-subaru-loop.mp4', poster: 'assets/hero-subaru.webp', duration: 10000, label: 'MECÁNICA, DE CERCA' },
@@ -18,7 +17,8 @@
     { type: 'image', src: 'assets/hero-subaru-azul.webp?v=privacy1', focus: '50% 52%', zoomStart: 1.015, zoomEnd: 1.055, duration: 3000, label: 'SUBARU, EN EL CORAZÓN' }
   ];
   let sequence = defaults;
-  if (new URLSearchParams(location.search).has('montaje')) {
+  const params = new URLSearchParams(location.search);
+  if (params.has('montaje')) {
     try {
       const draft = JSON.parse(localStorage.getItem('motorloz-home-sequence-draft-v1'));
       if (Array.isArray(draft) && draft.length) {
@@ -27,159 +27,162 @@
           const item = allowed.get(scene.src?.split('?')[0]);
           if (!item || scene.type !== item.type) return null;
           const duration = Math.min(30, Math.max(1, Number(scene.duration) || (item.type === 'video' ? 10 : 3)));
-          return {...item, duration: duration * 1000,
-            focus: `${Math.min(100,Math.max(0,Number(scene.focusX) || 50))}% ${Math.min(100,Math.max(0,Number(scene.focusY) || 50))}%`,
-            start: Math.max(0,Number(scene.trimStart) || 0),
-            end: scene.trimEnd == null ? null : Math.max(0,Number(scene.trimEnd) || 0),
-            transition: Math.max(0,Math.min(1.5,Number(scene.transition) || 0))};
+          return { ...item, duration: duration * 1000,
+            focus: `${Math.min(100, Math.max(0, Number(scene.focusX) || 50))}% ${Math.min(100, Math.max(0, Number(scene.focusY) || 50))}%`,
+            start: Math.max(0, Number(scene.trimStart) || 0),
+            end: scene.trimEnd == null ? null : Math.max(0, Number(scene.trimEnd) || 0),
+            transition: Math.max(0, Math.min(1.5, Number(scene.transition) || 0)) };
         }).filter(Boolean);
         if (preview.length) sequence = preview;
       }
-    } catch { /* A saved draft is optional; the published sequence stays available. */ }
+    } catch { /* The optional editor draft must never interrupt the published home. */ }
   }
 
-  let index = 0;
+  const requested = Number(params.get('scene'));
+  let index = Number.isInteger(requested) && requested >= 1 && requested <= sequence.length ? requested - 1 : 0;
   let active = 0;
-  let timer = 0;
   let visible = true;
-  let transitionToken = 0;
   let transitioning = false;
-  let player = null;
-  let playerSource = '';
-  const requestedScene = Number(new URLSearchParams(location.search).get('scene'));
-  if (Number.isInteger(requestedScene) && requestedScene >= 1 && requestedScene <= sequence.length) index = requestedScene - 1;
+  let timer = 0;
+  let token = 0;
 
-  const video = document.createElement('video');
-  video.className = 'cinema-media cinema-single-video';
-  video.muted = video.defaultMuted = true;
-  video.controls = false;
-  video.playsInline = true;
-  video.autoplay = true;
-  video.preload = 'auto';
-  video.tabIndex = -1;
-  video.setAttribute('muted', '');
-  video.setAttribute('playsinline', '');
-  video.setAttribute('webkit-playsinline', '');
-  video.setAttribute('autoplay', '');
-  video.removeAttribute('controls');
-  root.append(video);
-
+  function canPlay() {
+    return visible && !document.hidden && !document.documentElement?.classList.contains('assistant-chat-open');
+  }
+  function currentVideo() { return frames[active].querySelector('video'); }
+  function syncPlayback() {
+    const video = currentVideo();
+    if (!video) return;
+    if (canPlay() && !reducedMotion.matches && !video.ended) video.play().catch(() => {});
+    else video.pause();
+  }
   function updateMeta() {
-    const scene = sequence[index];
-    counter.textContent = `${String(index + 1).padStart(2, '0')} / ${String(sequence.length).padStart(2, '0')}`;
-    label.textContent = scene.label;
-    root.setAttribute('aria-label', scene.label);
-    root.dataset.currentKind = scene.type;
+    const item = sequence[index];
+    if (counter) counter.textContent = `${String(index + 1).padStart(2, '0')} / ${String(sequence.length).padStart(2, '0')}`;
+    if (label) label.textContent = item.label;
+    root.setAttribute('aria-label', item.label);
+    root.dataset.currentKind = item.type;
   }
-
   function clearFrame(frame) {
-    frame.querySelectorAll('img').forEach(image => image.remove());
+    frame.querySelector('video')?.pause();
     frame.replaceChildren();
+    frame.style.backgroundImage = '';
   }
-
-  function render(frame, item) {
+  function still(frame, src) {
+    const image = new Image();
+    image.className = 'cinema-media';
+    image.src = src;
+    image.alt = '';
+    image.decoding = 'async';
+    frame.append(image);
+    return image.decode?.().catch(() => {}) || Promise.resolve();
+  }
+  function prepare(frame, item) {
     clearFrame(frame);
     frame.dataset.kind = item.type;
-    frame.style.backgroundImage = item.type === 'image' ? `url("${item.src}")` : `url("${item.poster}")`;
+    frame.style.backgroundImage = `url("${item.type === 'image' ? item.src : item.poster}")`;
     frame.style.backgroundPosition = item.focus || 'center';
     frame.style.setProperty('--cinema-focus', item.focus || '50% 50%');
     frame.style.setProperty('--cinema-zoom-start', item.zoomStart || 1);
     frame.style.setProperty('--cinema-zoom-end', item.zoomEnd || 1.025);
+    if (item.type === 'image' || reducedMotion.matches) return still(frame, item.type === 'image' ? item.src : item.poster);
 
-    if (item.type === 'image' || reducedMotion.matches) {
-      const image = new Image();
-      image.className = 'cinema-media';
-      image.src = item.type === 'image' ? item.src : item.poster;
-      image.alt = '';
-      image.decoding = 'async';
-      frame.append(image);
-    } else {
-      video.poster = item.poster;
-    }
-  }
-
-  function shouldPlay() {
-    return visible && frames[active].classList.contains('is-current') && sequence[index].type === 'video' && !reducedMotion.matches;
-  }
-
-  function syncVideo(item = sequence[index]) {
-    if (reducedMotion.matches || item.type !== 'video') {
-      video.classList.remove('is-visible');
-      player?.sync();
-      return;
-    }
-    if (!player) {
-      player = window.MOTORLOZ_VIDEO(video, {
-        source: item.src,
-        shouldPlay,
-        onPlaying: () => video.classList.toggle('is-visible', shouldPlay())
-      });
-      // Each clip has one uninterrupted pass. Rewinding short assets inside a
-      // longer scene looked like a stall, particularly on mobile Safari.
-      video.addEventListener('ended', () => { if (shouldPlay()) advance(); });
-      video.addEventListener('timeupdate', () => {
-        const item = sequence[index];
-        if (shouldPlay() && item.end && video.currentTime >= item.end - .06) advance();
-      });
-      video.addEventListener('loadedmetadata', () => {
-        if (shouldPlay() && sequence[index].start) video.currentTime = sequence[index].start;
-      });
-      playerSource = item.src;
-    } else if (playerSource !== item.src) {
-      playerSource = item.src;
-      video.classList.remove('is-visible');
-      player.setSource(item.src, item.playbackRate || 1);
-    }
+    // Decode the incoming clip behind the outgoing frame. Never crossfade to a
+    // still and then replace that still with moving footage after the fade.
+    const video = document.createElement('video');
+    video.className = 'cinema-media';
+    video.muted = video.defaultMuted = true;
+    video.playsInline = true;
+    video.preload = 'auto';
+    video.loop = false;
+    video.poster = item.poster;
+    video.setAttribute('muted', '');
+    video.setAttribute('playsinline', '');
+    video.setAttribute('webkit-playsinline', '');
+    video.setAttribute('disablepictureinpicture', '');
+    video.src = item.src;
     video.playbackRate = video.defaultPlaybackRate = item.playbackRate || 1;
-    if (shouldPlay()) player.sync();
+    video.addEventListener('ended', () => { if (currentVideo() === video && !transitioning) advance(); });
+    video.addEventListener('timeupdate', () => {
+      if (currentVideo() === video && item.end && video.currentTime >= item.end - .08 && !transitioning) advance();
+    });
+    frame.append(video);
+    return new Promise(resolve => {
+      let settled = false;
+      const timeout = window.setTimeout(() => finish(false), 4500);
+      function finish(ready) {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timeout);
+        video.removeEventListener('loadeddata', loaded);
+        video.removeEventListener('error', failed);
+        if (!ready) { video.pause(); video.remove(); still(frame, item.poster).then(resolve); }
+        else resolve();
+      }
+      function loaded() {
+        if (item.start && Number.isFinite(video.duration) && item.start < video.duration) {
+          video.currentTime = item.start;
+          video.addEventListener('seeked', () => finish(true), { once: true });
+        } else finish(true);
+      }
+      function failed() { finish(false); }
+      video.addEventListener('loadeddata', loaded, { once: true });
+      video.addEventListener('error', failed, { once: true });
+      video.load();
+      // iOS may withhold loadeddata from a muted clip until playback is requested.
+      video.play().catch(() => {});
+      if (video.readyState >= 2) loaded();
+    });
   }
-
   function schedule() {
     clearTimeout(timer);
-    if (!visible || document.hidden || reducedMotion.matches) return;
+    if (!visible || document.hidden || reducedMotion.matches || transitioning) return;
     timer = window.setTimeout(advance, sequence[index].duration);
   }
-
-  function advance(step = 1) {
-    if (transitioning) return;
+  async function advance(step = 1) {
+    if (transitioning || !visible || document.hidden) return;
     transitioning = true;
-    const token = ++transitionToken;
     clearTimeout(timer);
-    const nextIndex = (index + step + sequence.length) % sequence.length;
-    const incoming = active === 0 ? 1 : 0;
+    currentVideo()?.pause();
+    const turn = ++token;
+    const incoming = 1 - active;
     const outgoing = active;
-    render(frames[incoming], sequence[nextIndex]);
-    root.style.setProperty('--scene-fade', `${sequence[index].transition ?? 1.25}s`);
+    const fadeSeconds = sequence[index].transition ?? 1.25;
+    const next = (index + step + sequence.length) % sequence.length;
+    const item = sequence[next];
     frames[incoming].setAttribute('aria-hidden', 'true');
-
-    requestAnimationFrame(() => requestAnimationFrame(() => {
-      if (token !== transitionToken) return;
-      frames[incoming].classList.add('is-current');
-      frames[incoming].removeAttribute('aria-hidden');
-      frames[outgoing].classList.remove('is-current');
-      frames[outgoing].setAttribute('aria-hidden', 'true');
-      window.setTimeout(() => {
-        if (token === transitionToken && !frames[outgoing].classList.contains('is-current')) clearFrame(frames[outgoing]);
-      }, 1500);
-      active = incoming;
-      index = nextIndex;
-      updateMeta();
+    await prepare(frames[incoming], item);
+    if (turn !== token) return;
+    root.style.setProperty('--scene-fade', `${fadeSeconds}s`);
+    frames[incoming].classList.add('is-current');
+    frames[incoming].removeAttribute('aria-hidden');
+    frames[outgoing].classList.remove('is-current');
+    frames[outgoing].setAttribute('aria-hidden', 'true');
+    active = incoming;
+    index = next;
+    updateMeta();
+    syncPlayback();
+    window.setTimeout(() => {
+      if (turn !== token) return;
+      clearFrame(frames[outgoing]);
       transitioning = false;
-      syncVideo(sequence[index]);
       schedule();
-    }));
+    }, fadeSeconds * 1000 + 60);
   }
 
-  render(frames[0], sequence[index]);
   updateMeta();
-  if (sequence[index].type === 'video' && !reducedMotion.matches) syncVideo(sequence[index]);
-  schedule();
-
-  reducedMotion.addEventListener?.('change', () => { render(frames[active], sequence[index]); syncVideo(sequence[index]); schedule(); });
+  prepare(frames[active], sequence[index]).then(() => { root.classList.add('is-ready'); syncPlayback(); schedule(); });
+  reducedMotion.addEventListener?.('change', () => {
+    ++token;
+    transitioning = false;
+    clearTimeout(timer);
+    prepare(frames[active], sequence[index]).then(() => { syncPlayback(); schedule(); });
+  });
   new IntersectionObserver(entries => {
     visible = entries[0].isIntersecting;
-    syncVideo(sequence[index]);
+    syncPlayback();
     schedule();
   }, { threshold: .12 }).observe(root);
-  document.addEventListener('visibilitychange', () => { syncVideo(sequence[index]); schedule(); });
+  document.addEventListener('visibilitychange', () => { syncPlayback(); schedule(); });
+  window.addEventListener?.('motorloz:chat-visibility', syncPlayback);
 })();

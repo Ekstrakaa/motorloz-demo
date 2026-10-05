@@ -121,10 +121,29 @@
     }, { threshold: .35 });
     emblemObserver.observe(hyundaiEmblem);
   }
-  rotateImages('[data-hyundai-carousel]', '.hyundai-image', slide => slide.classList.contains('hyundai-video-slide') ? 5000 : 3000, (i, n) => {
-    const count = document.querySelector('[data-hyundai-carousel] .hyundai-image.is-active .hyundai-image-index b');
-    if (count) count.textContent = `${String(i + 1).padStart(2, '0')} / ${String(n).padStart(2, '0')}`;
-  });
+  // The official Hyundai film is one uninterrupted pass, never a rotating set of clips.
+  const hyundaiFilm = hyundaiGallery?.querySelector('video');
+  if (hyundaiFilm) {
+    let visible = false;
+    let finished = false;
+    hyundaiFilm.loop = false;
+    hyundaiFilm.removeAttribute('loop');
+    hyundaiFilm.addEventListener('ended', () => { finished = true; });
+    const syncFilm = () => {
+      if (!visible || document.hidden || finished) { hyundaiFilm.pause(); return; }
+      hyundaiFilm.play().catch(() => {});
+    };
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(entries => {
+        visible = entries[0].isIntersecting;
+        syncFilm();
+      }, { threshold: .12 }).observe(hyundaiGallery);
+    } else {
+      visible = true;
+      syncFilm();
+    }
+    document.addEventListener('visibilitychange', syncFilm);
+  }
   const diagLabels = ['ATENCIÓN TOYOTA GR', 'DETALLE · TOYOTA GR', 'CORVETTE · TALLER', 'MOTOR PORSCHE · REVISIÓN'];
   rotateImages('[data-diagnostic-carousel]', '.diagnostic-feature-stage img', 4300, (i, n) => {
     const label = document.querySelector('[data-diagnostic-caption]');

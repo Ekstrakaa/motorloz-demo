@@ -105,9 +105,11 @@
 }
 #services-track .service-card:nth-child(7) > img,
 #services-track .service-card:nth-child(9) > img {
-  aspect-ratio: auto !important;
-  object-fit: contain !important;
+  aspect-ratio: 1.72 / 1 !important;
+  object-fit: cover !important;
 }
+#services-track .service-card:nth-child(7) > img { object-position: 50% 62% !important; }
+#services-track .service-card:nth-child(9) > img { object-position: 50% 100% !important; }
 #services-track .service-photo-meta {
   position: absolute !important;
   z-index: 2 !important;

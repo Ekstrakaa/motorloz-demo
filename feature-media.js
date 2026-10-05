@@ -26,17 +26,27 @@
   function setUpPhotoRail(railSelector, cardSelector, previousSelector, nextSelector) {
     const rail = document.querySelector(railSelector);
     const cards = rail ? [...rail.querySelectorAll(cardSelector)] : [];
-    if (!cards.length) return;
+    if (cards.length < 2) return;
+    // Two clones preserve both the visible photo and the next-photo peek at wrap.
+    const loopCards = cards.slice(0, 2).map(card => {
+      const clone = card.cloneNode(true);
+      clone.classList.add('is-loop-clone');
+      clone.setAttribute('aria-hidden', 'true');
+      clone.querySelectorAll('img').forEach(image => { image.loading = 'eager'; image.alt = ''; });
+      rail.append(clone);
+      return clone;
+    });
+    const loopCard = loopCards[0];
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
     const previousButton = document.querySelector(previousSelector);
     const nextButton = document.querySelector(nextSelector);
     let visible = !('IntersectionObserver' in window);
     let pausedUntil = 0;
     let activeIndex = 0;
-    let direction = 1;
     let animationFrame = 0;
     let settleTimer = 0;
     const cardLeft = card => card.getBoundingClientRect().left - rail.getBoundingClientRect().left + rail.scrollLeft;
+    const padding = () => parseFloat(getComputedStyle(rail).paddingLeft) || 0;
     const closestIndex = () => {
       return cards.reduce((best, card, index) => {
         const distance = Math.abs(cardLeft(card) - rail.scrollLeft);
@@ -51,7 +61,7 @@
     const warmAround = index => { warm(index); warm(index + 1); warm(index - 1); };
     const updateButtons = () => {
       if (previousButton) previousButton.disabled = activeIndex === 0;
-      if (nextButton) nextButton.disabled = activeIndex === cards.length - 1;
+      if (nextButton) nextButton.disabled = false;
     };
     const stopAnimation = () => {
       cancelAnimationFrame(animationFrame);
@@ -66,15 +76,16 @@
       updateButtons();
     };
     const moveTo = index => {
-      const target = Math.max(0, Math.min(cards.length - 1, index));
+      const wrapping = index >= cards.length;
+      const target = wrapping ? 0 : Math.max(0, Math.min(cards.length - 1, index));
+      const destination = wrapping ? loopCard : cards[target];
       activeIndex = target;
       warmAround(target);
       updateButtons();
       stopAnimation();
-      const padding = parseFloat(getComputedStyle(rail).paddingLeft) || 0;
-      const left = Math.max(0, Math.min(rail.scrollWidth - rail.clientWidth, cardLeft(cards[target]) - padding));
+      const left = Math.max(0, Math.min(rail.scrollWidth - rail.clientWidth, cardLeft(destination) - padding()));
       if (reducedMotion.matches) {
-        rail.scrollTo({ left, behavior: 'instant' });
+        rail.scrollTo({ left: wrapping ? 0 : left, behavior: 'instant' });
         return;
       }
       const from = rail.scrollLeft;
@@ -84,13 +95,14 @@
       rail.style.scrollSnapType = 'none';
       rail.style.scrollBehavior = 'auto';
       const animate = now => {
-        const progress = Math.min(1, (now - start) / 900);
+        const progress = Math.min(1, (now - start) / 850);
         const eased = progress < .5 ? 4 * progress ** 3 : 1 - (-2 * progress + 2) ** 3 / 2;
         rail.scrollLeft = from + distance * eased;
         if (progress < 1) animationFrame = requestAnimationFrame(animate);
         else {
           animationFrame = 0;
           rail.scrollLeft = left;
+          if (wrapping) rail.scrollLeft = 0;
           rail.style.scrollSnapType = '';
           rail.style.scrollBehavior = '';
         }
@@ -105,6 +117,17 @@
       if (animationFrame) return;
       clearTimeout(settleTimer);
       settleTimer = setTimeout(() => {
+        const secondCloneStart = cardLeft(loopCards[1]) - padding();
+        const firstCloneStart = cardLeft(loopCard) - padding();
+        if (rail.scrollLeft >= secondCloneStart - 5) {
+          rail.style.scrollSnapType = 'none';
+          rail.scrollLeft = cardLeft(cards[1]) - padding();
+          requestAnimationFrame(() => { rail.style.scrollSnapType = ''; });
+        } else if (rail.scrollLeft >= firstCloneStart - 5) {
+          rail.style.scrollSnapType = 'none';
+          rail.scrollLeft = 0;
+          requestAnimationFrame(() => { rail.style.scrollSnapType = ''; });
+        }
         activeIndex = closestIndex();
         warmAround(activeIndex);
         updateButtons();
@@ -131,10 +154,8 @@
     updateButtons();
     window.setInterval(() => {
       if (!visible || document.hidden || reducedMotion.matches || Date.now() < pausedUntil || animationFrame) return;
-      if (activeIndex === cards.length - 1) direction = -1;
-      else if (activeIndex === 0) direction = 1;
-      moveTo(activeIndex + direction);
-    }, 4800);
+      moveTo(activeIndex + 1);
+    }, 3000);
   }
   setUpPhotoRail('.workshop-photo-rail', '.workshop-photo-card', '[data-workshop-prev]', '[data-workshop-next]');
   setUpPhotoRail('.hyundai-photo-rail', '.hyundai-photo-card', '[data-hyundai-prev]', '[data-hyundai-next]');
