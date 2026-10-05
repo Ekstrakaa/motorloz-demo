@@ -5,6 +5,7 @@
   const targets = candidates.filter(node =>
     !node.matches('.engine-sketch') &&
     !node.closest('.hero') &&
+    !node.closest('.workshop-photo-rail,.hyundai-photo-rail') &&
     (node.querySelector('img,video') || node.matches('img,video')) &&
     !candidates.some(other => other !== node && other.contains(node))
   );
