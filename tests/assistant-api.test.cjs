@@ -381,6 +381,25 @@ test('a scheduling question keeps urgent driving advice visible',async()=>{
   assert.equal(body.handoffReady,false);
 });
 
+test('a dangerous driving warning persists through scheduling and WhatsApp handoff',async()=>{
+  const history=[
+    {role:'user',content:'Necesito que me revisen los frenos, el pedal se va muy abajo'},
+    {role:'assistant',content:'No lo manejes hasta acá. ¿Está detenido ahora?'},
+    {role:'user',content:'Sí, está detenido. Es un Volkswagen Gol 2016. Quiero coordinar una revisión.'}
+  ];
+  const vehicleFacts=facts({vehicle:'Volkswagen Gol',year:'2016',issue:'El pedal de freno se va muy abajo'});
+  const next=await chat(history,{facts:vehicleFacts,coordinationIntent:'interested',reply:'Perfecto, podés traerlo a nuestro taller para revisar los frenos. ¿Me decís tu nombre para preparar la solicitud por WhatsApp?'});
+  assert.match(next.body.reply,/si llega en grúa/i);
+  assert.doesNotMatch(next.body.reply,/podés traerlo/i);
+  assert.match(next.body.reply,/nombre/i);
+  const ready=await chat([...history,{role:'assistant',content:next.body.reply},{role:'user',content:'Soy Lucía Pérez, sí, preparala'}],{
+    facts:facts({...vehicleFacts,name:'Lucía Pérez'}),coordinationIntent:'confirmed',reply:'Listo.'
+  });
+  assert.equal(ready.body.handoffReady,true);
+  assert.match(ready.body.reply,/Revisar en WhatsApp/);
+  assert.match(ready.body.reply,/No lo manejes hasta acá/i);
+});
+
 test('serves the selected warm voice without requiring Gemini for narration', async () => {
   process.env.OPENAI_API_KEY = 'test-key';
   const geminiKey = process.env.GEMINI_API_KEY;
