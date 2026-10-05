@@ -7,7 +7,7 @@
     video.controls = false;
     video.removeAttribute('controls');
     const player = window.MOTORLOZ_VIDEO?.(video, {
-      source: 'assets/clips/subaru-section.mp4',
+      source: 'assets/cinema-subaru-natural.mp4',
       shouldPlay: () => visible,
     });
     let visible = false;
@@ -27,16 +27,6 @@
     const rail = document.querySelector(railSelector);
     const cards = rail ? [...rail.querySelectorAll(cardSelector)] : [];
     if (cards.length < 2) return;
-    // Two clones preserve both the visible photo and the next-photo peek at wrap.
-    const loopCards = cards.slice(0, 2).map(card => {
-      const clone = card.cloneNode(true);
-      clone.classList.add('is-loop-clone');
-      clone.setAttribute('aria-hidden', 'true');
-      clone.querySelectorAll('img').forEach(image => { image.loading = 'eager'; image.alt = ''; });
-      rail.append(clone);
-      return clone;
-    });
-    const loopCard = loopCards[0];
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
     const previousButton = document.querySelector(previousSelector);
     const nextButton = document.querySelector(nextSelector);
@@ -45,8 +35,12 @@
     let activeIndex = 0;
     let animationFrame = 0;
     let settleTimer = 0;
+    let wrapTimer = 0;
+    let wrapping = false;
+    let touchStart = null;
     const cardLeft = card => card.getBoundingClientRect().left - rail.getBoundingClientRect().left + rail.scrollLeft;
     const padding = () => parseFloat(getComputedStyle(rail).paddingLeft) || 0;
+    const maxScroll = () => Math.max(0, rail.scrollWidth - rail.clientWidth);
     const closestIndex = () => {
       return cards.reduce((best, card, index) => {
         const distance = Math.abs(cardLeft(card) - rail.scrollLeft);
@@ -58,14 +52,22 @@
       const image = cards[index]?.querySelector('img');
       if (image && image.loading === 'lazy') image.loading = 'eager';
     };
-    const warmAround = index => { warm(index); warm(index + 1); warm(index - 1); };
+    const warmAround = index => {
+      warm(index);
+      warm((index + 1) % cards.length);
+      warm((index - 1 + cards.length) % cards.length);
+    };
     const updateButtons = () => {
-      if (previousButton) previousButton.disabled = activeIndex === 0;
+      if (previousButton) previousButton.disabled = false;
       if (nextButton) nextButton.disabled = false;
     };
     const stopAnimation = () => {
       cancelAnimationFrame(animationFrame);
+      clearTimeout(wrapTimer);
       animationFrame = 0;
+      wrapping = false;
+      rail.style.transition = '';
+      rail.style.opacity = '';
       rail.style.scrollSnapType = '';
       rail.style.scrollBehavior = '';
     };
@@ -76,16 +78,37 @@
       updateButtons();
     };
     const moveTo = index => {
-      const wrapping = index >= cards.length;
-      const target = wrapping ? 0 : Math.max(0, Math.min(cards.length - 1, index));
-      const destination = wrapping ? loopCard : cards[target];
+      const shouldWrap = index < 0 || index >= cards.length;
+      const target = (index + cards.length) % cards.length;
       activeIndex = target;
       warmAround(target);
       updateButtons();
       stopAnimation();
-      const left = Math.max(0, Math.min(rail.scrollWidth - rail.clientWidth, cardLeft(destination) - padding()));
+      const left = Math.max(0, Math.min(maxScroll(), cardLeft(cards[target]) - padding()));
+      if (shouldWrap) {
+        if (reducedMotion.matches) { rail.scrollLeft = left; return; }
+        wrapping = true;
+        rail.style.transition = 'opacity 180ms ease';
+        rail.style.opacity = '0';
+        wrapTimer = setTimeout(() => {
+          rail.style.scrollSnapType = 'none';
+          rail.style.scrollBehavior = 'auto';
+          rail.scrollLeft = left;
+          requestAnimationFrame(() => {
+            rail.style.opacity = '1';
+            wrapTimer = setTimeout(() => {
+              wrapping = false;
+              rail.style.transition = '';
+              rail.style.opacity = '';
+              rail.style.scrollSnapType = '';
+              rail.style.scrollBehavior = '';
+            }, 190);
+          });
+        }, 190);
+        return;
+      }
       if (reducedMotion.matches) {
-        rail.scrollTo({ left: wrapping ? 0 : left, behavior: 'instant' });
+        rail.scrollLeft = left;
         return;
       }
       const from = rail.scrollLeft;
@@ -102,7 +125,6 @@
         else {
           animationFrame = 0;
           rail.scrollLeft = left;
-          if (wrapping) rail.scrollLeft = 0;
           rail.style.scrollSnapType = '';
           rail.style.scrollBehavior = '';
         }
@@ -112,22 +134,32 @@
     previousButton?.addEventListener('click', () => { pauseForInteraction(); moveTo(activeIndex - 1); });
     nextButton?.addEventListener('click', () => { pauseForInteraction(); moveTo(activeIndex + 1); });
     rail.addEventListener('pointerdown', pauseForInteraction);
-    rail.addEventListener('wheel', pauseForInteraction, { passive: true });
+    rail.addEventListener('touchstart', event => {
+      touchStart = { x: event.touches[0]?.clientX, left: rail.scrollLeft, index: closestIndex() };
+    }, { passive: true });
+    rail.addEventListener('touchend', event => {
+      if (!touchStart) return;
+      const delta = event.changedTouches[0]?.clientX - touchStart.x;
+      const stayedAtEdge = Math.abs(rail.scrollLeft - touchStart.left) < 8;
+      if (stayedAtEdge && delta < -55 && touchStart.index === cards.length - 1 && rail.scrollLeft >= maxScroll() - 8) moveTo(cards.length);
+      else if (stayedAtEdge && delta > 55 && touchStart.index === 0 && rail.scrollLeft <= 8) moveTo(-1);
+      touchStart = null;
+    }, { passive: true });
+    rail.addEventListener('wheel', event => {
+      pauseForInteraction();
+      if (Math.abs(event.deltaX) < 20 || Math.abs(event.deltaX) <= Math.abs(event.deltaY)) return;
+      if (event.deltaX > 0 && activeIndex === cards.length - 1 && rail.scrollLeft >= maxScroll() - 8) {
+        event.preventDefault();
+        moveTo(cards.length);
+      } else if (event.deltaX < 0 && activeIndex === 0 && rail.scrollLeft <= 8) {
+        event.preventDefault();
+        moveTo(-1);
+      }
+    }, { passive: false });
     rail.addEventListener('scroll', () => {
-      if (animationFrame) return;
+      if (animationFrame || wrapping) return;
       clearTimeout(settleTimer);
       settleTimer = setTimeout(() => {
-        const secondCloneStart = cardLeft(loopCards[1]) - padding();
-        const firstCloneStart = cardLeft(loopCard) - padding();
-        if (rail.scrollLeft >= secondCloneStart - 5) {
-          rail.style.scrollSnapType = 'none';
-          rail.scrollLeft = cardLeft(cards[1]) - padding();
-          requestAnimationFrame(() => { rail.style.scrollSnapType = ''; });
-        } else if (rail.scrollLeft >= firstCloneStart - 5) {
-          rail.style.scrollSnapType = 'none';
-          rail.scrollLeft = 0;
-          requestAnimationFrame(() => { rail.style.scrollSnapType = ''; });
-        }
         activeIndex = closestIndex();
         warmAround(activeIndex);
         updateButtons();

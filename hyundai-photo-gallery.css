@@ -196,3 +196,65 @@
 @media (prefers-reduced-motion: reduce) {
   .hyundai-signature .hyundai-copy .hyundai-emblem.is-intro-visible { animation: none !important; }
 }
+
+/* One measured turn followed by a short rest; the original chrome mark stays unobstructed. */
+.hyundai-signature .hyundai-copy .hyundai-emblem.is-intro-visible {
+  animation: hyundai-measured-turn 4.25s infinite !important;
+  filter: drop-shadow(0 14px 22px rgba(0, 0, 0, .42)) drop-shadow(0 0 9px rgba(124, 218, 229, .16));
+}
+.hyundai-signature .hyundai-copy .hyundai-emblem.is-intro-visible img {
+  animation: hyundai-chrome-shine 5.5s ease-in-out infinite !important;
+}
+@keyframes hyundai-measured-turn {
+  0% { transform: rotateY(0deg); animation-timing-function: cubic-bezier(.45, 0, .2, 1); }
+  51%, 100% { transform: rotateY(360deg); }
+}
+
+/* Both feature films have the same 16:9 frame as their complete local sources. */
+.hyundai-signature .hyundai-gallery .hyundai-image > video,
+.subaru-section .subaru-feature-video {
+  object-fit: contain !important;
+  object-position: center !important;
+  background: #071114 !important;
+}
+
+/* Give the official Hyundai service a branded, readable entry point on the home screen. */
+.hero-signal .hero-hyundai-link {
+  display: grid !important;
+  grid-template-columns: 44px minmax(0, 1fr) 27px;
+  align-items: center;
+  gap: 12px;
+  width: min(100%, 372px);
+  min-height: 66px !important;
+  padding: 9px 11px 9px 13px !important;
+  border-radius: 12px !important;
+  background: linear-gradient(116deg, rgba(13, 76, 87, .96), rgba(4, 35, 44, .97)) !important;
+  box-shadow: 0 15px 34px rgba(0, 9, 13, .36), inset 0 1px rgba(232, 255, 255, .23) !important;
+  white-space: normal !important;
+}
+.hero-signal .hero-hyundai-link > img {
+  display: block;
+  width: 44px;
+  height: 32px;
+  object-fit: contain;
+  filter: drop-shadow(0 3px 5px rgba(0, 0, 0, .38));
+}
+.hero-signal .hero-hyundai-copy { display: grid; gap: 4px; min-width: 0; }
+.hero-signal .hero-hyundai-copy strong {
+  color: #f4ffff;
+  font: 760 11px/1.15 var(--mono, monospace);
+  letter-spacing: .07em;
+}
+.hero-signal .hero-hyundai-copy small {
+  color: #add9dc;
+  font: 500 10px/1.2 "Segoe UI", Arial, sans-serif;
+  letter-spacing: .015em;
+}
+@media (max-width: 760px) {
+  .hero-signal .hero-hyundai-link { width: min(100%, 350px); min-height: 60px !important; }
+  .hero-signal .hero-hyundai-copy strong { font-size: 10px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hyundai-signature .hyundai-copy .hyundai-emblem.is-intro-visible,
+  .hyundai-signature .hyundai-copy .hyundai-emblem.is-intro-visible img { animation: none !important; }
+}

@@ -61,7 +61,7 @@ test('the next home video is ready before the outgoing footage fades', async () 
   first.dispatch('loadeddata');
   await flush();
   assert.equal(h.root.classList.contains('is-ready'), true);
-  h.fire(8700);
+  h.fire(15000);
   const second = h.frames[1].querySelector('video');
   assert.equal(second.src, 'assets/cinema-workshop-panorama.mp4');
   assert.equal(h.frames[0].classList.contains('is-current'), true);
@@ -80,7 +80,7 @@ test('the home sequence moves from a video to a photo with a three-second hold',
   const h = setup();
   h.frames[0].querySelector('video').dispatch('loadeddata');
   await flush();
-  h.fire(8700);
+  h.fire(15000);
   h.frames[1].querySelector('video').dispatch('loadeddata');
   await flush();
   h.fire(1310);
@@ -96,5 +96,6 @@ test('Hyundai official section has one film, outside the photo rail', () => {
   const official = html.match(/<div class="hyundai-gallery"[\s\S]*?<\/div>/)?.[0] || '';
   assert.equal((official.match(/<video\b/g) || []).length, 1);
   assert.equal((official.match(/hyundai-video-slide/g) || []).length, 1);
-  assert.ok(official.includes('hyundai-service-reveal.mp4'));
+  assert.ok(official.includes('cinema-hyundai-natural.mp4'));
+  assert.ok(html.includes('cinema-subaru-natural.mp4'));
 });
