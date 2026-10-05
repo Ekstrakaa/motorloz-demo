@@ -90,7 +90,7 @@ test('a direct request to bring the car gets a direct answer before an intake qu
     reply:'¿Cómo te llamás?',coordinationIntent:'interested',
     facts:facts({vehicle:'BMW Serie 3',issue:'Ruido al frenar'})
   });
-  assert.match(body.reply,/^Sí, podés traerlo a nuestro taller para revisarlo\./);
+  assert.match(body.reply,/^Sí, podemos recibirlo en nuestro taller una vez coordinada la visita\./);
   assert.match(body.reply,/¿Cómo te llamás/);
 });
 
@@ -113,7 +113,7 @@ test('a direct yes from the model is not repeated when the customer asks to visi
     reply:'Sí, podés traerlo sin problema. ¿Cómo te llamás?',coordinationIntent:'interested',
     facts:facts({vehicle:'BMW Serie 3',issue:'Ruido al frenar'})
   });
-  assert.equal((body.reply.match(/\bS[ií], pod[eé]s traerlo/g)||[]).length,1);
+  assert.equal((body.reply.match(/\bS[ií], podemos recibirlo/g)||[]).length,1);
   assert.match(body.reply,/¿Cómo te llamás/);
 });
 
@@ -268,6 +268,30 @@ test('a change-of-oil request keeps guiding the customer through WhatsApp handof
   const accepted=await chat([...withName,{role:'assistant',content:third.body.reply},{role:'user',content:'Sí, dale'}],{reply:'Genial.',coordinationIntent:'none',facts:facts({name:'Emanuel Leoni',vehicle:'Subaru Impreza',year:'2007',mileage:'350.000 km',issue:'Cambio de aceite'})});
   assert.equal(accepted.body.handoffReady,true);
   assert.match(accepted.body.reply,/Revisar en WhatsApp/);
+});
+
+test('a live-style oil reply asks one detail and does not invite an uncoordinated visit',async()=>{
+  const {body}=await chat([{role:'user',content:'Quiero hacerle cambio de aceite al auto'}],{
+    reply:'Perfecto, podés traerlo a nuestro taller para hacerle el cambio de aceite. ¿Me decís tu nombre y qué vehículo tenés para ir preparando todo?',
+    coordinationIntent:'interested',facts:facts({issue:'Cambio de aceite'})
+  });
+  assert.equal(body.handoffReady,false);
+  assert.match(body.reply,/¿Qué auto es, marca y modelo\?/);
+  assert.doesNotMatch(body.reply,/tu nombre|pod[eé]s traerlo/i);
+});
+
+test('the WhatsApp summary does not invent that the customer can wait',async()=>{
+  const messages=[
+    {role:'user',content:'Quiero cambiarle el aceite a mi Subaru Impreza 2007. Soy Martín Prueba.'},
+    {role:'assistant',content:'¿Querés que prepare la solicitud para revisarla en WhatsApp?'},
+    {role:'user',content:'Sí, preparala'}
+  ];
+  const {body}=await chat(messages,{
+    reply:'Listo.',coordinationIntent:'confirmed',
+    facts:facts({name:'Martín Prueba',vehicle:'Subaru Impreza',year:'2007',issue:'Cambio de aceite',urgency:'Puede esperar una fecha coordinada'})
+  });
+  assert.equal(body.handoffReady,true);
+  assert.equal(body.facts.urgency,'Sin prioridad indicada');
 });
 
 test('other concrete services do not end with a statement when a name is missing',async()=>{

@@ -110,6 +110,16 @@ function firstName(name) {
 function dangerousToDrive(text) {
   return /(?:no (?:me )?fren(?:a|an)|frenos? no (?:funcionan|responden)|sin frenos|pedal (?:de freno )?(?:se hunde|se va)|(?:mucho|abundante) humo|larga (?:mucho|abundante) humo|(?:olor|huele)(?: fuerte)? a (?:nafta|combustible)|(?:se )?(?:recalienta|sobrecalienta)|temperatura al (?:m[aá]ximo|rojo)|perd[ií] la direcci[oó]n|sin direcci[oó]n)/i.test(text);
 }
+function customerUrgency(history) {
+  const userTurns = history.filter(item => item.role === 'user');
+  if (userTurns.some(item => dangerousToDrive(item.content))) return 'Necesita atención cuanto antes';
+  for (const item of userTurns.reverse()) {
+    if (/no pued[eo] esperar/i.test(item.content)) return 'Necesita atención cuanto antes';
+    if (/(?:no es urgente|pued[eo] esperar|sin apuro|no hay apuro|fecha coordinada)/i.test(item.content)) return 'Puede esperar una fecha coordinada';
+    if (/(?:es urgente|es una urgencia|cuanto antes|lo antes posible)/i.test(item.content)) return 'Necesita atención cuanto antes';
+  }
+  return '';
+}
 function workshopVoice(reply) {
   return reply
     .replace(/\b(a|en|con) (?:un|otro|alg[uú]n) taller(?: especializado| de confianza)?\b/gi, (_match, preposition) => `${preposition} nuestro taller`)
@@ -199,6 +209,7 @@ async function handle(req, res, action) {
     if (!history.length || history.at(-1).role !== 'user') return json(res, 400, { error: 'mensaje_invalido', message: 'Escribí una consulta para continuar.' });
     const answer = await callOpenAI(history, { structured: true });
     const facts = Object.fromEntries(factFields.map(field => [field, typeof answer.facts?.[field] === 'string' ? answer.facts[field].trim().slice(0, field === 'issue' ? 550 : 200) : '']));
+    facts.urgency = customerUrgency(history);
     const latestUser = history.at(-1).content;
     // An explicit request to prepare the message can proceed without a mileage figure.
     // Describe the absence accurately rather than leaving the conversation stuck on it.
@@ -244,15 +255,19 @@ async function handle(req, res, action) {
       const latestUser = history.at(-1)?.content || '';
       const priorCondition = /\b(?:al|cuando|cada vez que)\s+(?:el auto\s+)?(?:aceler\w*|fren\w*|gir\w*|dobl\w*|arranc\w*)\b/i.test(history.filter(item => item.role === 'user').map(item => item.content).join(' '));
       const correctionAcknowledgment = /ya te (?:lo )?(?:hab[ií]a dicho|dije|coment[eé])|te lo dije/i.test(latestUser) && priorCondition;
+      const questionPart = reply.slice(reply.lastIndexOf('¿'));
+      const asksMultipleEssentials = [/nombre|c[oó]mo te llam/i, /marca|modelo|veh[ií]culo|qu[eé] auto/i, /qu[eé] (?:le |te )?(?:notaste|pasa|trabajo|servicio)/i]
+        .filter(pattern => pattern.test(questionPart)).length > 1;
+      const suggestsArrivalBeforeCoordination = /pod[eé]s (?:traerlo|llevarlo|acercarlo|venir|pasar)/i.test(reply);
       if (correctionAcknowledgment) {
         reply = `Tenés razón, ya me habías dicho que vibra al acelerar. ${question}`;
       } else {
         reply = reply.replace(/^\s*(?:para preparar (?:la )?(?:solicitud|servicio),?\s*)?me falta un dato\s*[:.]?\s*/iu, '').trim();
-        if (!/\?/.test(reply) || !asksMissing.test(reply) || claimsCompletedWork(reply)) reply = question;
+        if (!/\?/.test(reply) || !asksMissing.test(reply) || asksMultipleEssentials || suggestsArrivalBeforeCoordination || claimsCompletedWork(reply)) reply = question;
       }
       if (/cuando quieras|cuando te quede c[oó]modo|sin (?:turno|reserva)/i.test(reply)) reply = question;
       if (asksToVisitUs(latestUser) && !dangerousToDrive(latestUser) && !/^(?:s[ií]|claro|por supuesto)[,.!\s]/i.test(reply) && !/pod[eé]s traerlo a nuestro taller/i.test(reply)) {
-        reply = `Sí, podés traerlo a nuestro taller para revisarlo. ${reply}`;
+        reply = `Sí, podemos recibirlo en nuestro taller una vez coordinada la visita. ${reply}`;
       } else if (!asksToVisitUs(latestUser) && history.filter(item => item.role === 'user').length === 1 && !dangerousToDrive(latestUser)) {
         reply = `Dale, te ayudo a coordinarlo con nuestro taller. ${reply}`;
       }
@@ -277,9 +292,11 @@ async function handle(req, res, action) {
     } else if (history.filter(item => item.role === 'user').length === 1 && /\bBMW\b/i.test(latestUser) && !/(?:nave|terrible auto|gran auto|lindo auto)/i.test(reply)) {
       reply = `¡Pa, qué nave ese BMW! ${reply}`;
     }
-    reply = workshopVoice(reply).replace(/\bllevarlo a nuestro taller\b/gi, 'traerlo a nuestro taller');
+    reply = workshopVoice(reply).replace(/\bllevarlo a nuestro taller\b/gi, 'traerlo a nuestro taller')
+      .replace(/\bpod[eé]s (?:traerlo|llevarlo|acercarlo)(?: (?:a nuestro taller|ac[aá]))?\b/gi, 'podemos recibirlo en nuestro taller una vez coordinada la visita');
     if (history.some(item => item.role === 'user' && dangerousToDrive(item.content))) {
       reply = reply.replace(/\bpod[eé]s (?:traerlo|acercarlo|llevarlo) a nuestro taller\b/gi, 'podemos recibirlo en nuestro taller si llega en grúa');
+      reply = reply.replace(/podemos recibirlo en nuestro taller una vez coordinada la visita/gi, 'podemos recibirlo en nuestro taller si llega en grúa, una vez coordinada la visita');
       if (handoffReady && !/\b(?:gr[uú]a|asistencia|no lo manejes|no sigas conduciendo)\b/i.test(reply)) {
         reply += ' No lo manejes hasta acá; organizá el traslado con asistencia.';
       }

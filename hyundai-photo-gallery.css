@@ -78,8 +78,8 @@
   background: #10191b;
 }
 .hyundai-photo-card img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; }
-.hyundai-photo-card:nth-child(1) img,
 .hyundai-photo-card:nth-child(2) img,
+.hyundai-photo-card:nth-child(3) img,
 .hyundai-photo-card:nth-child(4) img { object-fit: contain; }
 .hyundai-photo-card figcaption {
   position: absolute;
@@ -116,21 +116,35 @@
 
 /* The official sign reads as one intentional proof card. */
 .hyundai-signature .hyundai-proof-strip {
+  position: relative;
   display: grid;
   grid-template-columns: minmax(150px, 230px) minmax(0, 1fr) auto !important;
   align-items: center;
   gap: clamp(20px, 3vw, 38px) !important;
   padding: clamp(18px, 2vw, 25px) !important;
-  border: 1px solid rgba(116, 197, 206, .34) !important;
+  overflow: hidden;
+  border: 1px solid rgba(190, 238, 243, .44) !important;
   border-radius: 18px;
-  background: linear-gradient(115deg, rgba(21, 67, 73, .68), rgba(9, 25, 29, .8) 60%, rgba(12, 48, 55, .56));
-  box-shadow: 0 22px 60px rgba(0, 0, 0, .25), inset 0 1px 0 rgba(191, 244, 247, .12);
+  background: linear-gradient(128deg, rgba(156, 231, 238, .17), rgba(20, 68, 75, .32) 36%, rgba(5, 26, 32, .54) 72%, rgba(100, 195, 203, .14));
+  -webkit-backdrop-filter: blur(22px) saturate(155%);
+  backdrop-filter: blur(22px) saturate(155%);
+  box-shadow: 0 24px 55px rgba(0, 0, 0, .21), inset 0 1px 0 rgba(233, 255, 255, .3), inset 0 -1px 0 rgba(51, 145, 156, .15);
 }
+.hyundai-signature .hyundai-proof-strip::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(112deg, rgba(227, 255, 255, .11), transparent 30%, transparent 65%, rgba(180, 242, 246, .035));
+}
+.hyundai-signature .hyundai-proof-strip > * { position: relative; z-index: 1; }
 .hyundai-signature .hyundai-proof-photo {
   width: 100% !important;
   height: 160px !important;
   overflow: hidden;
+  border: 1px solid rgba(224, 252, 255, .3);
   border-radius: 10px;
+  box-shadow: 0 10px 24px rgba(1, 14, 18, .23);
 }
 .hyundai-signature .hyundai-proof-photo img { width: 100%; height: 100%; object-fit: cover; }
 .hyundai-signature .hyundai-proof-strip > div { gap: 12px; }
