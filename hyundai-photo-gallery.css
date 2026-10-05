@@ -1,0 +1,167 @@
+/* A visible, slow reflection moves behind the entire Hyundai chapter. */
+.hyundai-signature.section { position: relative; isolation: isolate; overflow: hidden !important; }
+.hyundai-signature.section::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  inset: -28% -34%;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 34% 38% at 28% 60%, rgba(43, 172, 187, .42), transparent 78%),
+    radial-gradient(ellipse 29% 32% at 76% 31%, rgba(30, 132, 153, .36), transparent 80%) !important;
+  animation: hyundai-reflection-travel 9s ease-in-out infinite alternate !important;
+  will-change: transform;
+}
+.hyundai-signature > .section-label,
+.hyundai-signature > .hyundai-inner,
+.hyundai-signature > .hyundai-proof-strip { position: relative; z-index: 1; }
+@keyframes hyundai-reflection-travel {
+  from { transform: translate3d(-9%, 7%, 0) scale(1); }
+  to { transform: translate3d(10%, -8%, 0) scale(1.12); }
+}
+.hyundai-signature .hyundai-copy .hyundai-emblem,
+.hyundai-signature .hyundai-copy .hyundai-emblem img { border: 0 !important; background: none !important; box-shadow: none !important; }
+.hyundai-signature .hyundai-copy .hyundai-emblem::before,
+.hyundai-signature .hyundai-copy .hyundai-emblem::after { content: none !important; display: none !important; background: none !important; border: 0 !important; box-shadow: none !important; animation: none !important; }
+
+/* Hyundai keeps its moving footage separate from a swipeable photo story. */
+.hyundai-signature .hyundai-inner {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1.08fr) minmax(320px, .92fr) !important;
+  grid-template-rows: auto auto;
+  align-items: center !important;
+  column-gap: clamp(38px, 5.5vw, 82px) !important;
+  row-gap: clamp(24px, 3vw, 38px) !important;
+}
+.hyundai-signature .hyundai-gallery { grid-column: 1; grid-row: 1; }
+.hyundai-signature .hyundai-copy { grid-column: 2; grid-row: 1 / 3; }
+.hyundai-signature .hyundai-photo-gallery {
+  grid-column: 1;
+  grid-row: 2;
+  min-width: 0;
+  width: 100%;
+  color: #f0f6f6;
+}
+.hyundai-gallery-heading,
+.hyundai-gallery-controls { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+.hyundai-gallery-heading {
+  padding: 0 2px 12px;
+  color: #72d7df;
+  font: 700 9px var(--mono, monospace);
+  letter-spacing: .13em;
+}
+.hyundai-gallery-heading span:last-child { color: #afc4c5; font-size: 8px; white-space: nowrap; }
+.hyundai-gallery-heading i { padding-left: 6px; color: #71dde5; font-size: 15px; font-style: normal; }
+.hyundai-photo-rail {
+  display: flex;
+  gap: 12px;
+  min-width: 0;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: 2px;
+  padding: 2px 2px 11px;
+  scrollbar-color: rgba(111, 214, 223, .6) rgba(255, 255, 255, .09);
+  scrollbar-width: thin;
+  touch-action: pan-x pan-y;
+}
+.hyundai-photo-rail:focus-visible { outline: 2px solid #72d7df; outline-offset: 2px; }
+.hyundai-photo-card {
+  position: relative;
+  flex: 0 0 min(92%, 660px);
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  scroll-snap-align: start;
+  border: 1px solid rgba(154, 213, 219, .23);
+  border-radius: 12px;
+  background: #10191b;
+}
+.hyundai-photo-card img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; }
+.hyundai-photo-card:nth-child(1) img,
+.hyundai-photo-card:nth-child(2) img,
+.hyundai-photo-card:nth-child(4) img { object-fit: contain; }
+.hyundai-photo-card figcaption {
+  position: absolute;
+  inset: auto 0 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 46px;
+  padding: 12px 16px;
+  background: linear-gradient(0deg, rgba(5, 16, 19, .94), transparent);
+  color: #f4f9f9;
+  font-size: 12px;
+  font-weight: 650;
+  text-shadow: 0 1px 5px #071012;
+}
+.hyundai-photo-card figcaption span { color: #78e0e8; font: 700 9px var(--mono, monospace); white-space: nowrap; }
+.hyundai-gallery-controls { padding: 3px 2px 0; color: #87a5a8; font: 650 8px var(--mono, monospace); letter-spacing: .11em; }
+.hyundai-gallery-controls > div { display: flex; gap: 8px; }
+.hyundai-gallery-controls button {
+  display: grid;
+  place-items: center;
+  width: 35px;
+  height: 35px;
+  border: 1px solid rgba(121, 211, 219, .45);
+  border-radius: 50%;
+  background: rgba(15, 55, 61, .6);
+  color: #e8fafb;
+  font-size: 17px;
+  cursor: pointer;
+  transition: background .2s ease, transform .2s ease;
+}
+.hyundai-gallery-controls button:hover { background: #17545d; transform: translateY(-2px); }
+.hyundai-gallery-controls button:focus-visible { outline: 2px solid #9ceaf0; outline-offset: 3px; }
+
+/* The official sign reads as one intentional proof card. */
+.hyundai-signature .hyundai-proof-strip {
+  display: grid;
+  grid-template-columns: minmax(150px, 230px) minmax(0, 1fr) auto !important;
+  align-items: center;
+  gap: clamp(20px, 3vw, 38px) !important;
+  padding: clamp(18px, 2vw, 25px) !important;
+  border: 1px solid rgba(116, 197, 206, .34) !important;
+  border-radius: 18px;
+  background: linear-gradient(115deg, rgba(21, 67, 73, .68), rgba(9, 25, 29, .8) 60%, rgba(12, 48, 55, .56));
+  box-shadow: 0 22px 60px rgba(0, 0, 0, .25), inset 0 1px 0 rgba(191, 244, 247, .12);
+}
+.hyundai-signature .hyundai-proof-photo {
+  width: 100% !important;
+  height: 160px !important;
+  overflow: hidden;
+  border-radius: 10px;
+}
+.hyundai-signature .hyundai-proof-photo img { width: 100%; height: 100%; object-fit: cover; }
+.hyundai-signature .hyundai-proof-strip > div { gap: 12px; }
+.hyundai-signature .hyundai-proof-strip .eyebrow { color: #7cdee5; font-size: 10px; }
+.hyundai-signature .hyundai-proof-strip strong { max-width: 32ch; color: #edf8f8; font-size: clamp(17px, 1.7vw, 23px); line-height: 1.28; }
+.hyundai-signature .hyundai-proof-location { align-self: end; padding-bottom: 5px; color: #a6c2c5; line-height: 1.6; }
+
+@media (max-width: 760px) {
+  .hyundai-signature .hyundai-inner { grid-template-columns: minmax(0, 1fr) !important; grid-template-rows: auto auto auto; gap: 0 !important; }
+  .hyundai-signature .hyundai-gallery { grid-column: 1; grid-row: 1; }
+  .hyundai-signature .hyundai-copy { grid-column: 1; grid-row: 2; margin: 27px 20px 0 !important; }
+  .hyundai-signature .hyundai-photo-gallery { grid-column: 1; grid-row: 3; width: calc(100% - 40px); margin: 29px auto 0; }
+  .hyundai-gallery-heading { align-items: end; font-size: 8px; }
+  .hyundai-gallery-heading span:last-child { font-size: 7px; }
+  .hyundai-photo-card { flex-basis: 88%; }
+  .hyundai-photo-card img { aspect-ratio: 4 / 3; }
+  .hyundai-gallery-controls { padding-top: 6px; }
+  .hyundai-signature .hyundai-proof-strip {
+    grid-template-columns: minmax(105px, 38%) minmax(0, 1fr) !important;
+    gap: 15px !important;
+    margin: 30px 19px 0 !important;
+    padding: 14px !important;
+    border-radius: 15px;
+  }
+  .hyundai-signature .hyundai-proof-photo { height: 138px !important; }
+  .hyundai-signature .hyundai-proof-strip > div { gap: 8px; }
+  .hyundai-signature .hyundai-proof-strip .eyebrow { font-size: 8px; }
+  .hyundai-signature .hyundai-proof-strip strong { font-size: 14px; line-height: 1.35; }
+  .hyundai-signature .hyundai-proof-location { grid-column: 1 / -1; padding: 0; font-size: 8px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hyundai-signature.section::before { animation: none !important; transform: none !important; }
+  .hyundai-gallery-controls button { transition: none; }
+}
