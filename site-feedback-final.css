@@ -92,7 +92,7 @@
   .subaru-feature-video { aspect-ratio: 16 / 9; }
   .subaru-feature figcaption { margin-left: 22px; }
   .brand-lineup .brand-wordmark img[src*="subaru-logo-color"] { width: 108px !important; height: 65px !important; }
-  .workshop-swipe-hint { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: fit-content; margin: 0 0 14px auto; padding: 8px 10px 8px 13px; border: 1px solid rgba(7,133,150,.28); border-radius: 999px; background: rgba(226,246,245,.84); color: #08697a; font: 800 9px/1 var(--mono); letter-spacing: .08em; }
+  .workshop-swipe-hint { display: flex; align-items: center; justify-content: center; gap: 12px; width: fit-content; margin: 0 auto 14px; padding: 8px 10px 8px 13px; border: 1px solid rgba(7,133,150,.28); border-radius: 999px; background: rgba(226,246,245,.84); color: #08697a; font: 800 9px/1 var(--mono); letter-spacing: .08em; }
   .workshop-swipe-hint span { font-size: 18px; line-height: .8; font-weight: 400; }
   .workshop-photo-rail { scroll-padding-inline: 3px; }
   .workshop-photo-card { flex-basis: min(78%, 390px); scroll-snap-align: start; }

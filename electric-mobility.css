@@ -10,6 +10,13 @@
   font-weight: 700;
   letter-spacing: .15em;
 }
+.electric-mobility-icon {
+  display: block;
+  width: 112px;
+  height: auto;
+  margin: 0 0 16px;
+  filter: drop-shadow(0 10px 16px rgba(18, 94, 105, .12));
+}
 .electric-mobility-content {
   display: grid;
   grid-template-columns: minmax(0, 1.3fr) minmax(280px, .7fr);
@@ -72,6 +79,7 @@
 }
 @media (max-width: 760px) {
   .electric-mobility { padding-block: 54px 62px !important; }
+  .electric-mobility-icon { width: 102px; margin: 0 auto 14px; }
   .electric-mobility-content {
     grid-template-columns: 1fr;
     gap: 24px;
