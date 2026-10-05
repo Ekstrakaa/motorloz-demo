@@ -276,9 +276,10 @@ async function handle(req, res, action) {
       const suggestsWalkIn = /cuando quieras|cuando te quede c[oó]modo|sin (?:turno|reserva)/i.test(reply) || claimsCompletedWork(reply);
       if (!hasClearNextStep || suggestsWalkIn) {
         const subject = facts.vehicle ? `tu ${facts.vehicle}` : 'el auto';
+        const serviceRequest = requestsWorkshopService(history);
         reply = /[¿?]/.test(latestUser)
           ? `El taller confirma día y horario después de recibir la consulta. ¿Querés que prepare la solicitud para revisar ${subject} y enviarla por WhatsApp?`
-          : `Gracias${facts.name ? `, ${firstName(facts.name)}` : ''}. Ya tengo los datos de ${subject} y lo que le notaste. ¿Querés que prepare la solicitud para coordinar la revisión por WhatsApp?`;
+          : `Gracias${facts.name ? `, ${firstName(facts.name)}` : ''}. Ya tengo los datos de ${subject} y ${serviceRequest ? 'el servicio que necesitás' : 'lo que le notaste'}. ¿Querés que prepare la solicitud para coordinar ${serviceRequest ? 'el servicio' : 'la revisión'} por WhatsApp?`;
       }
     } else if (!handoffReady && /(?:bot[oó]n|toc[aá]|debajo|abrir|revisar).{0,90}whatsapp|whatsapp.{0,90}(?:bot[oó]n|debajo|toc[aá])/i.test(reply)) {
       // Never turn an invalid control claim into another canned intake question.

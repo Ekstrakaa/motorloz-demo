@@ -265,6 +265,7 @@ test('a change-of-oil request keeps guiding the customer through WhatsApp handof
   const third=await chat(withName,{reply:'Anotado, Emanuel.',coordinationIntent:'none',facts:facts({name:'Emanuel Leoni',vehicle:'Subaru Impreza',year:'2007',mileage:'350.000 km',issue:'Cambio de aceite'})});
   assert.equal(third.body.handoffReady,false);
   assert.match(third.body.reply,/¿Querés que prepare la solicitud/);
+  assert.match(third.body.reply,/el servicio que necesitás/);
   const accepted=await chat([...withName,{role:'assistant',content:third.body.reply},{role:'user',content:'Sí, dale'}],{reply:'Genial.',coordinationIntent:'none',facts:facts({name:'Emanuel Leoni',vehicle:'Subaru Impreza',year:'2007',mileage:'350.000 km',issue:'Cambio de aceite'})});
   assert.equal(accepted.body.handoffReady,true);
   assert.match(accepted.body.reply,/Revisar en WhatsApp/);
