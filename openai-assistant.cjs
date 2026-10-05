@@ -3,7 +3,7 @@ const narrator = require('./openai-narrator.cjs');
 const rateLimits = new Map();
 const factFields = ['name', 'vehicle', 'year', 'mileage', 'issue', 'circumstances', 'urgency'];
 const SYSTEM_PROMPT = `Sos parte del equipo de MOTORLOZ, taller multimarca en Montevideo. Hablá siempre como alguien de NUESTRO taller: "podés traerlo a nuestro taller", "lo revisamos acá", "nuestro equipo". Nunca sugieras buscar "un taller especializado", "otro taller" ni "un mecánico de confianza" como si MOTORLOZ fuera ajeno a la conversación. Si un trabajo realmente está fuera de nuestro alcance, decilo con honestidad sin inventar que lo hacemos ni recomendar otro negocio. Hyundai es servicio oficial a través de Lozano & Oliva; no atribuyas carácter oficial a otras marcas. No afirmes diagnósticos ni inventes precios, intervalos, disponibilidad, personas del equipo o fechas. El taller confirma día y hora: nunca digas que una reserva ya quedó hecha.
-Conversá en español rioplatense de Uruguay, con voseo y calidez, como un asesor atento al lado del auto. El saludo ya se mostró: no te presentes de nuevo. Respondé la inquietud más reciente ANTES de pedir datos: si preguntan "¿lo puedo llevar a ustedes?" o "¿me ayudan a revisarlo?", contestá que sí y después pedí el dato necesario para coordinar; no cierres ahí la charla. Reconocé lo particular de lo que te cuentan; con un BMW, un Subaru o un deportivo podés decir una sola vez "¡Pa, qué nave!" o algo natural y breve, salvo que haya una falla peligrosa, donde va primero la seguridad. Sé cercano, con humor liviano solo cuando corresponde; nunca hagas chistes sobre una avería o un costo. Evitá muletillas, entusiasmo repetido y frases de folleto. Usá 2 a 4 frases breves, normalmente menos de 400 caracteres y siempre menos de 650; una sola pregunta útil por turno. Podés explicar más si la persona lo pide. No hagas un interrogatorio ni ofrezcas reservar si el cliente solo está describiendo un síntoma. No plantees dos opciones en la misma pregunta.
+Conversá en español rioplatense de Uruguay, con voseo y calidez, como un asesor atento al lado del auto. El saludo ya se mostró: no te presentes de nuevo. Respondé la inquietud más reciente ANTES de pedir datos: si preguntan "¿lo puedo llevar a ustedes?" o "¿me ayudan a revisarlo?", contestá que sí y después pedí el dato necesario para coordinar; no cierres ahí la charla. Si piden un servicio concreto, por ejemplo "cambio de aceite", aunque escriban con errores, eso muestra interés en atenderlo: continuá hasta pedir nombre, vehículo y motivo, y después ofrecé preparar la solicitud por WhatsApp. No afirmes que el auto o el trabajo "está listo": todavía no ingresó al taller. Reconocé lo particular de lo que te cuentan; con un BMW, un Subaru o un deportivo podés decir una sola vez "¡Pa, qué nave!" o algo natural y breve, salvo que haya una falla peligrosa, donde va primero la seguridad. Sé cercano, con humor liviano solo cuando corresponde; nunca hagas chistes sobre una avería o un costo. Evitá muletillas, entusiasmo repetido y frases de folleto. Usá 2 a 4 frases breves, normalmente menos de 400 caracteres y siempre menos de 650; una sola pregunta útil por turno. Podés explicar más si la persona lo pide. No hagas un interrogatorio ni ofrezcas reservar si el cliente solo está describiendo un síntoma. No plantees dos opciones en la misma pregunta.
 Leé el historial COMPLETO antes de responder. Una respuesta corta como “al acelerar”, “200 mil”, “Manuel” o “puede esperar” responde a TU pregunta anterior: registrala y seguí al siguiente punto, no vuelvas a preguntar lo mismo con otras palabras. Si no sabe un dato, aceptalo como desconocido. Si corrige algo, prevalece lo último; no asumas que una sugerencia tuya es un hecho. Ante transcripción dudosa de marca/modelo, aclaralo; Impreza, Hawkeye y Wagon pueden corresponder a Subaru.
 Primero completá facts; después decidí coordinationIntent y AL FINAL escribí reply usando esos datos. En facts conservá SOLO lo que el cliente afirmó, incluyendo respuestas cortas interpretadas con su pregunta anterior: name, vehicle (marca y modelo), year opcional, mileage aproximado o “No lo sabe”, issue (síntoma o servicio concreto), circumstances (desde cuándo o cuándo ocurre), urgency (“Puede esperar una fecha coordinada” o “Necesita atención cuanto antes”). Usá cadena vacía si falta información. No inventes datos. El año, kilometraje, circunstancias y urgencia ayudan a orientar, pero NO son requisitos para armar una consulta por WhatsApp. No hagas que la conversación se estanque pidiendo esos datos. Para preparar WhatsApp solo hacen falta nombre, vehículo y motivo; si ya los tenés, confirmá si quiere preparar el mensaje aunque falten datos opcionales. Si responde que sí, preparalo y anotá los datos opcionales como no informados. Revisá lo ya respondido ANTES de elegir una pregunta.
 coordinationIntent vale none si solo busca orientación, interested si pregunta cómo coordinar o quiere llevar el auto pero todavía no aceptó preparar el mensaje, y confirmed si pide expresamente preparar/enviar la solicitud o acepta tu propuesta. Interpretá errores al escribir y transcripciones de voz por el sentido de la conversación, no por palabras exactas. Primero ayudá con su consulta; tener datos no significa querer reservar. Si quiere coordinar y falta nombre, vehículo o motivo, pedí SOLO el siguiente dato esencial. Si esos tres datos están y todavía no confirmó, preguntá si quiere preparar la solicitud para revisarla en WhatsApp. El botón aparece después de que acepte. Nunca digas que la reserva ya está hecha. No inventes enlaces ni copies todo el borrador en reply. No pidas teléfono, día ni horario: el taller coordina la fecha por WhatsApp después de recibir la solicitud.
@@ -85,6 +85,22 @@ function asksToVisitUs(text) {
     || /(?:traer|llevar|acercar).{0,35}(?:a ustedes|ah[ií]|ac[aá]|al taller)/i.test(text)
     || /(?:me|nos)\s+(?:ayudan|pueden ayudar|podr[ií]an ayudar)\s+a\s+(?:revisar|evaluar)/i.test(text)
     || /(?:pueden|pod[eé]s)\s+(?:revisar|evaluar)\b/i.test(text);
+}
+function requestsWorkshopService(history) {
+  for (let i = history.length - 1; i >= 0; i--) {
+    const item = history[i];
+    if (item.role !== 'user') continue;
+    const text = item.content.trim().replace(/^[¿¡\s]+/, '');
+    if (declinedCoordination([{ role: 'user', content: text }])) return false;
+    if (/^(?:cu[aá]nto|qu[eé]|c[oó]mo|por qu[eé])\b|\b(?:quiero|necesito) saber\b|\b(?:precio|cu[aá]nto sale|qu[eé] incluye)\b/i.test(text)) continue;
+    if (/\b(?:cambi[oa]r?|hacer(?:le)?|hacen|hac[eé]s|necesito|preciso|quiero|busco|reparar|arreglar|revisar)\b.{0,50}\b(?:aceite|sceite|filtros?|alineaci[oó]n|balanceo|cubiertas?|neum[aá]ticos?|mantenimiento|service|servicio|revisi[oó]n|diagn[oó]stico|frenos?|pastillas?|bater[ií]a|embrague|suspensi[oó]n)\b/i.test(text)
+      || /^(?:cambio (?:de )?(?:aceite|sceite|filtros?|pastillas?)|alineaci[oó]n|balanceo|mantenimiento|service|revisi[oó]n|diagn[oó]stico|reparaci[oó]n)\b/i.test(text)
+      || /\b(?:quiero|necesito|preciso|pod[eé]s|pueden)\b.{0,50}\b(?:revisarlo|revisen|verlo|lo vean|mirarlo|miren el auto|chequearlo)\b/i.test(text)) return true;
+  }
+  return false;
+}
+function claimsCompletedWork(reply) {
+  return /\b(?:auto|veh[ií]culo|camioneta|subaru|hyundai|bmw|toyota|trabajo|servicio)\b.{0,90}\b(?:ya\s+)?est[aá]\s+list[oa]\b|\b(?:turno|reserva)\b.{0,35}\b(?:confirmad[oa]|agendad[oa]|reservad[oa])\b/i.test(reply);
 }
 function firstName(name) {
   const first = String(name || '').trim().split(/\s+/)[0];
@@ -188,7 +204,7 @@ async function handle(req, res, action) {
     if (!facts.mileage && /\b(?:prepar[aá]l[oa]|hac[eé]l[oa])\b/i.test(latestUser)) facts.mileage = 'Kilometraje no informado';
     const complete = ['name', 'vehicle', 'issue'].every(field => facts[field]);
     const modelIntent = ['none', 'interested', 'confirmed'].includes(answer.coordinationIntent) ? answer.coordinationIntent : 'none';
-    const customerRaisedCoordination = wantsCoordination(history) || history.some(item => item.role === 'user' && asksToVisitUs(item.content));
+    const customerRaisedCoordination = wantsCoordination(history) || history.some(item => item.role === 'user' && asksToVisitUs(item.content)) || requestsWorkshopService(history);
     const modelIntentHasCustomerCue = modelIntent !== 'none' && /(?:turno|reserv|agend|coord|cood|whats|traer|llevar|acercar|venir al taller)/i.test(latestUser);
     const coordinating = !declinedCoordination(history) && (customerRaisedCoordination || modelIntentHasCustomerCue);
     const handoffReady = complete && coordinating && confirmedCoordination(history);
@@ -211,7 +227,7 @@ async function handle(req, res, action) {
       const missing = ['vehicle','issue','name'].find(field => !facts[field]);
       reply = missing ? `Anoté lo que me contaste. ${questions[missing]}` : 'Ya tengo esos datos. Contame qué duda te quedó para poder ayudarte.';
     }
-    const separateQuestion = /[¿?]/.test(latestUser) && !asksToVisitUs(latestUser) && !/(?:turno|reserv|agend|coord|cood|whatsapp|traer|llevar|acercar|venir al taller)/i.test(latestUser);
+    const separateQuestion = /[¿?]/.test(latestUser) && !asksToVisitUs(latestUser) && !requestsWorkshopService([{ role: 'user', content: latestUser }]) && !/(?:turno|reserv|agend|coord|cood|whatsapp|traer|llevar|acercar|venir al taller)/i.test(latestUser);
     if (coordinating && !complete && !separateQuestion) {
       const missing = ['vehicle','issue','name'].find(field => !facts[field]);
       const question = {
@@ -220,7 +236,7 @@ async function handle(req, res, action) {
         urgency: '¿Necesitás atención cuanto antes o puede esperar una fecha coordinada?', name: '¿Cómo te llamás para dejar la consulta a tu nombre?'
       }[missing];
       const asksMissing = {
-        vehicle:/marca|modelo/i, mileage:/kilometraje|kil[oó]metros|\bkm\b/i, issue:/qu[eé] not|qu[eé] pasa|s[ií]ntoma|servicio/i,
+        vehicle:/marca|modelo|veh[ií]culo|qu[eé] auto/i, mileage:/kilometraje|kil[oó]metros|\bkm\b/i, issue:/qu[eé] not|qu[eé] pasa|s[ií]ntoma|servicio/i,
         circumstances:/desde cu[aá]ndo|cu[aá]ndo (?:ocurre|aparece|empez)|en qu[eé] (?:situaci[oó]n|momento)/i,
         urgency:/urgente|urgencia|puede esperar|cuanto antes/i, name:/nombre|c[oó]mo te llam/i
       }[missing];
@@ -231,7 +247,7 @@ async function handle(req, res, action) {
         reply = `Tenés razón, ya me habías dicho que vibra al acelerar. ${question}`;
       } else {
         reply = reply.replace(/^\s*(?:para preparar (?:la )?(?:solicitud|servicio),?\s*)?me falta un dato\s*[:.]?\s*/iu, '').trim();
-        if (!/\?/.test(reply) || !asksMissing.test(reply)) reply = question;
+        if (!/\?/.test(reply) || !asksMissing.test(reply) || claimsCompletedWork(reply)) reply = question;
       }
       if (/cuando quieras|cuando te quede c[oó]modo|sin (?:turno|reserva)/i.test(reply)) reply = question;
       if (asksToVisitUs(latestUser) && !dangerousToDrive(latestUser) && !/^(?:s[ií]|claro|por supuesto)[,.!\s]/i.test(reply) && !/pod[eé]s traerlo a nuestro taller/i.test(reply)) {
@@ -241,7 +257,7 @@ async function handle(req, res, action) {
       }
     } else if (coordinating && complete && !handoffReady && !separateQuestion) {
       const hasClearNextStep = /¿[^?]{0,160}(?:quer[eé]s|pod[eé]s).{0,100}(?:prepar|revis|envi).{0,100}(?:solicitud|consulta|whatsapp)/i.test(reply);
-      const suggestsWalkIn = /cuando quieras|cuando te quede c[oó]modo|sin (?:turno|reserva)/i.test(reply);
+      const suggestsWalkIn = /cuando quieras|cuando te quede c[oó]modo|sin (?:turno|reserva)/i.test(reply) || claimsCompletedWork(reply);
       if (!hasClearNextStep || suggestsWalkIn) {
         const subject = facts.vehicle ? `tu ${facts.vehicle}` : 'el auto';
         reply = /[¿?]/.test(latestUser)

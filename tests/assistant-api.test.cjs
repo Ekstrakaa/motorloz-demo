@@ -252,6 +252,51 @@ test('the photographed wording cannot end at “I have all the details” withou
   assert.match(accepted.body.reply,/Revisar en WhatsApp/);
 });
 
+test('a change-of-oil request keeps guiding the customer through WhatsApp handoff',async()=>{
+  const opening=[{role:'user',content:'cambio sceite'}];
+  const first=await chat(opening,{reply:'Claro, podemos hacer el cambio de aceite. ¿Qué vehículo tenés?',coordinationIntent:'none',facts:facts({issue:'Cambio de aceite'})});
+  assert.match(first.body.reply,/¿Qué vehículo tenés/);
+  const withVehicle=[...opening,{role:'assistant',content:first.body.reply},{role:'user',content:'subaru impreza 2007 350000 km'}];
+  const second=await chat(withVehicle,{reply:'Perfecto, el Subaru Impreza 2007 con 350.000 km está listo para su cambio de aceite en nuestro taller.',coordinationIntent:'none',facts:facts({vehicle:'Subaru Impreza',year:'2007',mileage:'350.000 km',issue:'Cambio de aceite'})});
+  assert.equal(second.body.handoffReady,false);
+  assert.match(second.body.reply,/¿Cómo te llamás/);
+  assert.doesNotMatch(second.body.reply,/est[aá] listo/i);
+  const withName=[...withVehicle,{role:'assistant',content:second.body.reply},{role:'user',content:'Emanuel Leoni'}];
+  const third=await chat(withName,{reply:'Anotado, Emanuel.',coordinationIntent:'none',facts:facts({name:'Emanuel Leoni',vehicle:'Subaru Impreza',year:'2007',mileage:'350.000 km',issue:'Cambio de aceite'})});
+  assert.equal(third.body.handoffReady,false);
+  assert.match(third.body.reply,/¿Querés que prepare la solicitud/);
+  const accepted=await chat([...withName,{role:'assistant',content:third.body.reply},{role:'user',content:'Sí, dale'}],{reply:'Genial.',coordinationIntent:'none',facts:facts({name:'Emanuel Leoni',vehicle:'Subaru Impreza',year:'2007',mileage:'350.000 km',issue:'Cambio de aceite'})});
+  assert.equal(accepted.body.handoffReady,true);
+  assert.match(accepted.body.reply,/Revisar en WhatsApp/);
+});
+
+test('other concrete services do not end with a statement when a name is missing',async()=>{
+  for (const [request,issue] of [
+    ['Quiero hacer alineación y balanceo.','Alineación y balanceo'],
+    ['Necesito cambiar las pastillas de freno.','Cambio de pastillas'],
+    ['¿Me hacen cambio de aceite?','Cambio de aceite'],
+    ['Revisión de frenos','Revisión de frenos'],
+    ['Necesito que me revisen el auto.','Revisión general']
+  ]) {
+    const {body}=await chat([{role:'user',content:request},{role:'assistant',content:'¿Qué auto tenés?'},{role:'user',content:'Subaru Impreza'}],{
+      reply:'Podemos revisarlo en nuestro taller.',coordinationIntent:'none',facts:facts({vehicle:'Subaru Impreza',issue})
+    });
+    assert.match(body.reply,/¿Cómo te llamás/,request);
+    assert.equal(body.handoffReady,false);
+  }
+});
+
+test('a price question or an explicit refusal does not force a WhatsApp request',async()=>{
+  const price=await chat([{role:'user',content:'¿Cuánto sale un cambio de aceite?'}],{
+    reply:'El precio depende del aceite y filtro que lleve tu auto. ¿Qué modelo es?',coordinationIntent:'none',facts:facts({issue:'Consulta por cambio de aceite'})
+  });
+  assert.doesNotMatch(price.body.reply,/solicitud|WhatsApp/);
+  const decline=await chat([{role:'user',content:'Necesito cambio de aceite para mi Subaru Impreza.'},{role:'assistant',content:'¿Cómo te llamás?'},{role:'user',content:'No quiero agendar, solo consultaba.'}],{
+    reply:'Claro, no hay problema. Si querés saber algo del servicio, contame.',coordinationIntent:'none',facts:facts({vehicle:'Subaru Impreza',issue:'Cambio de aceite'})
+  });
+  assert.doesNotMatch(decline.body.reply,/¿Cómo te llamás|solicitud|WhatsApp/);
+});
+
 test('accepting an evaluation leads from name and car to a clear WhatsApp next step',async()=>{
   const messages=[
     {role:'user',content:'Mi Subaru larga humo blanco. ¿Lo puedo llevar a ustedes?'},
