@@ -1,3 +1,3 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Demo local. Regenerar con el dominio real antes de publicar. -->
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>http://127.0.0.1:4173/</loc><lastmod>2026-09-24</lastmod></url></urlset>
+<!-- La demo no anuncia URLs indexables. Preparar con el dominio definitivo antes de publicar. -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>

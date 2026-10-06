@@ -15,7 +15,7 @@
       "headers": [
         { "key": "X-Content-Type-Options", "value": "nosniff" },
         { "key": "X-Frame-Options", "value": "DENY" },
-        { "key": "Content-Security-Policy", "value": "default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self' 'sha256-Gaa5u2S6PRKy6RDg7oSOoP5hiWLzZh96ZrLKapgr1zk='; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://upload.wikimedia.org; media-src 'self' blob:; connect-src 'self'; font-src 'self' data:; frame-src https://www.google.com https://maps.google.com; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests" },
+        { "key": "Content-Security-Policy", "value": "default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self' 'sha256-WtzHHdRM3nReFqnMAknxjhAteKWFMtjlY3Jb+HEoD9M='; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://upload.wikimedia.org; media-src 'self' blob:; connect-src 'self'; font-src 'self' data:; frame-src https://www.google.com https://maps.google.com; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests" },
         { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
         { "key": "Permissions-Policy", "value": "camera=(), geolocation=(), payment=(), usb=()" },
         { "key": "X-Permitted-Cross-Domain-Policies", "value": "none" }
