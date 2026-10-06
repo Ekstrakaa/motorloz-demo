@@ -1,0 +1,32 @@
+/* Keep the section 06 caption readable and both team photos in one frame. */
+.people > .section-label {
+  display: flex !important;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px 24px !important;
+}
+.people > .section-label > span { display: block; }
+.people .team-story .slide-stage {
+  aspect-ratio: 1.55 !important;
+  overflow: hidden !important;
+}
+.people .team-story .slide-frame,
+.people .team-story .slide-frame img {
+  width: 100% !important;
+  height: 100% !important;
+}
+.people .team-story .slide-frame img,
+.people .team-story .slide-frame.clean-photo img {
+  object-fit: cover !important;
+}
+.people .team-story .slide-frame img[src*="equipo-diagnostico"] {
+  object-position: 50% 28% !important;
+}
+@media (max-width: 760px) {
+  .people > .section-label {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 5px !important;
+  }
+  .people > .section-label > span:last-child { text-align: left !important; }
+}
