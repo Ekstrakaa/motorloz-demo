@@ -50,7 +50,7 @@
     let index = 0;
     let visible = false;
     const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduced) return;
+    if (reduced && !root.matches('[data-diagnostic-carousel]')) return;
     function syncVideo() {
       slides.forEach((slide, slideIndex) => {
         const video = slide.tagName === 'VIDEO' ? slide : slide.querySelector('video');
@@ -66,10 +66,10 @@
         video.play().catch(() => {});
       });
     }
-    function advance() {
+    function advance(step = 1) {
       slides[index].classList.remove('is-active');
       slides[index].setAttribute('aria-hidden', 'true');
-      index = (index + 1) % slides.length;
+      index = (index + step + slides.length) % slides.length;
       slides[index].classList.add('is-active');
       slides[index].removeAttribute('aria-hidden');
       const incomingVideo = slides[index].tagName === 'VIDEO' ? slides[index] : slides[index].querySelector('video');
@@ -77,8 +77,19 @@
       update?.(index, slides.length);
       syncVideo();
     }
+    if (root.matches('[data-diagnostic-carousel]')) {
+      root.querySelector('[data-diagnostic-prev]')?.addEventListener('click', () => {
+        advance(-1);
+        if (visible) start();
+      });
+      root.querySelector('[data-diagnostic-next]')?.addEventListener('click', () => {
+        advance(1);
+        if (visible) start();
+      });
+    }
     function start() {
       clearTimeout(root._refreshTimer);
+      if (reduced) return;
       const scheduleNext = () => {
         const delay = typeof interval === 'function' ? interval(slides[index]) : interval;
         root._refreshTimer = setTimeout(() => {
@@ -110,28 +121,32 @@
     if (label) label.textContent = ['SUBARU · DETALLE', 'SUBARU · ATENCIÓN MULTIMARCA', 'SUBARU · EN EL TALLER', 'SUBARU · EN MOVIMIENTO'][i];
     if (count) count.textContent = `${String(i + 1).padStart(2, '0')} / ${String(n).padStart(2, '0')}`;
   });
-  const hyundaiGallery = document.querySelector('[data-hyundai-carousel]');
-  hyundaiGallery?.querySelectorAll('iframe').forEach(media => media.remove());
-  const hyundaiEmblem = document.querySelector('.hyundai-signature .hyundai-emblem');
-  if (hyundaiEmblem && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    const emblemObserver = new IntersectionObserver(entries => {
-      if (!entries[0].isIntersecting) return;
-      hyundaiEmblem.classList.add('is-intro-visible');
-      emblemObserver.disconnect();
-    }, { threshold: .35 });
-    emblemObserver.observe(hyundaiEmblem);
-  }
-  // The official Hyundai film is one uninterrupted pass, never a rotating set of clips.
+  const hyundaiGallery = document.querySelector('#hyundai .hyundai-vehicle-scene');
   const hyundaiFilm = hyundaiGallery?.querySelector('video');
-  if (hyundaiFilm) {
+  if (hyundaiGallery && hyundaiFilm) {
+    // Keep the Santa Fe film as the section's single video.
+    const activeSlide = hyundaiFilm.closest('.hyundai-video-slide') || hyundaiFilm;
+    activeSlide.replaceChildren(hyundaiFilm);
+    [...hyundaiGallery.children].forEach(child => { if (child !== activeSlide) child.remove(); });
+    hyundaiFilm.muted = hyundaiFilm.defaultMuted = true;
+    hyundaiFilm.autoplay = true;
+    hyundaiFilm.playsInline = true;
+    hyundaiFilm.controls = false;
+    hyundaiFilm.loop = true;
+    hyundaiFilm.removeAttribute('controls');
+    hyundaiFilm.setAttribute('loop', '');
+    hyundaiFilm.setAttribute('autoplay', '');
+    hyundaiFilm.setAttribute('muted', '');
+    hyundaiFilm.setAttribute('playsinline', '');
+    hyundaiFilm.setAttribute('webkit-playsinline', '');
     let visible = false;
-    let finished = false;
-    hyundaiFilm.loop = false;
-    hyundaiFilm.removeAttribute('loop');
-    hyundaiFilm.addEventListener('ended', () => { finished = true; });
-    const syncFilm = () => {
-      if (!visible || document.hidden || finished) { hyundaiFilm.pause(); return; }
+    const startFilm = () => {
+      if (!visible || document.hidden || !hyundaiFilm.paused) return;
       hyundaiFilm.play().catch(() => {});
+    };
+    const syncFilm = () => {
+      if (!visible || document.hidden) { hyundaiFilm.pause(); return; }
+      startFilm();
     };
     if ('IntersectionObserver' in window) {
       new IntersectionObserver(entries => {
@@ -143,7 +158,22 @@
       syncFilm();
     }
     document.addEventListener('visibilitychange', syncFilm);
+    window.addEventListener('pageshow', syncFilm);
+    window.addEventListener('focus', startFilm);
+    hyundaiFilm.addEventListener('canplay', startFilm);
+    hyundaiFilm.addEventListener('stalled', startFilm);
+    document.addEventListener('pointerdown', startFilm, { passive: true });
   }
+  const hyundaiEmblem = document.querySelector('.hyundai-signature .hyundai-emblem');
+  if (hyundaiEmblem && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const emblemObserver = new IntersectionObserver(entries => {
+      if (!entries[0].isIntersecting) return;
+      hyundaiEmblem.classList.add('is-intro-visible');
+      emblemObserver.disconnect();
+    }, { threshold: .35 });
+    emblemObserver.observe(hyundaiEmblem);
+  }
+
   const diagLabels = ['ATENCIÓN TOYOTA GR', 'DETALLE · TOYOTA GR', 'CORVETTE · TALLER', 'MOTOR PORSCHE · REVISIÓN'];
   rotateImages('[data-diagnostic-carousel]', '.diagnostic-feature-stage img', 4300, (i, n) => {
     const label = document.querySelector('[data-diagnostic-caption]');

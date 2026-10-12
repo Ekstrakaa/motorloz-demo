@@ -8,14 +8,28 @@
     const source = window.MOTORLOZ.clips?.[card.dataset.clip];
     if (!source || !/^assets\/[a-z0-9_./-]+\.(mp4|webm)$/i.test(source)) { card.hidden = true; return; }
     const video = card.querySelector('video');
+    const control = card.querySelector('[data-clip-control]');
     video.loop = true;
     let visible = !('IntersectionObserver' in window);
+    let userOverride = null;
+    const updateControl = () => {
+      if (!control) return;
+      const playing = !video.paused && !video.ended;
+      control.setAttribute('aria-label', playing ? 'Pausar video' : 'Reproducir video');
+      control.querySelector('span').textContent = playing ? '❚❚' : '▶';
+      card.classList.toggle('is-playing', playing);
+    };
     const player = window.MOTORLOZ_VIDEO(video, {
       host: card, source,
-      shouldPlay: () => visible && !reducedMotion.matches,
-      onPlaying: () => card.classList.add('is-playing')
+      shouldPlay: () => visible && (userOverride === true || (userOverride === null && !reducedMotion.matches)),
+      onPlaying: updateControl
     });
-    video.addEventListener('pause', () => card.classList.remove('is-playing'));
+    video.addEventListener('pause', updateControl);
+    control?.addEventListener('click', () => {
+      userOverride = video.paused ? true : false;
+      player.sync();
+      updateControl();
+    });
     players.push(player);
     if ('IntersectionObserver' in window) {
       new IntersectionObserver(entries => {

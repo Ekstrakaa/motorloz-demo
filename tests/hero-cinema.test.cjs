@@ -93,7 +93,7 @@ test('the home sequence moves from a video to a photo with a three-second hold',
 
 test('Hyundai official section has one film, outside the photo rail', () => {
   const html = fs.readFileSync(__dirname + '/../index.html', 'utf8');
-  const official = html.match(/<div class="hyundai-gallery"[\s\S]*?<\/div>/)?.[0] || '';
+  const official = html.match(/<div class="hyundai-gallery(?:\s[^"]*)?"[\s\S]*?<\/div>/)?.[0] || '';
   assert.equal((official.match(/<video\b/g) || []).length, 1);
   assert.equal((official.match(/hyundai-video-slide/g) || []).length, 1);
   assert.ok(official.includes('cinema-hyundai-natural.mp4'));

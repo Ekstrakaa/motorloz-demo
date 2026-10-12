@@ -1,0 +1,584 @@
+/* Hyundai and Subaru content refresh. Existing section backgrounds and animations are intentionally left intact. */
+
+/* Hyundai: cinematic dark chapter, with the vehicle, official service and working video in one composition. */
+#hyundai.hyundai-signature {
+  position: relative !important;
+  isolation: isolate;
+  overflow: hidden !important;
+  padding: clamp(30px, 4vw, 58px) clamp(18px, 5.1vw, 76px) clamp(38px, 5vw, 70px) !important;
+  color: #f2f7f7 !important;
+}
+#hyundai > .section-label,
+#hyundai > .hyundai-masthead,
+#hyundai > .hyundai-inner,
+#hyundai > .hyundai-proof-strip { position: relative; z-index: 1; }
+#hyundai > .section-label {
+  width: min(100%, 1480px);
+  margin: 0 auto clamp(14px, 2vw, 24px) !important;
+  padding-bottom: 13px;
+  border-bottom: 1px solid rgba(210, 239, 240, .13);
+  color: #adc5c7 !important;
+  font-size: 9px !important;
+  letter-spacing: .14em !important;
+}
+#hyundai > .section-label span:first-child { color: #8be3eb !important; }
+#hyundai .hyundai-masthead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 22px;
+  width: min(100%, 1480px);
+  margin: 0 auto clamp(26px, 3.6vw, 48px);
+}
+#hyundai .hyundai-masthead-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 13px;
+  min-width: 0;
+  color: #f3f8f8;
+  text-decoration: none;
+}
+#hyundai .hyundai-masthead-brand img { display: block; width: 47px; height: 39px; object-fit: contain; }
+#hyundai .hyundai-masthead-brand span { display: grid; gap: 3px; }
+#hyundai .hyundai-masthead-brand strong { font: 700 12px/1 var(--body, Arial, sans-serif); letter-spacing: .18em; }
+#hyundai .hyundai-masthead-brand small,
+#hyundai .hyundai-masthead-location { color: #a8c1c4; font: 650 8px/1.4 var(--mono, monospace); letter-spacing: .15em; }
+#hyundai .hyundai-masthead-location { display: inline-flex; align-items: center; gap: 9px; margin-left: auto; }
+#hyundai .hyundai-masthead-location i { width: 6px; height: 6px; border-radius: 50%; background: #53d0dd; box-shadow: 0 0 0 4px rgba(83, 208, 221, .12); }
+#hyundai .hyundai-masthead-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 17px;
+  min-height: 43px;
+  padding: 0 17px;
+  border: 1px solid rgba(94, 216, 229, .55);
+  border-radius: 999px;
+  color: #f1fbfc;
+  background: rgba(4, 41, 48, .35);
+  font-size: 11px;
+  font-weight: 650;
+  text-decoration: none;
+  transition: border-color .2s ease, background .2s ease, transform .2s ease;
+}
+#hyundai .hyundai-masthead-cta:hover { transform: translateY(-2px); border-color: #8bedf2; background: rgba(10, 87, 98, .55); }
+#hyundai .hyundai-masthead-cta span { color: #70e2ea; font-size: 16px; }
+#hyundai .hyundai-inner {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1.12fr) minmax(330px, .88fr) !important;
+  grid-template-rows: auto auto;
+  align-items: stretch;
+  gap: clamp(26px, 4vw, 58px) clamp(26px, 4.4vw, 68px) !important;
+  width: min(100%, 1480px) !important;
+  margin: 0 auto !important;
+}
+#hyundai .hyundai-vehicle-scene {
+  grid-column: 1;
+  grid-row: 1;
+  position: relative;
+  isolation: isolate;
+  align-self: stretch;
+  min-width: 0;
+  min-height: clamp(430px, 39vw, 590px);
+  margin: 0 !important;
+  overflow: hidden;
+  border: 1px solid rgba(215, 242, 245, .2);
+  border-radius: 13px;
+  background: #0c171b;
+  box-shadow: 0 26px 64px rgba(0, 0, 0, .25);
+}
+#hyundai .hyundai-vehicle-scene::after {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  content: "";
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(4, 12, 15, .05) 28%, rgba(4, 12, 15, .13) 58%, rgba(4, 12, 15, .76));
+}
+#hyundai .hyundai-vehicle-scene img { display: block; width: 100%; height: 100%; min-height: inherit; object-fit: cover; object-position: 50% 53%; }
+#hyundai .hyundai-vehicle-scene figcaption {
+  position: absolute;
+  z-index: 2;
+  right: 23px;
+  bottom: 23px;
+  left: 23px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #eef8f8;
+  font: 650 9px/1.4 var(--mono, monospace);
+  letter-spacing: .16em;
+  text-shadow: 0 2px 10px #001;
+}
+#hyundai .hyundai-vehicle-scene figcaption span:first-child { color: #fff; font-size: 13px; letter-spacing: .12em; }
+#hyundai .hyundai-vehicle-scene figcaption i { width: 24px; height: 1px; background: #65dbe5; }
+#hyundai .hyundai-copy {
+  grid-column: 2;
+  grid-row: 1;
+  align-self: center;
+  min-width: 0;
+  max-width: 650px !important;
+  margin: 0 !important;
+  padding: 3px 0 18px !important;
+  text-align: left !important;
+}
+#hyundai .hyundai-copy > .eyebrow { margin: 0 0 11px !important; color: #83e2e9 !important; font: 700 9px/1.5 var(--mono, monospace); letter-spacing: .18em; }
+#hyundai .hyundai-emblem {
+  display: inline-flex !important;
+  align-items: center;
+  width: 92px !important;
+  height: 64px;
+  margin: 0 0 9px !important;
+  filter: drop-shadow(0 9px 14px rgba(0, 0, 0, .24));
+}
+#hyundai .hyundai-emblem img { width: 92px !important; height: 64px !important; object-fit: contain; }
+#hyundai .hyundai-badge { display: inline-flex !important; align-items: center; gap: 10px; margin: 0 0 18px !important; padding: 7px 10px !important; border: 1px solid rgba(192, 232, 235, .21); border-radius: 3px; background: rgba(207, 237, 239, .06); }
+#hyundai .hyundai-badge span { color: #e8f4f4 !important; font-size: 11px !important; font-weight: 750; letter-spacing: .16em !important; }
+#hyundai .hyundai-badge i { padding-left: 10px; border-left: 1px solid rgba(197, 228, 230, .35); color: #afc4c5 !important; font: 700 8px/1.3 var(--mono, monospace); letter-spacing: .12em; }
+#hyundai .hyundai-copy h2 { max-width: 13ch; margin: 0 0 17px !important; color: #f4f8f8 !important; font-size: clamp(39px, 4vw, 62px) !important; line-height: .99 !important; letter-spacing: -.055em; text-align: left !important; text-wrap: balance; }
+#hyundai .hyundai-copy h2 em { color: #9ce4f1 !important; font-style: normal; }
+#hyundai .hyundai-copy > p:not(.eyebrow) { max-width: 49ch; margin: 0 0 12px !important; color: #c0d0d1 !important; font-size: clamp(13px, 1vw, 15px); line-height: 1.66; text-align: left !important; }
+#hyundai .hyundai-copy > a.text-link { display: inline-flex; align-items: center; gap: 16px; min-height: 45px; margin: 9px 0 0 !important; padding: 0 16px !important; border: 1px solid rgba(79, 212, 229, .62); border-radius: 5px; color: #f4ffff !important; background: linear-gradient(110deg, rgba(10, 103, 117, .54), rgba(8, 48, 57, .58)); font-size: 12px; font-weight: 650; text-decoration: none; }
+#hyundai .hyundai-copy > a.text-link span { color: #87e8ef; font-size: 18px; }
+#hyundai .hyundai-copy > a.text-link:hover { border-color: #9af3f7; background: rgba(10, 104, 117, .7); }
+#hyundai .hyundai-source { display: block !important; margin: 15px 0 0 !important; color: #829fa2 !important; font: 650 7px/1.5 var(--mono, monospace); letter-spacing: .11em; text-align: left !important; }
+#hyundai .hyundai-trust-points { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 24px; padding-top: 16px; border-top: 1px solid rgba(204, 236, 238, .17); }
+#hyundai .hyundai-trust-point { display: flex; align-items: flex-start; gap: 9px; min-width: 0; }
+#hyundai .hyundai-trust-point svg { flex: 0 0 21px; width: 21px; height: 21px; fill: none; stroke: #68dce6; stroke-width: 1.45; stroke-linecap: round; stroke-linejoin: round; }
+#hyundai .hyundai-trust-point span { display: grid; gap: 4px; min-width: 0; }
+#hyundai .hyundai-trust-point strong { color: #e9f4f4; font-size: 10px; line-height: 1.25; }
+#hyundai .hyundai-trust-point small { color: #a9c0c2; font-size: 9px; line-height: 1.4; }
+#hyundai .hyundai-gallery {
+  grid-column: 1;
+  grid-row: 1;
+  z-index: 3;
+  align-self: end;
+  justify-self: end;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+  width: min(52%, 405px) !important;
+  min-width: 275px;
+  margin: 0 21px 22px 0 !important;
+  overflow: hidden;
+  border: 1px solid rgba(122, 228, 237, .65);
+  border-radius: 8px;
+  background: #071317;
+  box-shadow: 0 17px 38px rgba(0, 0, 0, .43), 0 0 0 4px rgba(6, 42, 49, .28);
+}
+#hyundai .hyundai-gallery .hyundai-image { width: 100% !important; height: auto !important; min-height: 0 !important; aspect-ratio: 16 / 9; margin: 0 !important; overflow: hidden; border: 0; border-radius: 0; background: #081317; box-shadow: none; }
+#hyundai .hyundai-gallery .hyundai-image::before { background: linear-gradient(180deg, rgba(0, 0, 0, .16), transparent 34%); }
+#hyundai .hyundai-gallery .hyundai-image > video { display: block; width: 100% !important; height: 100% !important; min-height: 0 !important; object-fit: contain !important; object-position: center; background: #061014; }
+#hyundai .hyundai-image-index { top: 11px; left: 12px; gap: 8px; font-size: 7px; }
+#hyundai .hyundai-image-index::before { width: 14px; }
+#hyundai .hyundai-video-caption { display: flex; align-items: center; gap: 10px; min-height: 50px; padding: 8px 11px; color: #eaf7f8; }
+#hyundai .hyundai-video-play { display: grid; flex: 0 0 27px; width: 27px; height: 27px; place-items: center; border: 1px solid rgba(111, 222, 232, .72); border-radius: 50%; color: #9cf0f4; font-size: 9px; }
+#hyundai .hyundai-video-caption > span:nth-child(2) { display: grid; gap: 3px; min-width: 0; }
+#hyundai .hyundai-video-caption strong { font-size: 10px; line-height: 1.2; }
+#hyundai .hyundai-video-caption small { color: #adc6c8; font-size: 8px; line-height: 1.25; }
+#hyundai .hyundai-video-duration { margin-left: auto; color: #9ab3b6; font: 700 7px var(--mono, monospace); letter-spacing: .12em; }
+#hyundai .hyundai-photo-gallery { grid-column: 1 / -1; grid-row: 2; width: 100% !important; min-width: 0; margin: 0 !important; color: #edf7f7; }
+#hyundai .hyundai-gallery-heading { display: flex; justify-content: space-between; gap: 16px; padding: 0 2px 11px; color: #87e0e7; font: 700 9px var(--mono, monospace); letter-spacing: .13em; }
+#hyundai .hyundai-gallery-heading span:last-child { color: #b4c9ca; font-size: 8px; }
+#hyundai .hyundai-gallery-heading i { color: #80e4eb; font-style: normal; }
+#hyundai .hyundai-photo-rail { display: flex; gap: 13px; min-width: 0; overflow-x: auto; overflow-y: hidden; padding: 2px 2px 10px; scroll-snap-type: x mandatory; scroll-padding-inline: 2px; overscroll-behavior-inline: contain; touch-action: pan-x pan-y; scrollbar-color: rgba(126, 218, 227, .56) rgba(255, 255, 255, .08); scrollbar-width: thin; }
+#hyundai .hyundai-photo-card { position: relative; flex: 0 0 min(31%, 385px); min-width: 0; aspect-ratio: 16 / 10; margin: 0; overflow: hidden; scroll-snap-align: start; border: 1px solid rgba(217, 244, 245, .19); border-radius: 7px; background: #091316; }
+#hyundai .hyundai-photo-card img { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover; object-position: center; }
+#hyundai .hyundai-photo-card:nth-child(3) img { object-position: 50% 56%; }
+#hyundai .hyundai-photo-card figcaption { position: absolute; inset: auto 0 0; display: flex; align-items: center; gap: 9px; min-height: 40px; padding: 10px 12px; color: #f3fbfb; background: linear-gradient(0deg, rgba(3, 14, 17, .94), transparent); font-size: 10px; font-weight: 650; }
+#hyundai .hyundai-photo-card figcaption span { color: #82e2ea; font: 700 8px var(--mono, monospace); white-space: nowrap; }
+#hyundai .hyundai-gallery-controls { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 5px 2px 0; color: #9cb5b6; font: 650 8px var(--mono, monospace); letter-spacing: .11em; }
+#hyundai .hyundai-gallery-controls > div { display: flex; gap: 7px; }
+#hyundai .hyundai-gallery-controls button { display: grid; width: 34px; height: 34px; place-items: center; border: 1px solid rgba(121, 211, 219, .45); border-radius: 50%; color: #e8fafb; background: rgba(15, 55, 61, .6); font-size: 16px; cursor: pointer; }
+#hyundai .hyundai-proof-strip {
+  display: grid !important;
+  grid-template-columns: minmax(260px, .7fr) minmax(0, 1.3fr) !important;
+  grid-template-areas: "copy gallery";
+  align-items: stretch;
+  gap: clamp(20px, 3.6vw, 50px) !important;
+  width: min(100%, 1480px) !important;
+  margin: clamp(30px, 4vw, 54px) auto 0 !important;
+  padding: clamp(16px, 2.3vw, 28px) !important;
+  border: 1px solid rgba(177, 224, 228, .29) !important;
+  border-radius: 11px;
+  background: linear-gradient(110deg, rgba(14, 51, 58, .68), rgba(4, 21, 26, .44));
+  box-shadow: inset 0 1px rgba(230, 251, 252, .1), 0 18px 42px rgba(0, 0, 0, .18);
+}
+#hyundai .hyundai-proof-gallery { grid-area: gallery; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 11px; min-width: 0; }
+#hyundai .hyundai-proof-image { position: relative; min-width: 0; aspect-ratio: 1.34; margin: 0; overflow: hidden; border: 1px solid rgba(222, 247, 248, .19); border-radius: 5px; background: #102228; }
+#hyundai .hyundai-proof-image img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center; }
+#hyundai .hyundai-proof-image:first-child img { object-position: 50% 53%; }
+#hyundai .hyundai-proof-image:nth-child(2) img { object-position: 48% 35%; }
+#hyundai .hyundai-proof-image figcaption { position: absolute; inset: auto 0 0; padding: 18px 9px 7px; color: #f4fafa; background: linear-gradient(0deg, rgba(3, 17, 20, .85), transparent); font: 650 8px/1.35 var(--mono, monospace); letter-spacing: .06em; }
+#hyundai .hyundai-proof-copy { grid-area: copy; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 10px; min-width: 0; }
+#hyundai .hyundai-proof-copy .eyebrow { margin: 0; color: #85e0e8; font: 700 8px/1.5 var(--mono, monospace); letter-spacing: .14em; }
+#hyundai .hyundai-proof-copy strong { color: #f3f8f8; font-size: clamp(17px, 1.7vw, 23px); line-height: 1.25; }
+#hyundai .hyundai-proof-copy p { max-width: 55ch; margin: 0; color: #bfd0d1; font-size: 11px; line-height: 1.65; }
+#hyundai .hyundai-proof-location { color: #a8c3c6; font: 700 8px/1.5 var(--mono, monospace); letter-spacing: .1em; }
+#hyundai .hyundai-proof-location i { color: #74dce5; font-style: normal; }
+#hyundai .hyundai-map-action { display: inline-flex; align-items: center; gap: 12px; margin-top: 2px; color: #a5edf1; font-size: 10px; font-weight: 700; text-decoration: none; }
+#hyundai .hyundai-map-action:hover { color: white; }
+
+/* Subaru: refine the content on its existing light surface and leave its texture and motion alone. */
+#marca-subaru.subaru-section { position: relative; isolation: isolate; overflow: hidden; padding: clamp(32px, 4vw, 58px) clamp(18px, 5.1vw, 76px) clamp(34px, 4vw, 58px) !important; color: #102a3b !important; }
+#marca-subaru > .section-label,
+#marca-subaru > .subaru-masthead,
+#marca-subaru > .japan-gallery,
+#marca-subaru > .subaru-technical-band,
+#marca-subaru > .subaru-story { position: relative; z-index: 1; }
+#marca-subaru > .section-label { width: min(100%, 1480px); margin: 0 auto 14px !important; padding-bottom: 13px; border-bottom: 1px solid rgba(35, 85, 118, .15); color: #4a6475 !important; font-size: 9px !important; letter-spacing: .14em !important; }
+#marca-subaru > .section-label span:first-child { color: #125d9f !important; }
+#marca-subaru .subaru-masthead { display: flex; align-items: center; justify-content: space-between; gap: 20px; width: min(100%, 1480px); margin: 0 auto clamp(28px, 3.6vw, 46px); }
+#marca-subaru .subaru-masthead-brand { display: inline-flex; align-items: center; gap: 13px; min-width: 0; color: #0c2436; text-decoration: none; }
+#marca-subaru .subaru-masthead-brand img { display: block; width: 63px; height: 39px; object-fit: contain; }
+#marca-subaru .subaru-masthead-brand span { display: grid; gap: 4px; }
+#marca-subaru .subaru-masthead-brand strong { font: 750 12px/1 var(--body, Arial, sans-serif); letter-spacing: .17em; }
+#marca-subaru .subaru-masthead-brand small { color: #627c8e; font: 650 8px/1.4 var(--mono, monospace); letter-spacing: .11em; }
+#marca-subaru .subaru-masthead-cta { display: inline-flex; align-items: center; gap: 13px; min-height: 41px; padding: 0 17px; border: 1px solid rgba(18, 92, 159, .35); border-radius: 999px; color: #123955; background: rgba(255, 255, 255, .54); font-size: 11px; font-weight: 700; text-decoration: none; transition: color .2s ease, background .2s ease, transform .2s ease; }
+#marca-subaru .subaru-masthead-cta:hover { transform: translateY(-2px); color: #fff; background: #155c9b; }
+#marca-subaru .subaru-masthead-cta span { color: #1375c5; font-size: 16px; }
+#marca-subaru .japan-gallery {
+  display: grid !important;
+  grid-template-columns: minmax(250px, .9fr) minmax(260px, .95fr) minmax(320px, 1.2fr) !important;
+  align-items: center !important;
+  gap: clamp(20px, 3.1vw, 46px) !important;
+  width: min(100%, 1480px) !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+  border: 0 !important;
+}
+#marca-subaru .japan-heading { grid-column: auto !important; align-self: center !important; min-width: 0; padding: 0 !important; text-align: left !important; }
+#marca-subaru .japan-heading > .eyebrow { display: block; margin: 0 0 18px; color: #1265ac !important; font: 750 9px/1.5 var(--mono, monospace) !important; letter-spacing: .15em; }
+#marca-subaru .japan-brand-pair { justify-content: flex-start !important; gap: 14px !important; margin: 0 0 20px !important; }
+#marca-subaru .japan-flag { flex: 0 0 40px !important; width: 40px !important; height: 29px !important; border: 1px solid rgba(26, 64, 88, .14) !important; border-radius: 3px; box-shadow: 0 4px 12px rgba(13, 39, 58, .08); }
+#marca-subaru .japan-flag i { width: 10px !important; height: 10px !important; }
+#marca-subaru .brand-separator { height: 26px !important; background: rgba(17, 65, 106, .3) !important; }
+#marca-subaru .subaru-lockup { display: inline-flex !important; align-items: center; gap: 9px; }
+#marca-subaru .subaru-lockup img { width: 52px !important; height: 36px !important; object-fit: contain; }
+#marca-subaru .subaru-wordmark { display: inline !important; color: #1b2831; font: 750 11px/1 var(--body, Arial, sans-serif); letter-spacing: .11em; }
+#marca-subaru .japan-heading h2 { max-width: 12ch; margin: 0 0 14px !important; color: #102737 !important; font-size: clamp(35px, 3.4vw, 51px) !important; line-height: .99 !important; letter-spacing: -.05em; text-align: left !important; text-wrap: balance; }
+#marca-subaru .japan-heading h2 span { color: #176cc0 !important; }
+#marca-subaru .japan-heading > p { max-width: 44ch; margin: 0 !important; color: #4c6270 !important; font-size: 13px !important; line-height: 1.7 !important; text-align: left !important; }
+#marca-subaru .subaru-service-action { display: inline-flex; align-items: center; gap: 10px; min-height: 45px; margin-top: 21px; padding: 0 16px; border: 1px solid #146bb6; border-radius: 5px; color: #fff; background: #1465aa; box-shadow: 0 8px 20px rgba(18, 92, 159, .15); font-size: 11px; font-weight: 700; text-decoration: none; transition: transform .2s ease, background .2s ease, box-shadow .2s ease; }
+#marca-subaru .subaru-service-action:hover { transform: translateY(-2px); background: #0b5598; box-shadow: 0 12px 24px rgba(18, 92, 159, .22); }
+#marca-subaru .subaru-service-action > span { font-size: 16px; }
+#marca-subaru .subaru-service-action b { margin-left: 9px; font-size: 16px; font-weight: 500; }
+#marca-subaru .japan-note { margin-top: 17px; color: #4b6d80 !important; font: 700 7px/1.6 var(--mono, monospace) !important; letter-spacing: .11em; }
+#marca-subaru .subaru-engine-panel { position: relative; display: flex; flex-direction: column; justify-content: center; min-width: 0; padding: 12px 0 9px; }
+#marca-subaru .subaru-engine-label { align-self: flex-end; padding: 7px 9px; border-left: 2px solid #1472c3; color: #31566e; background: rgba(255, 255, 255, .55); font: 700 7px/1.45 var(--mono, monospace); letter-spacing: .11em; }
+#marca-subaru figure.engine-sketch { width: min(100%, 560px) !important; height: clamp(220px, 23vw, 320px) !important; margin: 5px auto 3px !important; }
+#marca-subaru .engine-sketch img { width: 100% !important; height: 100% !important; object-fit: contain !important; }
+#marca-subaru .engine-sketch::before { background: radial-gradient(ellipse, rgba(12, 55, 99, .16), rgba(17, 86, 139, .06) 46%, transparent 76%) !important; }
+#marca-subaru .engine-sketch::after { border-color: rgba(22, 105, 182, .22) !important; background: radial-gradient(circle at 11% 23%, rgba(22, 105, 182, .3) 0 2px, transparent 3px) !important; box-shadow: 0 0 0 9px rgba(22, 105, 182, .018), inset 0 0 22px rgba(22, 105, 182, .02) !important; }
+#marca-subaru .engine-sketch figcaption { margin: 4px 0 0 !important; color: #4c6574 !important; font: 700 8px/1.4 var(--mono, monospace) !important; letter-spacing: .12em !important; }
+#marca-subaru .subaru-engine-specs { display: flex; align-items: center; justify-content: center; gap: 9px; color: #476679; font: 700 7px/1.5 var(--mono, monospace); letter-spacing: .11em; }
+#marca-subaru .subaru-engine-specs i { width: 20px; height: 1px; background: #468bc0; }
+#marca-subaru .subaru-feature { position: relative; min-width: 0; width: 100% !important; max-width: none !important; margin: 0 !important; overflow: hidden; border: 1px solid rgba(20, 68, 103, .18); border-radius: 8px; background: #0c2432; box-shadow: 0 16px 35px rgba(20, 54, 79, .13); }
+#marca-subaru .subaru-feature-video { display: block; width: 100% !important; height: auto !important; aspect-ratio: 16 / 9; object-fit: contain !important; background: #091a25 !important; }
+#marca-subaru .subaru-feature figcaption { display: flex !important; align-items: center; justify-content: space-between; gap: 12px; margin: 0 !important; padding: 11px 13px; color: #eaf5fa !important; background: #102e40; font: 700 8px/1.4 var(--mono, monospace) !important; letter-spacing: .13em; }
+#marca-subaru .subaru-feature figcaption span:last-child { color: #6fc2ff; font-size: 14px; }
+#marca-subaru .subaru-technical-band { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); width: min(100%, 1480px); margin: clamp(27px, 3.5vw, 45px) auto 0; padding: 17px clamp(12px, 2.5vw, 32px); border: 1px solid rgba(35, 86, 118, .13); border-radius: 8px; background: rgba(255, 255, 255, .52); box-shadow: 0 10px 26px rgba(28, 63, 84, .07), inset 0 1px rgba(255, 255, 255, .8); }
+#marca-subaru .subaru-technical-item { display: flex; align-items: center; gap: 13px; min-width: 0; padding: 4px clamp(8px, 1.7vw, 25px); }
+#marca-subaru .subaru-technical-item + .subaru-technical-item { border-left: 1px solid rgba(36, 83, 112, .2); }
+#marca-subaru .subaru-technical-item svg { flex: 0 0 36px; width: 36px; height: 36px; padding: 7px; border: 1px solid rgba(23, 106, 182, .45); border-radius: 8px; fill: none; stroke: #176fbd; stroke-width: 1.55; stroke-linecap: round; stroke-linejoin: round; }
+#marca-subaru .subaru-technical-item span { display: grid; gap: 4px; min-width: 0; }
+#marca-subaru .subaru-technical-item strong { color: #172e40; font-size: 12px; line-height: 1.25; }
+#marca-subaru .subaru-technical-item small { color: #587184; font-size: 10px; line-height: 1.4; }
+#marca-subaru .subaru-story { display: block; width: min(100%, 920px); margin: clamp(35px, 4vw, 56px) auto 0; }
+#marca-subaru .subaru-story-copy { min-width: 0; padding: 3px 0; }
+#marca-subaru .subaru-story-copy > .eyebrow { margin: 0 0 13px; color: #176bb1; font: 750 8px/1.5 var(--mono, monospace); letter-spacing: .16em; }
+#marca-subaru .subaru-story-copy h3 { max-width: 13ch; margin: 0 0 16px; color: #102737; font-size: clamp(34px, 3.1vw, 47px); line-height: .99; letter-spacing: -.05em; text-wrap: balance; }
+#marca-subaru .subaru-story-copy h3 em { color: #176cc0; font-style: normal; }
+#marca-subaru .subaru-story-copy p { max-width: 48ch; margin: 0 0 11px; color: #4d6472; font-size: 12px; line-height: 1.7; }
+#marca-subaru .subaru-story-copy > a { display: inline-flex; align-items: center; gap: 11px; margin-top: 7px; color: #105f9f; font-size: 11px; font-weight: 750; text-decoration: none; }
+#marca-subaru .subaru-story-copy > a:hover { color: #0b85dc; }
+#marca-subaru .subaru-story-copy > a span { font-size: 17px; }
+#marca-subaru .subaru-story-signature { display: block; margin-top: 24px; padding-top: 12px; border-top: 1px solid rgba(29, 79, 112, .16); color: #617b8b; font: 700 7px/1.6 var(--mono, monospace); letter-spacing: .11em; }
+
+@media (max-width: 1100px) {
+  #hyundai .hyundai-inner { grid-template-columns: minmax(0, 1.03fr) minmax(300px, .97fr) !important; gap: 24px !important; }
+  #hyundai .hyundai-vehicle-scene { min-height: 440px; }
+  #hyundai .hyundai-gallery { width: 54% !important; min-width: 250px; margin: 0 13px 14px 0 !important; }
+  #hyundai .hyundai-copy h2 { font-size: clamp(36px, 4.3vw, 50px) !important; }
+  #hyundai .hyundai-trust-points { gap: 7px; }
+  #hyundai .hyundai-trust-point { gap: 6px; }
+  #hyundai .hyundai-trust-point strong { font-size: 9px; }
+  #hyundai .hyundai-trust-point small { font-size: 8px; }
+  #marca-subaru .japan-gallery { grid-template-columns: minmax(0, .95fr) minmax(0, 1.05fr) !important; gap: 20px 28px !important; }
+  #marca-subaru .japan-heading { grid-column: 1 !important; grid-row: 1; }
+  #marca-subaru .subaru-engine-panel { grid-column: 2 !important; grid-row: 1; }
+  #marca-subaru .subaru-feature { grid-column: 1 / -1 !important; grid-row: 2; width: min(100%, 850px) !important; justify-self: center; }
+  #marca-subaru figure.engine-sketch { height: clamp(220px, 28vw, 300px) !important; }
+}
+@media (max-width: 760px) {
+  #hyundai.hyundai-signature { padding: 26px 0 36px !important; }
+  #hyundai > .section-label { margin: 0 18px 12px !important; font-size: 7px !important; }
+  #hyundai .hyundai-masthead { gap: 9px; margin: 0 18px 18px; }
+  #hyundai .hyundai-masthead-brand { gap: 8px; }
+  #hyundai .hyundai-masthead-brand img { width: 37px; height: 32px; }
+  #hyundai .hyundai-masthead-brand strong { font-size: 10px; }
+  #hyundai .hyundai-masthead-brand small { font-size: 6px; }
+  #hyundai .hyundai-masthead-location { display: none; }
+  #hyundai .hyundai-masthead-cta { min-height: 36px; gap: 8px; padding: 0 11px; font-size: 9px; white-space: nowrap; }
+  #hyundai .hyundai-masthead-cta span { font-size: 13px; }
+  #hyundai .hyundai-inner { display: grid !important; grid-template-columns: minmax(0, 1fr) !important; grid-template-rows: auto !important; gap: 0 !important; width: 100% !important; }
+  #hyundai .hyundai-vehicle-scene { grid-column: 1 !important; grid-row: 1 !important; width: 100% !important; min-height: 0; height: auto; aspect-ratio: 1.15; border-inline: 0; border-radius: 0; }
+  #hyundai .hyundai-vehicle-scene img { min-height: 0; object-position: 51% 52%; }
+  #hyundai .hyundai-vehicle-scene figcaption { right: 17px; bottom: 14px; left: 17px; gap: 8px; font-size: 7px; }
+  #hyundai .hyundai-vehicle-scene figcaption span:first-child { font-size: 11px; }
+  #hyundai .hyundai-copy { grid-column: 1 !important; grid-row: 2 !important; max-width: none !important; margin: 25px 20px 0 !important; padding: 0 !important; }
+  #hyundai .hyundai-copy > .eyebrow { margin-bottom: 8px !important; font-size: 8px; }
+  #hyundai .hyundai-emblem { width: 70px !important; height: 46px; margin-bottom: 7px !important; }
+  #hyundai .hyundai-emblem img { width: 70px !important; height: 46px !important; }
+  #hyundai .hyundai-badge { margin-bottom: 14px !important; padding: 6px 8px !important; }
+  #hyundai .hyundai-badge span { font-size: 9px !important; }
+  #hyundai .hyundai-badge i { font-size: 7px; }
+  #hyundai .hyundai-copy h2 { max-width: 13ch; margin-bottom: 12px !important; font-size: clamp(35px, 10vw, 46px) !important; }
+  #hyundai .hyundai-copy > p:not(.eyebrow) { margin-bottom: 9px !important; font-size: 13px; line-height: 1.65; }
+  #hyundai .hyundai-copy > a.text-link { min-height: 43px; margin-top: 6px !important; font-size: 11px; }
+  #hyundai .hyundai-source { margin-top: 11px !important; font-size: 6px; }
+  #hyundai .hyundai-trust-points { gap: 7px; margin-top: 19px; padding-top: 13px; }
+  #hyundai .hyundai-trust-point { display: grid; gap: 6px; align-content: start; }
+  #hyundai .hyundai-trust-point svg { width: 20px; height: 20px; }
+  #hyundai .hyundai-trust-point strong { font-size: 9px; }
+  #hyundai .hyundai-trust-point small { font-size: 8px; }
+  #hyundai .hyundai-gallery { grid-column: 1 !important; grid-row: 3 !important; align-self: auto; justify-self: stretch; width: auto !important; min-width: 0; margin: 22px 18px 0 !important; border-radius: 8px; }
+  #hyundai .hyundai-gallery .hyundai-image { aspect-ratio: 16 / 9; }
+  #hyundai .hyundai-video-caption { min-height: 47px; }
+  #hyundai .hyundai-video-caption strong { font-size: 10px; }
+  #hyundai .hyundai-photo-gallery { grid-column: 1 !important; grid-row: 4 !important; width: auto !important; margin: 25px 18px 0 !important; }
+  #hyundai .hyundai-gallery-heading { align-items: center; font-size: 8px; }
+  #hyundai .hyundai-gallery-heading span:last-child { font-size: 7px; white-space: nowrap; }
+  #hyundai .hyundai-photo-card { flex-basis: 84%; aspect-ratio: 1.22; }
+  #hyundai .hyundai-photo-card figcaption { min-height: 40px; padding: 9px 10px; font-size: 10px; }
+  #hyundai .hyundai-gallery-controls { padding-top: 6px; }
+  #hyundai .hyundai-proof-strip { grid-template-columns: minmax(0, 1fr) !important; grid-template-areas: "copy" "gallery" !important; gap: 15px !important; margin: 27px 14px 0 !important; padding: 14px !important; border-radius: 9px; }
+  #hyundai .hyundai-proof-copy { gap: 8px; }
+  #hyundai .hyundai-proof-copy .eyebrow { font-size: 7px; }
+  #hyundai .hyundai-proof-copy strong { font-size: 17px; }
+  #hyundai .hyundai-proof-copy p { font-size: 11px; }
+  #hyundai .hyundai-proof-location { font-size: 7px; }
+  #hyundai .hyundai-proof-gallery { display: flex; gap: 9px; overflow-x: auto; padding-bottom: 5px; scroll-snap-type: x mandatory; overscroll-behavior-inline: contain; touch-action: pan-x pan-y; }
+  #hyundai .hyundai-proof-image { flex: 0 0 78%; aspect-ratio: 1.38; scroll-snap-align: start; }
+
+  #marca-subaru.subaru-section { padding: 26px 0 34px !important; }
+  #marca-subaru > .section-label { margin: 0 18px 12px !important; font-size: 7px !important; }
+  #marca-subaru .subaru-masthead { gap: 9px; margin: 0 18px 20px; }
+  #marca-subaru .subaru-masthead-brand { gap: 8px; }
+  #marca-subaru .subaru-masthead-brand img { width: 45px; height: 31px; }
+  #marca-subaru .subaru-masthead-brand strong { font-size: 10px; }
+  #marca-subaru .subaru-masthead-brand small { font-size: 6px; letter-spacing: .08em; }
+  #marca-subaru .subaru-masthead-cta { min-height: 35px; gap: 7px; padding: 0 11px; font-size: 9px; white-space: nowrap; }
+  #marca-subaru .japan-gallery { grid-template-columns: minmax(0, 1fr) !important; gap: 18px !important; width: 100% !important; margin: 0 !important; padding: 0 !important; }
+  #marca-subaru .japan-heading { grid-column: 1 !important; grid-row: 1 !important; margin: 0 20px !important; text-align: left !important; }
+  #marca-subaru .japan-heading > .eyebrow { margin-bottom: 13px; font-size: 8px !important; }
+  #marca-subaru .japan-brand-pair { margin-bottom: 14px !important; }
+  #marca-subaru .japan-flag { flex-basis: 35px !important; width: 35px !important; height: 26px !important; }
+  #marca-subaru .subaru-lockup img { width: 45px !important; height: 31px !important; }
+  #marca-subaru .subaru-wordmark { font-size: 10px; }
+  #marca-subaru .japan-heading h2 { max-width: 12ch; margin: 0 0 12px !important; font-size: clamp(34px, 9.7vw, 45px) !important; line-height: 1 !important; }
+  #marca-subaru .japan-heading > p { max-width: 48ch; margin: 0 !important; font-size: 13px !important; line-height: 1.65 !important; }
+  #marca-subaru .subaru-service-action { min-height: 42px; margin-top: 16px; font-size: 10px; }
+  #marca-subaru .japan-note { margin-top: 13px; font-size: 6px !important; }
+  #marca-subaru .subaru-engine-panel { grid-column: 1 !important; grid-row: 2 !important; padding: 0 17px; }
+  #marca-subaru .subaru-engine-label { margin-right: 3px; font-size: 6px; }
+  #marca-subaru figure.engine-sketch { width: min(100%, 470px) !important; height: clamp(215px, 62vw, 285px) !important; margin: 0 auto !important; }
+  #marca-subaru .engine-sketch figcaption { font-size: 7px !important; }
+  #marca-subaru .subaru-engine-specs { font-size: 6px; }
+  #marca-subaru .subaru-feature { grid-column: 1 !important; grid-row: 3 !important; width: calc(100% - 36px) !important; max-width: none !important; margin: 0 18px !important; justify-self: stretch !important; border-radius: 7px; }
+  #marca-subaru .subaru-feature-video { aspect-ratio: 16 / 9; object-fit: contain !important; }
+  #marca-subaru .subaru-feature figcaption { padding: 9px 11px; font-size: 7px !important; }
+  #marca-subaru .subaru-technical-band { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; margin: 21px 14px 0; padding: 11px 5px; border-radius: 7px; }
+  #marca-subaru .subaru-technical-item { display: grid; justify-items: start; align-content: start; gap: 7px; padding: 2px 8px; }
+  #marca-subaru .subaru-technical-item + .subaru-technical-item { border-left: 1px solid rgba(36, 83, 112, .17); }
+  #marca-subaru .subaru-technical-item svg { width: 28px; height: 28px; padding: 5px; border-radius: 6px; }
+  #marca-subaru .subaru-technical-item span { gap: 3px; }
+  #marca-subaru .subaru-technical-item strong { font-size: 9px; line-height: 1.2; }
+  #marca-subaru .subaru-technical-item small { font-size: 8px; line-height: 1.35; }
+  #marca-subaru .subaru-story { grid-template-columns: minmax(0, 1fr) !important; gap: 17px; margin: 25px 18px 0; }
+  #marca-subaru .subaru-story-copy > .eyebrow { margin-bottom: 9px; font-size: 7px; }
+  #marca-subaru .subaru-story-copy h3 { max-width: 13ch; margin-bottom: 12px; font-size: clamp(33px, 9vw, 42px); }
+  #marca-subaru .subaru-story-copy p { margin-bottom: 9px; font-size: 11px; line-height: 1.65; }
+  #marca-subaru .subaru-story-copy > a { margin-top: 4px; font-size: 10px; }
+  #marca-subaru .subaru-story-signature { margin-top: 15px; padding-top: 9px; font-size: 6px; }
+}
+@media (max-width: 380px) {
+  #hyundai .hyundai-masthead-brand small { letter-spacing: .04em; }
+  #hyundai .hyundai-copy { margin-inline: 17px !important; }
+  #hyundai .hyundai-gallery-heading { gap: 6px; letter-spacing: .08em; }
+  #hyundai .hyundai-gallery-heading span:last-child { font-size: 6px; }
+  #hyundai .hyundai-trust-point small { font-size: 7px; }
+  #marca-subaru .subaru-masthead-brand small { display: none; }
+  #marca-subaru .subaru-technical-item { padding-inline: 6px; }
+  #marca-subaru .subaru-technical-item strong { font-size: 8px; }
+  #marca-subaru .subaru-technical-item small { font-size: 7px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #hyundai .hyundai-masthead-cta,
+  #hyundai .hyundai-gallery-controls button,
+  #marca-subaru .subaru-masthead-cta,
+  #marca-subaru .subaru-service-action {
+    transition-duration: .01ms !important;
+    animation-duration: .01ms !important;
+  }
+}
+
+/* Final mobile pass: MOTORLOZ palette, centered Subaru typography and safe side gutters. */
+#marca-subaru > .section-label span:first-child,
+#marca-subaru .japan-heading > .eyebrow,
+#marca-subaru .japan-heading h2 span,
+#marca-subaru .subaru-story-copy > .eyebrow,
+#marca-subaru .subaru-story-copy h3 em,
+#marca-subaru .subaru-story-copy > a { color: #008ca6 !important; }
+#marca-subaru .subaru-masthead-cta { border-color: rgba(0, 140, 166, .38); }
+#marca-subaru .subaru-masthead-cta:hover { background: #007c93; }
+#marca-subaru .subaru-masthead-cta span { color: #008ca6; }
+#marca-subaru .subaru-service-action { border-color: #007c93; background: #007c93; box-shadow: 0 8px 20px rgba(0, 124, 147, .15); }
+#marca-subaru .subaru-service-action:hover { background: #006b7d; box-shadow: 0 12px 24px rgba(0, 124, 147, .22); }
+#marca-subaru .subaru-engine-label { border-left-color: #008ca6; }
+#marca-subaru .engine-sketch::before { background: radial-gradient(ellipse, rgba(0, 140, 166, .14), rgba(0, 140, 166, .05) 46%, transparent 76%) !important; }
+#marca-subaru .engine-sketch::after { border-color: rgba(0, 140, 166, .22) !important; background: radial-gradient(circle at 11% 23%, rgba(0, 140, 166, .25) 0 2px, transparent 3px) !important; box-shadow: 0 0 0 9px rgba(0, 140, 166, .018), inset 0 0 22px rgba(0, 140, 166, .02) !important; }
+#marca-subaru .subaru-engine-specs i { background: #008ca6; }
+#marca-subaru .subaru-technical-item svg { border-color: rgba(0, 140, 166, .42); stroke: #008ca6; }
+#marca-subaru .subaru-feature figcaption span:last-child { color: #71dce5; }
+#marca-subaru .subaru-story-copy { width: 100%; }
+
+@media (max-width: 760px) {
+  #hyundai > .section-label,
+  #marca-subaru > .section-label { width: auto; }
+  #hyundai .hyundai-masthead,
+  #marca-subaru .subaru-masthead { width: auto; }
+  #hyundai .hyundai-proof-strip { width: auto !important; }
+  #marca-subaru .subaru-technical-band,
+  #marca-subaru .subaru-story { width: auto; }
+
+  #marca-subaru .japan-heading { text-align: center !important; }
+  #marca-subaru .japan-heading > .eyebrow,
+  #marca-subaru .japan-note { text-align: center; }
+  #marca-subaru .japan-brand-pair { justify-content: center !important; margin-inline: auto !important; }
+  #marca-subaru .japan-flag { flex-basis: 47px !important; width: 47px !important; height: 34px !important; }
+  #marca-subaru .japan-flag i { width: 12px !important; height: 12px !important; }
+  #marca-subaru .brand-separator { height: 34px !important; }
+  #marca-subaru .subaru-lockup { gap: 11px; }
+  #marca-subaru .subaru-lockup img { width: 68px !important; height: 47px !important; }
+  #marca-subaru .subaru-wordmark { font-size: 13px; }
+  #marca-subaru .japan-heading h2 { max-width: 13ch; margin: 0 auto 13px !important; text-align: center !important; }
+  #marca-subaru .japan-heading > p { max-width: 37ch; margin: 0 auto !important; text-align: center !important; }
+  #marca-subaru .subaru-service-action { justify-content: center; margin-inline: auto; }
+  #marca-subaru .subaru-engine-label { align-self: center; }
+
+  #marca-subaru .subaru-story-copy { text-align: center; }
+  #marca-subaru .subaru-story-copy h3 { max-width: 13ch; margin: 0 auto 12px; }
+  #marca-subaru .subaru-story-copy p { max-width: 37ch; margin: 0 auto 10px; }
+  #marca-subaru .subaru-story-copy > a { justify-content: center; }
+  #marca-subaru .subaru-story-signature { text-align: center; }
+}
+
+/* One clean Hyundai film in the hero; center its copy on narrow screens. */
+#hyundai .hyundai-gallery.hyundai-vehicle-scene {
+  position: relative;
+  grid-column: 1 !important;
+  grid-row: 1 !important;
+  align-self: center;
+  justify-self: stretch;
+  width: 100% !important;
+  min-width: 0;
+  min-height: 0;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  margin: 0 !important;
+  overflow: hidden;
+  border: 1px solid rgba(215, 242, 245, .17);
+  border-radius: 10px;
+  background: #071317;
+  box-shadow: 0 24px 58px rgba(0, 0, 0, .31);
+}
+#hyundai .hyundai-gallery.hyundai-vehicle-scene::after { content: none; }
+#hyundai .hyundai-gallery:not(.hyundai-vehicle-scene) { display: none !important; }
+#hyundai .hyundai-vehicle-scene > :not(.hyundai-video-slide) { display: none !important; }
+#hyundai .hyundai-gallery.hyundai-vehicle-scene .hyundai-image { position: absolute; inset: 0; width: 100% !important; height: 100% !important; aspect-ratio: auto; border: 0; border-radius: 0; }
+#hyundai .hyundai-gallery.hyundai-vehicle-scene .hyundai-image::before { display: none; }
+#hyundai .hyundai-gallery.hyundai-vehicle-scene .hyundai-image > video { display: block; width: 100% !important; height: 100% !important; object-fit: contain !important; background: #071317; }
+
+@media (max-width: 760px) {
+  #hyundai .hyundai-gallery.hyundai-vehicle-scene { grid-row: 1 !important; width: auto !important; margin: 0 18px !important; border-radius: 7px; }
+  #hyundai .hyundai-copy { text-align: center !important; }
+  #hyundai .hyundai-copy > .eyebrow,
+  #hyundai .hyundai-copy > p:not(.eyebrow),
+  #hyundai .hyundai-source { text-align: center !important; margin-inline: auto !important; }
+  #hyundai .hyundai-copy h2 { margin-inline: auto !important; text-align: center !important; }
+  #hyundai .hyundai-emblem { display: flex !important; margin-inline: auto !important; }
+  #hyundai .hyundai-badge { display: flex !important; width: fit-content; margin-inline: auto !important; }
+  #hyundai .hyundai-copy > a.text-link { justify-content: center; margin-inline: auto !important; }
+  #hyundai .hyundai-trust-point { justify-items: center; text-align: center; }
+  #marca-subaru .japan-heading h2 {
+    width: 100%;
+    max-width: none;
+    margin: 0 auto 13px !important;
+    font-size: clamp(29px, 8vw, 36px) !important;
+    line-height: 1.05 !important;
+    text-align: center !important;
+    text-wrap: balance;
+  }
+}
+
+/* Subaru point 02 now carries the original workshop carousel and proof icons. */
+#marca-subaru.subaru-section { padding-bottom: clamp(26px, 2.6vw, 38px) !important; }
+#marca-subaru .subaru-story {
+  display: block;
+  width: min(calc(100% - 48px), 1480px);
+  margin: clamp(28px, 3vw, 42px) auto 0;
+}
+#marca-subaru .subaru-story > .intro-feature {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1.08fr) minmax(300px, .92fr) !important;
+  align-items: center !important;
+  gap: clamp(30px, 4.6vw, 72px) !important;
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+}
+#marca-subaru .subaru-story .intro-feature-copy { min-width: 0; }
+#marca-subaru .subaru-story .intro-feature-copy h2 { text-wrap: balance; }
+#marca-subaru .subaru-story .intro-feature-copy p { max-width: 54ch; }
+#marca-subaru .subaru-story .intro-proof-row {
+  width: min(100%, 1180px) !important;
+  margin: clamp(28px, 3vw, 42px) auto 0 !important;
+}
+
+@media (max-width: 1050px) and (min-width: 761px) {
+  #marca-subaru .subaru-story > .intro-feature {
+    grid-template-columns: minmax(0, 1fr) minmax(0, .92fr) !important;
+    gap: 28px !important;
+  }
+}
+
+@media (max-width: 760px) {
+  #marca-subaru.subaru-section { padding-bottom: 28px !important; }
+  #marca-subaru .subaru-story {
+    width: auto;
+    margin: 28px 16px 0;
+  }
+  #marca-subaru .subaru-story > .intro-feature {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 22px !important;
+  }
+  #marca-subaru .subaru-story .intro-feature-copy {
+    width: 100%;
+    max-width: none;
+    text-align: center;
+  }
+  #marca-subaru .subaru-story .intro-feature-copy h2 {
+    max-width: 22ch;
+    margin-inline: auto;
+    text-wrap: balance;
+  }
+  #marca-subaru .subaru-story .intro-feature-copy p {
+    max-width: 48ch;
+    margin-inline: auto;
+  }
+  #marca-subaru .subaru-story .intro-proof-row {
+    width: 100% !important;
+    margin-top: 22px !important;
+  }
+}

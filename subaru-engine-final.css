@@ -1,0 +1,58 @@
+/* The boxer artwork is the focal object, with the page pattern visible through its cutout. */
+#marca-subaru figure.engine-sketch {
+  width: 100% !important;
+  height: clamp(280px, 24vw, 450px) !important;
+  margin: 0 auto 7px !important;
+  overflow: visible !important;
+  background: none !important;
+}
+#marca-subaru .engine-sketch img,
+#marca-subaru .engine-sketch.is-revving img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  transform: translateY(0) rotate(-.4deg) !important;
+  transform-origin: 50% 58% !important;
+  animation: boxer-idle 6.8s ease-in-out infinite !important;
+  filter: drop-shadow(0 17px 15px rgba(31, 55, 70, .18)) drop-shadow(0 4px 4px rgba(16, 46, 62, .1)) !important;
+}
+#marca-subaru .engine-sketch::before,
+#marca-subaru .engine-sketch.is-revving::before {
+  top: 77% !important;
+  width: 62% !important;
+  height: 13% !important;
+  background: radial-gradient(ellipse, rgba(27, 63, 88, .15), transparent 72%) !important;
+  filter: blur(13px) !important;
+  opacity: .6 !important;
+  animation: boxer-ground 6.8s ease-in-out infinite !important;
+}
+#marca-subaru .engine-sketch::after,
+#marca-subaru .engine-sketch.is-revving::after {
+  display: none !important;
+  content: none !important;
+  animation: none !important;
+}
+#marca-subaru .engine-sketch figcaption { margin: 1px 0 0 !important; }
+
+@keyframes boxer-idle {
+  0%, 100% { transform: translateY(0) rotate(-.4deg); }
+  50% { transform: translateY(-9px) rotate(.55deg); }
+}
+@keyframes boxer-ground {
+  0%, 100% { opacity: .6; transform: translate(-50%, -50%) scale(1); }
+  50% { opacity: .42; transform: translate(-50%, -50%) scale(.91); }
+}
+@media (prefers-reduced-motion: reduce) {
+  #marca-subaru .engine-sketch img,
+  #marca-subaru .engine-sketch.is-revving img,
+  #marca-subaru .engine-sketch::before,
+  #marca-subaru .engine-sketch.is-revving::before { animation: none !important; transform: none !important; }
+}
+
+@media (max-width: 760px) {
+  #marca-subaru figure.engine-sketch {
+    width: min(100%, 450px) !important;
+    height: clamp(245px, 74vw, 330px) !important;
+    margin: 2px auto 8px !important;
+  }
+}
