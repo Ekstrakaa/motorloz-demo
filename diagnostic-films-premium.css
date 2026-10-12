@@ -291,6 +291,7 @@
   flex-direction: column;
   align-items: flex-start !important;
   justify-content: center !important;
+  gap: 0 !important;
   width: 100% !important;
   max-width: none !important;
   min-width: 0;
@@ -420,7 +421,6 @@
   .premium-rebuild > .films-section.section { width: calc(100% - 30px) !important; }
   .premium-rebuild .diagnostic-story-copy { padding: 23px !important; border-radius: 12px !important; }
   .premium-rebuild .diagnostic-story-copy h2 { margin-top: 17px !important; font-size: clamp(32px, 8.2vw, 38px) !important; }
-  .premium-rebuild .diagnostic-story-copy h2 br { display: none; }
   .premium-rebuild .diagnostic-story-copy > p:not(.eyebrow) { font-size: 12px !important; line-height: 1.62 !important; }
   .premium-rebuild .diagnostic-story-copy .button.outline { width: 100%; min-height: 47px !important; margin-top: 20px !important; font-size: 11px !important; }
   .premium-rebuild .diagnostic-benefits { gap: 6px; margin-top: 22px; padding-top: 14px; }
