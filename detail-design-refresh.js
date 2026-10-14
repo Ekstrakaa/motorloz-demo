@@ -128,6 +128,8 @@
     let activeIndex = 0;
     let visible = !('IntersectionObserver' in window);
     let changing = false;
+    let pendingAdvance = -1;
+    let holdTimer = 0;
     const transitionTime = 900;
 
     hyundaiFilms.forEach((film, index) => {
@@ -137,6 +139,8 @@
       film.controls = false;
       film.loop = false;
       film.preload = 'auto';
+      const playbackRate = Number.parseFloat(hyundaiSlides[index].dataset.playbackRate || '1');
+      film.playbackRate = film.defaultPlaybackRate = Number.isFinite(playbackRate) ? playbackRate : 1;
       film.removeAttribute('controls');
       film.removeAttribute('loop');
       film.setAttribute('muted', '');
@@ -157,6 +161,12 @@
       hyundaiFilms.forEach((film, index) => {
         if (!canPlay() || index !== activeIndex) film.pause();
       });
+      if (canPlay() && pendingAdvance >= 0) {
+        const nextIndex = pendingAdvance;
+        pendingAdvance = -1;
+        activate(nextIndex);
+        return;
+      }
       playActive();
     };
     const activate = nextIndex => {
@@ -195,7 +205,17 @@
       });
     };
     hyundaiFilms.forEach((film, index) => film.addEventListener('ended', () => {
-      if (index === activeIndex) activate((index + 1) % hyundaiFilms.length);
+      if (index !== activeIndex) return;
+      window.clearTimeout(holdTimer);
+      const nextIndex = (index + 1) % hyundaiFilms.length;
+      const holdAfter = Number.parseInt(hyundaiSlides[index].dataset.holdAfter || '0', 10);
+      const queueAdvance = () => {
+        if (index !== activeIndex) return;
+        pendingAdvance = nextIndex;
+        syncFilms();
+      };
+      if (holdAfter > 0) holdTimer = window.setTimeout(queueAdvance, holdAfter);
+      else queueAdvance();
     }));
     if ('IntersectionObserver' in window) {
       new IntersectionObserver(entries => {
