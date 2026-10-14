@@ -171,9 +171,10 @@
 .editorial-rebuild .why-motorloz > h2 em { color: #30d4e0 !important; font-style: normal; }
 .editorial-rebuild .why-motorloz > .why-subtitle { margin: 0 auto !important; color: #d4e2e3 !important; text-align: center !important; font-size: 13px !important; }
 .editorial-rebuild .why-grid { display: grid !important; grid-template-columns: repeat(3, minmax(0, 1fr)) !important; gap: 10px !important; width: min(100%, 1560px) !important; max-width: none !important; margin: 30px auto 0 !important; }
-.editorial-rebuild .why-grid .why-card { position: relative !important; display: grid !important; grid-template-columns: 92px minmax(0, 1fr) 32px !important; align-items: center !important; gap: 12px !important; min-width: 0 !important; min-height: 118px !important; padding: 12px 14px !important; border: 1px solid rgba(50, 185, 198, .52) !important; border-radius: 9px !important; background: linear-gradient(105deg, rgba(2, 25, 32, .88), rgba(0, 19, 26, .67)) !important; box-shadow: inset 0 1px rgba(191, 255, 255, .05), 0 8px 24px rgba(0, 0, 0, .16) !important; color: #fff !important; text-align: left !important; transition: border-color .25s, transform .25s, box-shadow .25s !important; }
+.editorial-rebuild .why-grid .why-card { position: relative !important; display: grid !important; grid-template-columns: 92px minmax(0, 1fr) 32px !important; align-items: center !important; gap: 12px !important; min-width: 0 !important; min-height: 118px !important; padding: 12px 14px !important; border: 0 !important; border-bottom: 1px solid rgba(93, 211, 222, .32) !important; border-radius: 0 !important; background: transparent !important; box-shadow: none !important; color: #fff !important; text-align: left !important; transition: border-color .25s, transform .25s !important; }
 .editorial-rebuild .why-grid .why-card:hover,
-.editorial-rebuild .why-grid .why-card:focus-visible { border-color: #6cebf2 !important; transform: translateY(-3px) !important; box-shadow: 0 12px 34px rgba(0, 0, 0, .25), 0 0 22px rgba(37, 215, 228, .15) !important; }
+.editorial-rebuild .why-grid .why-card:focus-visible { border-bottom-color: #6cebf2 !important; transform: translateY(-3px) !important; box-shadow: none !important; }
+.editorial-rebuild .why-grid .why-card:focus-visible { outline: 2px solid #6cebf2; outline-offset: 2px; }
 .editorial-rebuild .why-grid .why-card > .why-icon { grid-column: 1 !important; grid-row: 1 !important; align-self: center !important; justify-self: center !important; width: 90px !important; height: 90px !important; background-color: transparent !important; border: 0 !important; box-shadow: none !important; -webkit-mask-image: radial-gradient(ellipse 65% 65% at center, #000 54%, transparent 100%); mask-image: radial-gradient(ellipse 65% 65% at center, #000 54%, transparent 100%); }
 .editorial-rebuild .why-grid .why-card:nth-child(3) > .why-icon { background-position: 33.333% 100% !important; }
 .editorial-rebuild .why-grid .why-card:nth-child(4) > .why-icon { background-position: 66.666% 33.333% !important; }
@@ -200,11 +201,11 @@
   .editorial-rebuild .people .team-story .slide-toolbar { padding: 5px 9px !important; }
   .editorial-rebuild .people .team-story .slide-caption { font-size: 9px !important; }
   .editorial-rebuild .people-media-caption { margin-top: 8px; font-size: 7px; }
-  .editorial-rebuild .people-text { grid-row: 2 !important; }
-  .editorial-rebuild .people-text .eyebrow { margin-bottom: 11px !important; font-size: 8px !important; }
-  .editorial-rebuild .people-text h2 { margin-bottom: 14px !important; font-size: clamp(32px, 9vw, 43px) !important; line-height: 1.02 !important; }
-  .editorial-rebuild .people-text > p:not(.eyebrow) { font-size: 12.5px !important; line-height: 1.55 !important; }
-  .editorial-rebuild .people-actions { margin-top: 20px; }
+  .editorial-rebuild .people-text { grid-row: 2 !important; text-align: center !important; }
+  .editorial-rebuild .people-text .eyebrow { margin: 0 auto 11px !important; font-size: 8px !important; text-align: center !important; }
+  .editorial-rebuild .people-text h2 { margin: 0 auto 14px !important; font-size: clamp(32px, 9vw, 43px) !important; line-height: 1.02 !important; text-align: center !important; }
+  .editorial-rebuild .people-text > p:not(.eyebrow) { margin: 0 auto 12px !important; font-size: 12.5px !important; line-height: 1.55 !important; text-align: center !important; }
+  .editorial-rebuild .people-actions { justify-content: center; margin-top: 20px; }
   .editorial-rebuild .people-primary-action { min-width: min(100%, 190px); min-height: 44px; }
   .editorial-rebuild .people-facts { grid-row: 3; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; margin-top: 3px; padding: 13px 0 0; }
   .editorial-rebuild .people-facts > div { padding: 0 8px; }
