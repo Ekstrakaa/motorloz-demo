@@ -11,9 +11,9 @@
   width: 100% !important;
   height: 100% !important;
   object-fit: contain !important;
-  transform: translate3d(0, 0, 0) rotate(-.15deg) !important;
+  transform: translate3d(0, 0, 0) rotate(-.15deg);
   transform-origin: 50% 58% !important;
-  animation: boxer-idle 3.2s linear infinite !important;
+  animation: boxer-idle .72s linear infinite !important;
   filter: drop-shadow(0 17px 15px rgba(31, 55, 70, .18)) drop-shadow(0 4px 4px rgba(16, 46, 62, .1)) !important;
 }
 #marca-subaru .engine-sketch::before,
@@ -24,7 +24,7 @@
   background: radial-gradient(ellipse, rgba(27, 63, 88, .15), transparent 72%) !important;
   filter: blur(13px) !important;
   opacity: .6 !important;
-  animation: boxer-ground 3.2s linear infinite !important;
+  animation: boxer-ground .72s linear infinite !important;
 }
 #marca-subaru .engine-sketch::after,
 #marca-subaru .engine-sketch.is-revving::after {
@@ -35,14 +35,20 @@
 #marca-subaru .engine-sketch figcaption { margin: 1px 0 0 !important; }
 
 @keyframes boxer-idle {
-  0%, 8%, 16%, 24%, 64%, 72%, 80%, 88%, 100% { transform: translate3d(0, 0, 0) rotate(-.15deg); }
-  4%, 12%, 20%, 68%, 76%, 84% { transform: translate3d(.8px, -.45px, 0) rotate(-.04deg); }
-  28%, 34%, 40%, 46%, 52%, 58% { transform: translate3d(-1.35px, .55px, 0) rotate(-.28deg); }
-  31%, 37%, 43%, 49%, 55%, 61% { transform: translate3d(1.2px, -.7px, 0) rotate(.02deg); }
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(-.12deg) scale(1); }
+  12% { transform: translate3d(-2.1px, .7px, 0) rotate(.08deg) scale(1.002); }
+  24% { transform: translate3d(1.7px, -1.1px, 0) rotate(-.22deg) scale(1); }
+  37% { transform: translate3d(-1.5px, .8px, 0) rotate(.1deg) scale(1.002); }
+  50% { transform: translate3d(2.2px, -.8px, 0) rotate(-.24deg) scale(1); }
+  63% { transform: translate3d(-1.8px, 1px, 0) rotate(.09deg) scale(1.002); }
+  76% { transform: translate3d(1.6px, -1.2px, 0) rotate(-.2deg) scale(1); }
+  88% { transform: translate3d(-2px, .6px, 0) rotate(.08deg) scale(1.002); }
 }
 @keyframes boxer-ground {
-  0%, 24%, 64%, 100% { opacity: .56; transform: translate(-50%, -50%) scaleX(1); }
-  40%, 52% { opacity: .63; transform: translate(-50%, -50%) scaleX(1.018); }
+  0%, 100% { opacity: .56; transform: translate(-50%, -50%) scaleX(1); }
+  25% { opacity: .63; transform: translate(-50%, -50%) scaleX(1.025) scaleY(.96); }
+  50% { opacity: .58; transform: translate(-50%, -50%) scaleX(.992); }
+  75% { opacity: .64; transform: translate(-50%, -50%) scaleX(1.022) scaleY(.965); }
 }
 @media (prefers-reduced-motion: reduce) {
   #marca-subaru .engine-sketch img,

@@ -16,6 +16,6 @@
   if (!root.classList.contains('brand-intro-active')) { dismiss(); return; }
   document.addEventListener('keydown', onKey);
   // CSS also dismisses the overlay, even if this script cannot finish loading.
-  timer = setTimeout(dismiss, 3200);
+  timer = setTimeout(dismiss, 4050);
   window.addEventListener('pageshow', event => { if (event.persisted) dismiss(); });
 })();

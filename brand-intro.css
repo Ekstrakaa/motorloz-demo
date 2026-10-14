@@ -1,56 +1,92 @@
-/* A restrained three-second ident built around Pablo Lozano's original lockup. */
-.brand-intro { display:none; }
+/* Cinematic workshop ident using the original Pablo Lozano lockup. */
+.brand-intro { display: none; }
 .brand-intro-active .brand-intro {
-  position:fixed;inset:0;z-index:10000;display:grid!important;place-items:center;
-  padding:32px;color:#eff9f8;background:#070d10;isolation:isolate;overflow:hidden;
-  animation:brand-studio-out 3.15s cubic-bezier(.22,.7,.22,1) both;
+  position: fixed; inset: 0; z-index: 10000; display: grid !important; place-items: center;
+  overflow: hidden; padding: clamp(24px, 4vw, 58px); color: #f2f7f6; background: #071013;
+  isolation: isolate; animation: brand-studio-out 4s cubic-bezier(.65, 0, .35, 1) both;
 }
-html.brand-intro-active { scrollbar-color:#070d10 #070d10; }
+html.brand-intro-active { scrollbar-color: #071013 #071013; }
 .brand-intro-atmosphere {
-  position:absolute;z-index:-1;inset:0;pointer-events:none;
-  background:linear-gradient(180deg,rgba(7,13,16,.66) 0%,rgba(7,13,16,.4) 42%,rgba(7,13,16,.44) 70%,rgba(7,13,16,.76) 100%),
-    linear-gradient(90deg,rgba(7,13,16,.36),rgba(7,13,16,.14) 42%,rgba(7,13,16,.15) 63%,rgba(7,13,16,.36)),
-    url('assets/taller-interior-overview.webp') center 45%/cover;
-  animation:brand-atmosphere 2.65s cubic-bezier(.2,.7,.2,1) both;
+  position: absolute; z-index: -3; inset: -2.5%; pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(3, 9, 11, .74) 0%, rgba(3, 10, 12, .38) 43%, rgba(3, 10, 12, .53) 72%, rgba(3, 9, 11, .88) 100%),
+    linear-gradient(90deg, rgba(2, 8, 10, .62), rgba(2, 8, 10, .08) 38%, rgba(2, 8, 10, .1) 62%, rgba(2, 8, 10, .62)),
+    url('assets/taller-interior-overview.webp') center 45% / cover no-repeat;
+  animation: brand-atmosphere 3.55s cubic-bezier(.18, .72, .18, 1) both;
+}
+.brand-intro-atmosphere::before, .brand-intro-atmosphere::after { content: ""; position: absolute; inset: 0; }
+.brand-intro-atmosphere::before {
+  background: linear-gradient(rgba(129, 202, 207, .035) 1px, transparent 1px), linear-gradient(90deg, rgba(129, 202, 207, .035) 1px, transparent 1px);
+  background-size: 72px 72px; mask-image: linear-gradient(to bottom, transparent, #000 24%, #000 72%, transparent);
+  opacity: 0; animation: brand-grid-arrive .9s ease 1.15s forwards;
 }
 .brand-intro-atmosphere::after {
-  content:"";position:absolute;inset:0;
-  background:radial-gradient(ellipse at 50% 48%,rgba(5,11,13,.48) 0%,rgba(5,11,13,.32) 30%,transparent 66%),
-    radial-gradient(ellipse at 50% 44%,rgba(45,165,180,.1),transparent 60%);
+  background: radial-gradient(ellipse at 50% 51%, rgba(2, 10, 12, .2) 0%, rgba(2, 9, 11, .42) 49%, rgba(2, 7, 9, .68) 100%), linear-gradient(105deg, transparent 36%, rgba(134, 219, 222, .06) 48%, transparent 59%);
+  background-size: auto, 220% 100%; animation: brand-light-pass 3.15s ease .25s both;
 }
-.brand-intro-studio { position:relative;width:min(680px,85vw); }
-.brand-intro-lockup { position:relative;width:100%;aspect-ratio:3/1; }
-.brand-intro-lockup img { position:absolute;inset:0;display:block;width:100%;height:100%;max-width:none;object-fit:contain; }
-.brand-intro-caption {
-  position:relative;margin:23px 0 0;text-align:center;color:#d0dcdd;
-  font:400 clamp(13px,1.3vw,16px)/1.6 var(--body,"Segoe UI",sans-serif);letter-spacing:.035em;
-  animation:brand-caption-arrive .58s ease 1.18s both;
+.brand-intro-aperture { position: absolute; inset: clamp(25px, 4vw, 58px); z-index: -1; pointer-events: none; opacity: .82; animation: brand-details-arrive .7s ease .45s both; }
+.brand-intro-aperture i { position: absolute; width: clamp(31px, 3.2vw, 54px); height: clamp(31px, 3.2vw, 54px); border-color: rgba(111, 207, 214, .62); border-style: solid; }
+.brand-intro-aperture i:nth-child(1) { top: 0; left: 0; border-width: 1px 0 0 1px; }
+.brand-intro-aperture i:nth-child(2) { top: 0; right: 0; border-width: 1px 1px 0 0; }
+.brand-intro-aperture i:nth-child(3) { right: 0; bottom: 0; border-width: 0 1px 1px 0; }
+.brand-intro-aperture i:nth-child(4) { bottom: 0; left: 0; border-width: 0 0 1px 1px; }
+.brand-intro-studio { position: relative; width: min(710px, 82vw); transform: translateY(-1.5vh); text-align: center; }
+.brand-intro-kicker { margin: 0 0 21px; color: rgba(220, 234, 234, .75); font: 600 9px/1.4 var(--mono, "Consolas", monospace); letter-spacing: .3em; animation: brand-details-arrive .6s ease .7s both; }
+.brand-intro-kicker span { color: #70cbd2; }
+.brand-intro-lockup { position: relative; width: 100%; aspect-ratio: 3 / 1; clip-path: inset(0 50% 0 50%); filter: drop-shadow(0 18px 34px rgba(0, 0, 0, .28)); animation: brand-logo-reveal .92s cubic-bezier(.16, .78, .22, 1) .48s forwards; }
+.brand-intro-lockup img { position: absolute; inset: 0; display: block; width: 100%; height: 100%; max-width: none; object-fit: contain; opacity: 0; transform: scale(.945); animation: brand-mark-settle 1.15s cubic-bezier(.16, .78, .22, 1) .36s forwards; }
+.brand-intro-rule { position: relative; width: min(270px, 46%); height: 1px; margin: 5px auto 0; overflow: visible; background: rgba(191, 221, 223, .18); transform: scaleX(0); animation: brand-rule-draw .72s cubic-bezier(.16, .78, .22, 1) 1.18s forwards; }
+.brand-intro-rule span { position: absolute; top: -2px; left: 50%; width: 5px; height: 5px; border-radius: 50%; background: #6bc6cc; box-shadow: 0 0 12px rgba(107, 198, 204, .45); transform: translateX(-50%); }
+.brand-intro-caption { margin: 19px 0 0; color: #d2dddd; font: 400 clamp(13px, 1.2vw, 16px)/1.55 var(--body, "Segoe UI", sans-serif); letter-spacing: .055em; animation: brand-caption-arrive .66s ease 1.38s both; }
+.brand-intro-signature { position: absolute; right: max(32px, env(safe-area-inset-right)); bottom: max(28px, env(safe-area-inset-bottom)); left: max(32px, env(safe-area-inset-left)); display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 20px; padding-top: 16px; border-top: 1px solid rgba(175, 212, 216, .16); color: rgba(187, 207, 209, .67); font: 8px/1.5 var(--mono, "Consolas", monospace); letter-spacing: .19em; animation: brand-details-arrive .62s ease .9s both; }
+.brand-intro-signature > span:first-child { text-align: left; }
+.brand-intro-signature > span:last-child { text-align: right; }
+.brand-intro-status { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; color: rgba(218, 232, 233, .78); }
+.brand-intro-status i { width: 5px; height: 5px; border-radius: 50%; background: #6bc6cc; animation: brand-status-pulse 1.7s ease-in-out infinite; }
+/* This ident deliberately outranks older site-wide logo treatments loaded later. */
+html.brand-intro-active .brand-intro .brand-intro-studio { width: min(710px, 82vw) !important; }
+html.brand-intro-active .brand-intro .brand-intro-lockup.brand-intro-original {
+  width: min(650px, 76vw) !important;
+  aspect-ratio: 3 / 1 !important;
+  clip-path: inset(0 50% 0 50%);
+  animation: brand-logo-reveal .92s cubic-bezier(.16, .78, .22, 1) .48s forwards !important;
 }
-.brand-intro-caption::before { content:"";display:block;width:30px;height:1px;margin:0 auto 16px;background:#70b8c3; }
-.brand-intro-signature {
-  position:absolute;left:max(32px,env(safe-area-inset-left));right:max(32px,env(safe-area-inset-right));
-  bottom:max(29px,env(safe-area-inset-bottom));display:flex;justify-content:space-between;gap:16px;
-  padding-top:17px;border-top:1px solid rgba(186,214,219,.2);color:#9aadb0;
-  font:9px/1.5 var(--mono,"Consolas",monospace);letter-spacing:.16em;
-  animation:brand-caption-arrive .58s ease .7s both;
+html.brand-intro-active .brand-intro .brand-intro-lockup.brand-intro-original img {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  opacity: 0;
+  clip-path: none !important;
+  filter: drop-shadow(0 18px 34px rgba(0, 0, 0, .28)) !important;
+  animation: brand-mark-settle 1.15s cubic-bezier(.16, .78, .22, 1) .36s forwards !important;
 }
-@keyframes brand-caption-arrive { from { opacity:0;transform:translateY(5px); } to { opacity:1;transform:none; } }
-@keyframes brand-atmosphere {
-  from { opacity:0;transform:scale(1.04);filter:blur(5px) brightness(.70); }
-  55% { opacity:1;filter:blur(2px) brightness(.79); }
-  to { opacity:1;transform:scale(1.02);filter:blur(1.2px) brightness(.82); }
+html.brand-intro-active .brand-intro .brand-intro-lockup.brand-intro-original::after { display: none !important; }
+html.brand-intro-active .brand-intro .brand-intro-studio::before { opacity: .18 !important; animation: brand-details-arrive .8s ease .65s both !important; }
+@keyframes brand-logo-reveal { to { clip-path: inset(0); } }
+@keyframes brand-mark-settle { from { opacity: 0; transform: scale(.945); } to { opacity: 1; transform: scale(1); } }
+@keyframes brand-caption-arrive { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes brand-details-arrive { from { opacity: 0; } to { opacity: 1; } }
+@keyframes brand-grid-arrive { to { opacity: .52; } }
+@keyframes brand-rule-draw { to { transform: scaleX(1); } }
+@keyframes brand-status-pulse { 50% { opacity: .35; } }
+@keyframes brand-light-pass { from { background-position: center, 100% 0; } to { background-position: center, -110% 0; } }
+@keyframes brand-atmosphere { from { opacity: 0; transform: scale(1.055); filter: blur(7px) brightness(.62); } 38% { opacity: 1; filter: blur(2px) brightness(.78); } to { opacity: 1; transform: scale(1.012); filter: blur(.25px) brightness(.84); } }
+@keyframes brand-studio-out { 0%, 86% { opacity: 1; visibility: visible; } 98% { opacity: 0; visibility: visible; pointer-events: none; } 100% { opacity: 0; visibility: hidden; pointer-events: none; } }
+@media (max-width: 760px) {
+  .brand-intro-active .brand-intro { padding: 22px; }
+  .brand-intro-atmosphere { background-position: center, center, 42% center; }
+  .brand-intro-atmosphere::before { background-size: 46px 46px; }
+  .brand-intro-aperture { inset: 20px; }
+  .brand-intro-studio { width: min(500px, 91vw); transform: translateY(-2vh); }
+  .brand-intro-kicker { margin-bottom: 18px; font-size: 8px; letter-spacing: .22em; }
+  .brand-intro-lockup { aspect-ratio: 2.72 / 1; }
+  .brand-intro-rule { width: min(190px, 48%); margin-top: 7px; }
+  .brand-intro-caption { margin-top: 18px; font-size: 13px; }
+  .brand-intro-signature { right: 22px; bottom: max(22px, env(safe-area-inset-bottom)); left: 22px; grid-template-columns: 1fr 1fr; padding-top: 12px; font-size: 7px; letter-spacing: .11em; }
+  .brand-intro-status { display: none; }
+  html.brand-intro-active .brand-intro .brand-intro-studio { width: min(500px, 91vw) !important; }
+  html.brand-intro-active .brand-intro .brand-intro-lockup.brand-intro-original { width: min(430px, 84vw) !important; aspect-ratio: 2.72 / 1 !important; }
 }
-@keyframes brand-studio-out {
-  0%,82% { opacity:1;visibility:visible; }
-  98% { opacity:0;visibility:visible;pointer-events:none; }
-  100% { opacity:0;visibility:hidden;pointer-events:none; }
-}
-@media(max-width:760px) {
-  .brand-intro-active .brand-intro { padding:24px; }
-  .brand-intro-studio { width:min(500px,87vw); }
-  .brand-intro-caption { margin-top:28px;font-size:13px; }
-  .brand-intro-signature { left:24px;right:24px;font-size:8px;letter-spacing:.09em; }
-  .brand-intro-atmosphere { background-position:center,center,42% center; }
-}
-@media(max-width:350px) { .brand-intro-signature { font-size:7px;gap:10px; } }
-@media(prefers-reduced-motion:reduce) { .brand-intro-active .brand-intro { display:none!important;animation:none; } }
+@media (max-width: 350px) { .brand-intro-signature { gap: 8px; font-size: 6.5px; } }
+@media (prefers-reduced-motion: reduce) { .brand-intro-active .brand-intro { display: none !important; animation: none; } }
