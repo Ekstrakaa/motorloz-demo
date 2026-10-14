@@ -104,7 +104,7 @@
     align-items: center;
     min-height: 112px;
     margin-bottom: 0 !important;
-    padding-left: 205px;
+    padding-left: 300px;
     font-size: 11px;
     letter-spacing: .28em;
     text-align: left;
@@ -112,14 +112,14 @@
   #hyundai .hyundai-copy .hyundai-badge { display: none !important; }
   #hyundai .hyundai-emblem {
     position: absolute;
-    top: 0;
+    top: -56px;
     right: auto;
     left: 0;
-    width: 190px !important;
-    height: 112px;
+    width: 285px !important;
+    height: 168px;
     margin: 0 !important;
   }
-  #hyundai .hyundai-emblem img { width: 190px !important; height: 112px !important; }
+  #hyundai .hyundai-emblem img { width: 285px !important; height: 168px !important; }
   #hyundai .hyundai-copy h2 {
     width: 100%;
     max-width: 16ch;
