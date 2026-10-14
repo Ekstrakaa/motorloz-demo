@@ -98,8 +98,8 @@ test('Hyundai official section preloads the Santa Fe and HB20 films as one seque
   assert.equal((official.match(/hyundai-video-slide/g) || []).length, 2);
   assert.ok(official.includes('cinema-hyundai-natural.mp4'));
   assert.ok(official.includes('cinema-hyundai-hb20.mp4'));
-  assert.ok(official.includes('data-playback-rate="0.8"'));
-  assert.ok(official.includes('data-hold-after="3000"'));
+  assert.ok(!official.includes('data-playback-rate='));
+  assert.ok(!official.includes('data-hold-after='));
   assert.equal((official.match(/\sloop(?:\s|>)/g) || []).length, 0);
   assert.ok(fs.statSync(__dirname + '/../assets/cinema-hyundai-hb20.mp4').size > 500000);
   assert.ok(html.includes('cinema-subaru-natural.mp4'));
