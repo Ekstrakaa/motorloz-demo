@@ -122,47 +122,92 @@
     if (count) count.textContent = `${String(i + 1).padStart(2, '0')} / ${String(n).padStart(2, '0')}`;
   });
   const hyundaiGallery = document.querySelector('#hyundai .hyundai-vehicle-scene');
-  const hyundaiFilm = hyundaiGallery?.querySelector('video');
-  if (hyundaiGallery && hyundaiFilm) {
-    // Keep the Santa Fe film as the section's single video.
-    const activeSlide = hyundaiFilm.closest('.hyundai-video-slide') || hyundaiFilm;
-    activeSlide.replaceChildren(hyundaiFilm);
-    [...hyundaiGallery.children].forEach(child => { if (child !== activeSlide) child.remove(); });
-    hyundaiFilm.muted = hyundaiFilm.defaultMuted = true;
-    hyundaiFilm.autoplay = true;
-    hyundaiFilm.playsInline = true;
-    hyundaiFilm.controls = false;
-    hyundaiFilm.loop = true;
-    hyundaiFilm.removeAttribute('controls');
-    hyundaiFilm.setAttribute('loop', '');
-    hyundaiFilm.setAttribute('autoplay', '');
-    hyundaiFilm.setAttribute('muted', '');
-    hyundaiFilm.setAttribute('playsinline', '');
-    hyundaiFilm.setAttribute('webkit-playsinline', '');
-    let visible = false;
-    const startFilm = () => {
-      if (!visible || document.hidden || !hyundaiFilm.paused) return;
-      hyundaiFilm.play().catch(() => {});
+  const hyundaiSlides = hyundaiGallery ? [...hyundaiGallery.querySelectorAll('.hyundai-video-slide')] : [];
+  const hyundaiFilms = hyundaiSlides.map(slide => slide.querySelector('video')).filter(Boolean);
+  if (hyundaiGallery && hyundaiFilms.length) {
+    let activeIndex = 0;
+    let visible = !('IntersectionObserver' in window);
+    let changing = false;
+    const transitionTime = 900;
+
+    hyundaiFilms.forEach((film, index) => {
+      film.muted = film.defaultMuted = true;
+      film.autoplay = index === 0;
+      film.playsInline = true;
+      film.controls = false;
+      film.loop = false;
+      film.preload = 'auto';
+      film.removeAttribute('controls');
+      film.removeAttribute('loop');
+      film.setAttribute('muted', '');
+      film.setAttribute('playsinline', '');
+      film.setAttribute('webkit-playsinline', '');
+      film.setAttribute('disablepictureinpicture', '');
+      if (index === 0) film.setAttribute('autoplay', '');
+      else film.removeAttribute('autoplay');
+    });
+
+    const canPlay = () => visible && !document.hidden && !document.documentElement.classList.contains('assistant-chat-open');
+    const playActive = () => {
+      if (!canPlay()) return;
+      const film = hyundaiFilms[activeIndex];
+      if (film.paused && !film.ended) film.play().catch(() => {});
     };
-    const syncFilm = () => {
-      if (!visible || document.hidden) { hyundaiFilm.pause(); return; }
-      startFilm();
+    const syncFilms = () => {
+      hyundaiFilms.forEach((film, index) => {
+        if (!canPlay() || index !== activeIndex) film.pause();
+      });
+      playActive();
     };
+    const activate = nextIndex => {
+      if (changing || !hyundaiSlides[nextIndex]) return;
+      changing = true;
+      const previousIndex = activeIndex;
+      const previousSlide = hyundaiSlides[previousIndex];
+      const nextSlide = hyundaiSlides[nextIndex];
+      const nextFilm = hyundaiFilms[nextIndex];
+      nextFilm.currentTime = 0;
+      const reveal = () => {
+        nextFilm.removeEventListener('playing', reveal);
+        nextSlide.classList.add('is-active');
+        nextSlide.removeAttribute('aria-hidden');
+        previousSlide.classList.remove('is-active');
+        previousSlide.setAttribute('aria-hidden', 'true');
+        activeIndex = nextIndex;
+        changing = false;
+        window.setTimeout(() => {
+          if (activeIndex !== previousIndex) {
+            hyundaiFilms[previousIndex].pause();
+            hyundaiFilms[previousIndex].currentTime = 0;
+          }
+        }, transitionTime);
+      };
+      nextFilm.addEventListener('playing', reveal, { once: true });
+      nextFilm.play().catch(() => {
+        nextFilm.removeEventListener('playing', reveal);
+        changing = false;
+        previousSlide.classList.add('is-active');
+        previousSlide.removeAttribute('aria-hidden');
+        if (canPlay()) {
+          hyundaiFilms[previousIndex].currentTime = 0;
+          hyundaiFilms[previousIndex].play().catch(() => {});
+        }
+      });
+    };
+    hyundaiFilms.forEach((film, index) => film.addEventListener('ended', () => {
+      if (index === activeIndex) activate((index + 1) % hyundaiFilms.length);
+    }));
     if ('IntersectionObserver' in window) {
       new IntersectionObserver(entries => {
         visible = entries[0].isIntersecting;
-        syncFilm();
-      }, { threshold: .12 }).observe(hyundaiGallery);
-    } else {
-      visible = true;
-      syncFilm();
-    }
-    document.addEventListener('visibilitychange', syncFilm);
-    window.addEventListener('pageshow', syncFilm);
-    window.addEventListener('focus', startFilm);
-    hyundaiFilm.addEventListener('canplay', startFilm);
-    hyundaiFilm.addEventListener('stalled', startFilm);
-    document.addEventListener('pointerdown', startFilm, { passive: true });
+        syncFilms();
+      }, { threshold: .12, rootMargin: '100px 0px' }).observe(hyundaiGallery);
+    } else syncFilms();
+    document.addEventListener('visibilitychange', syncFilms);
+    window.addEventListener('pageshow', syncFilms);
+    window.addEventListener('focus', playActive);
+    window.addEventListener('motorloz:chat-visibility', syncFilms);
+    document.addEventListener('pointerdown', playActive, { passive: true });
   }
   const hyundaiEmblem = document.querySelector('.hyundai-signature .hyundai-emblem');
   if (hyundaiEmblem && !matchMedia('(prefers-reduced-motion: reduce)').matches) {

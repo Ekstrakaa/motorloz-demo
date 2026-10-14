@@ -1,4 +1,4 @@
-/* One Santa Fe film over one continuous photographic garage environment. */
+/* Santa Fe and HB20 share one continuous photographic garage environment. */
 #hyundai.hyundai-signature {
   background-color: #06131c !important;
   background-image:
@@ -24,6 +24,15 @@
 #hyundai .hyundai-gallery.hyundai-vehicle-scene .hyundai-image {
   overflow: hidden !important;
   background: transparent !important;
+  z-index: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .9s cubic-bezier(.33, 1, .68, 1);
+  will-change: opacity;
+}
+#hyundai .hyundai-gallery.hyundai-vehicle-scene .hyundai-image.is-active {
+  z-index: 1;
+  opacity: 1;
 }
 #hyundai .hyundai-gallery.hyundai-vehicle-scene .hyundai-image > video {
   background: transparent !important;
@@ -181,6 +190,7 @@
 }
 @keyframes chapter-action-shine { 0%, 64% { transform: skewX(-22deg) translateX(-180%); } 86%, 100% { transform: skewX(-22deg) translateX(580%); } }
 @media (prefers-reduced-motion: reduce) {
+  #hyundai .hyundai-gallery.hyundai-vehicle-scene .hyundai-image { transition-duration: .01ms; }
   #hyundai .hyundai-service-action::before,
   #marca-subaru .subaru-service-action::before { animation: none !important; }
 }

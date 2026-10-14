@@ -91,11 +91,14 @@ test('the home sequence moves from a video to a photo with a three-second hold',
   assert.ok([...h.timers.values()].some(timer => timer.ms === 3000));
 });
 
-test('Hyundai official section has one film, outside the photo rail', () => {
+test('Hyundai official section preloads the Santa Fe and HB20 films as one sequence', () => {
   const html = fs.readFileSync(__dirname + '/../index.html', 'utf8');
   const official = html.match(/<div class="hyundai-gallery(?:\s[^"]*)?"[\s\S]*?<\/div>/)?.[0] || '';
-  assert.equal((official.match(/<video\b/g) || []).length, 1);
-  assert.equal((official.match(/hyundai-video-slide/g) || []).length, 1);
+  assert.equal((official.match(/<video\b/g) || []).length, 2);
+  assert.equal((official.match(/hyundai-video-slide/g) || []).length, 2);
   assert.ok(official.includes('cinema-hyundai-natural.mp4'));
+  assert.ok(official.includes('cinema-hyundai-hb20.mp4'));
+  assert.equal((official.match(/\sloop(?:\s|>)/g) || []).length, 0);
+  assert.ok(fs.statSync(__dirname + '/../assets/cinema-hyundai-hb20.mp4').size > 500000);
   assert.ok(html.includes('cinema-subaru-natural.mp4'));
 });
