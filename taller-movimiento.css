@@ -70,13 +70,14 @@
   display: block;
   width: 100%;
   aspect-ratio: 1;
-  object-fit: cover;
+  object-fit: contain;
   object-position: center;
+  background: #e8eeee;
   transition: transform .6s cubic-bezier(.2,.75,.25,1);
 }
 
 .taller-movimiento figure:hover img {
-  transform: scale(1.045);
+  transform: none;
 }
 
 .taller-movimiento figcaption {
