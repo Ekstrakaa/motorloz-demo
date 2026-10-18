@@ -24,12 +24,6 @@ html.brand-intro-active { scrollbar-color: #071013 #071013; }
   background: radial-gradient(ellipse at 50% 51%, rgba(2, 10, 12, .2) 0%, rgba(2, 9, 11, .42) 49%, rgba(2, 7, 9, .68) 100%), linear-gradient(105deg, transparent 36%, rgba(134, 219, 222, .06) 48%, transparent 59%);
   background-size: auto, 220% 100%; animation: brand-light-pass 3.15s ease .25s both;
 }
-.brand-intro-aperture { position: absolute; inset: clamp(25px, 4vw, 58px); z-index: -1; pointer-events: none; opacity: .82; animation: brand-details-arrive .7s ease .45s both; }
-.brand-intro-aperture i { position: absolute; width: clamp(31px, 3.2vw, 54px); height: clamp(31px, 3.2vw, 54px); border-color: rgba(111, 207, 214, .62); border-style: solid; }
-.brand-intro-aperture i:nth-child(1) { top: 0; left: 0; border-width: 1px 0 0 1px; }
-.brand-intro-aperture i:nth-child(2) { top: 0; right: 0; border-width: 1px 1px 0 0; }
-.brand-intro-aperture i:nth-child(3) { right: 0; bottom: 0; border-width: 0 1px 1px 0; }
-.brand-intro-aperture i:nth-child(4) { bottom: 0; left: 0; border-width: 0 0 1px 1px; }
 .brand-intro-studio { position: relative; width: min(710px, 82vw); transform: translateY(-1.5vh); text-align: center; }
 .brand-intro-kicker { margin: 0 0 21px; color: rgba(220, 234, 234, .75); font: 600 9px/1.4 var(--mono, "Consolas", monospace); letter-spacing: .3em; animation: brand-details-arrive .6s ease .7s both; }
 .brand-intro-kicker span { color: #70cbd2; }
@@ -77,7 +71,6 @@ html.brand-intro-active .brand-intro .brand-intro-studio::before { opacity: .18 
   .brand-intro-active .brand-intro { padding: 22px; }
   .brand-intro-atmosphere { background-position: center, center, 42% center; }
   .brand-intro-atmosphere::before { background-size: 46px 46px; }
-  .brand-intro-aperture { inset: 20px; }
   .brand-intro-studio { width: min(500px, 91vw); transform: translateY(-2vh); }
   .brand-intro-kicker { margin-bottom: 18px; font-size: 8px; letter-spacing: .22em; }
   .brand-intro-lockup { aspect-ratio: 2.72 / 1; }
